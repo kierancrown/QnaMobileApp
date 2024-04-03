@@ -7,11 +7,17 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "adb": "adb reverse tcp:8081 tcp:8081",
+    "codegen": "npx supabase gen types typescript --project-id \"rvnfizvcmzyorjkzgchr\" --schema public > src/types/supabase.ts"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@supabase/supabase-js": "^2.42.0",
     "react": "18.2.0",
-    "react-native": "0.73.6"
+    "react-native": "0.73.6",
+    "react-native-dotenv": "^3.4.11",
+    "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
