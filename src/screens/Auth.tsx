@@ -42,7 +42,8 @@ const Auth: FC = () => {
           <TextInput
             value={email}
             onChangeText={setEmail}
-            style={styles.input}
+            style={[styles.input, {color: theme.colors.foreground}]}
+            cursorColor={theme.colors.foreground}
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -52,7 +53,8 @@ const Auth: FC = () => {
           <TextInput
             value={password}
             onChangeText={setPassword}
-            style={styles.input}
+            style={[styles.input, {color: theme.colors.foreground}]}
+            cursorColor={theme.colors.foreground}
             placeholder="Password"
             secureTextEntry
             autoCapitalize="none"

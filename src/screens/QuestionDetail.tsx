@@ -180,6 +180,13 @@ const QuestionDetail: FC = () => {
                     onRefresh={refreshResponses}
                   />
                 }
+                ListEmptyComponent={
+                  <Center flex={1}>
+                    <Text variant="medium" my="xlY" color="cardText">
+                      No responses yet
+                    </Text>
+                  </Center>
+                }
                 refreshing={responsesLoading}
                 onRefresh={refreshResponses}
                 contentContainerStyle={{
