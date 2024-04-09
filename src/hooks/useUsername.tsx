@@ -1,13 +1,23 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
-import {Database} from 'app/types/supabase';
-
-type Username = Database['public']['Tables']['usernames']['Row'];
+import {setUsernameCache} from 'app/redux/slices/authSlice';
+import {AppDispatch, RootState} from 'app/redux/store';
+import {useDispatch, useSelector} from 'react-redux';
 
 export const useUsername = () => {
-  const [username, setUsername] = useState<Username>();
   const {user} = useUser();
+  const username = useSelector(
+    (state: RootState) => state.persistent.auth.username,
+  );
+  const dispatch = useDispatch<AppDispatch>();
+
+  const setUsername = useCallback(
+    (value: Username | undefined) => {
+      dispatch(setUsernameCache(value));
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     if (!user) {
@@ -25,11 +35,10 @@ export const useUsername = () => {
           return;
         }
         if (data?.length > 0) {
-          console.log('data', JSON.stringify(data, null, 2));
           setUsername(data[0]);
         }
       });
-  }, [user]);
+  }, [setUsername, user]);
 
   const updateUsername = async (newUsername: string) => {
     if (!user) {

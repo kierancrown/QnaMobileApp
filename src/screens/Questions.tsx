@@ -2,7 +2,7 @@ import {Alert, Button} from 'react-native';
 import React, {FC, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
-import {resetAuth} from 'app/redux/slices/authSlice';
+import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
 import {Box, Center, Flex, HStack, Text, VStack} from 'ui';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -50,6 +50,7 @@ const Questions: FC = () => {
     dispatch(resetAuth());
     if (user) {
       supabase.auth.signOut();
+      dispatch(resetCache());
     }
   };
 
