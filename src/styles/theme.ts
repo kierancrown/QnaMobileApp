@@ -2,9 +2,20 @@ import {createTheme, useTheme} from '@shopify/restyle';
 import {s, vs, mvs} from 'react-native-size-matters';
 
 const palette = {
-  purpleLight: '#95cdfb',
-  purplePrimary: '#4fabf8',
-  purpleDark: '#2f6795',
+  primary: {
+    DEFAULT: '#84CC16',
+    50: '#D5F5A4',
+    100: '#CDF392',
+    200: '#BCEF6D',
+    300: '#ABEB48',
+    400: '#9AE723',
+    500: '#84CC16',
+    600: '#639911',
+    700: '#42670B',
+    800: '#223406',
+    900: '#010100',
+    950: '#000000',
+  },
 
   secondaryText: '#ddd',
 
@@ -17,8 +28,8 @@ const palette = {
   sheetBackdropLight: '#f5f5f5E0',
   sheetBackdropDark: '#2f2f2fE0',
 
-  cardBackgroundLight: '#f5f5f5A8',
-  cardBackgroundDark: '#2f2f2fA8',
+  cardBackgroundLight: '#f5f5f5',
+  cardBackgroundDark: '#2f2f2f',
 
   cardTextLight: '#2f2f2fA8',
   cardTextDark: '#f5f5f5A8',
@@ -52,45 +63,26 @@ const palette = {
   dividerLight: '#f5f5f5',
   dividerDark: '#2f2f2f',
 
-  airQualityIndex: {
-    low: {
-      light: '#16a34a',
-      dark: '#22c55e',
-    },
-    moderate: {
-      light: '#d97706',
-      dark: '#f59e0b',
-    },
-    high: {
-      light: '#dc2626',
-      dark: '#ef4444',
-    },
-    veryHigh: {
-      light: '#6b21a8',
-      dark: '#a855f7',
-    },
-  },
-
   black: '#0B0B0B',
   white: '#F0F2F3',
 };
 
 const theme = createTheme({
   colors: {
-    brand: palette.purplePrimary,
+    brand: palette.primary[600],
     // Actions
     successfulAction: palette.successfulActionLight,
     destructiveAction: palette.destructiveActionLight,
     bookmarkAction: palette.bookmarkActionLight,
     // Backgrounds
     mainBackground: palette.white,
-    cardBackground: palette.cardBackgroundLight,
+    cardBackground: palette.lightSecondaryBackground,
     sheetBackdrop: palette.sheetBackdropDark,
-    backdrop: palette.purpleLight,
+    backdrop: palette.primary[200],
     // Text
     foreground: palette.black,
     secondary: palette.secondaryText,
-    secondaryBrand: palette.purpleDark,
+    secondaryBrand: palette.primary[800],
     cardText: palette.cardTextLight,
     // Input
     inputBackground: palette.inputBackgroundLight,
@@ -109,11 +101,6 @@ const theme = createTheme({
     black: palette.black,
     // Skeleton
     skeleton: palette.skeletonLight,
-    // Air Quality
-    airQualityIndexLow: palette.airQualityIndex.low.light,
-    airQualityIndexModerate: palette.airQualityIndex.moderate.light,
-    airQualityIndexHigh: palette.airQualityIndex.high.light,
-    airQualityIndexVeryHigh: palette.airQualityIndex.veryHigh.light,
   },
   spacing: {
     xxxsMinus: s(-2),
@@ -263,17 +250,18 @@ const darkTheme: Theme = {
   ...theme,
   colors: {
     ...theme.colors,
+    brand: palette.primary.DEFAULT,
     // Actions
     successfulAction: palette.successfulActionDark,
     destructiveAction: palette.destructiveActionDark,
     bookmarkAction: palette.bookmarkActionDark,
     // Backgrounds
     mainBackground: palette.black,
-    cardBackground: palette.cardBackgroundDark,
-    backdrop: palette.purpleDark,
+    cardBackground: palette.darkSecondaryBackground,
+    backdrop: palette.primary[800],
     // Text
     foreground: palette.white,
-    secondaryBrand: palette.purpleLight,
+    secondaryBrand: palette.primary[200],
     cardText: palette.cardTextDark,
     // Input
     inputBackground: palette.inputBackgroundDark,
@@ -289,11 +277,6 @@ const darkTheme: Theme = {
     outline: palette.dividerLight,
     // Skeleton
     skeleton: palette.skeletonDark,
-    // Air Quality
-    airQualityIndexLow: palette.airQualityIndex.low.dark,
-    airQualityIndexModerate: palette.airQualityIndex.moderate.dark,
-    airQualityIndexHigh: palette.airQualityIndex.high.dark,
-    airQualityIndexVeryHigh: palette.airQualityIndex.veryHigh.dark,
   },
 };
 

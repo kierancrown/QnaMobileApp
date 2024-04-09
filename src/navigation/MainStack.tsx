@@ -17,7 +17,9 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
 
 const MainStack = () => {
   return (
-    <Stack.Navigator initialRouteName="Questions">
+    <Stack.Navigator
+      initialRouteName="Questions"
+      screenOptions={{headerShown: false}}>
       <Stack.Screen name="Questions" component={QuestionsScreen} />
     </Stack.Navigator>
   );

@@ -19,6 +19,7 @@ export type Database = {
           question: string;
           tags: number[];
           user_id: string;
+          username: string;
         };
         Insert: {
           attachments?: Json[] | null;
@@ -29,6 +30,7 @@ export type Database = {
           question: string;
           tags: number[];
           user_id?: string;
+          username: string;
         };
         Update: {
           attachments?: Json[] | null;
@@ -39,6 +41,7 @@ export type Database = {
           question?: string;
           tags?: number[];
           user_id?: string;
+          username?: string;
         };
         Relationships: [
           {
@@ -47,6 +50,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'users';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_questions_username_fkey';
+            columns: ['username'];
+            isOneToOne: false;
+            referencedRelation: 'usernames';
+            referencedColumns: ['username'];
           },
         ];
       };
@@ -109,6 +119,38 @@ export type Database = {
           name?: string;
         };
         Relationships: [];
+      };
+      usernames: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          id: number;
+          user_id: string;
+          username: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          id?: number;
+          user_id?: string;
+          username: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          id?: number;
+          user_id?: string;
+          username?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_usernames_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: {

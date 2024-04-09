@@ -5,11 +5,15 @@ import {supabase} from 'app/lib/supabase';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {skipAuth} from 'app/redux/slices/authSlice';
+import {Theme} from 'app/styles/theme';
+import {useTheme} from '@shopify/restyle';
 
 const Auth: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const theme = useTheme<Theme>();
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -60,8 +64,14 @@ const Auth: FC = () => {
           title="Login"
           disabled={!email.trim().length || !password.trim().length || loading}
           onPress={login}
+          color={theme.colors.brand}
         />
-        <Button title="Skip Login" onPress={skipLogin} disabled={loading} />
+        <Button
+          title="Skip Login"
+          onPress={skipLogin}
+          disabled={loading}
+          color={theme.colors.brand}
+        />
       </Center>
     </SafeAreaView>
   );
