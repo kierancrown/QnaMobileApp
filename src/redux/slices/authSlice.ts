@@ -1,4 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {Username} from 'app/lib/supabase/types';
 
 export interface AuthState {
   skippedAuth: boolean;

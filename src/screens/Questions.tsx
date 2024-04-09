@@ -1,4 +1,4 @@
-import {Alert, Button} from 'react-native';
+import {Alert, Button, Pressable} from 'react-native';
 import React, {FC, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
@@ -10,19 +10,21 @@ import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
-import {Database} from 'app/types/supabase';
 import useMount from 'app/hooks/useMount';
 import {FlashList} from '@shopify/flash-list';
 import {RefreshControl} from 'react-native-gesture-handler';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {useUsername} from 'app/hooks/useUsername';
-dayjs.extend(relativeTime);
+import {Question} from 'app/lib/supabase/types';
+import {useNavigation} from '@react-navigation/native';
+import {MainStackNavigationProp} from 'app/navigation/MainStack';
 
-type Question = Database['public']['Tables']['questions']['Row'];
+dayjs.extend(relativeTime);
 
 const Questions: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const {navigate} = useNavigation<MainStackNavigationProp>();
   const theme = useTheme<Theme>();
   const {user} = useUser();
   const {username, updateUsername} = useUsername();
@@ -96,6 +98,10 @@ const Questions: FC = () => {
   };
 
   const updateUserPrompt = () => {
+    if (!user) {
+      Alert.alert('Login Required', 'You must be logged in to update username');
+      return;
+    }
     Alert.prompt(
       'Update Username',
       'Enter your new username',
@@ -159,22 +165,31 @@ const Questions: FC = () => {
           }}
           estimatedItemSize={100}
           renderItem={({item}) => (
-            <Box
-              backgroundColor="cardBackground"
-              my="xsY"
-              px="xs"
-              py="xsY"
-              borderRadius="m">
-              <VStack rowGap="xsY">
-                <HStack alignItems="center" justifyContent="space-between">
-                  <Text fontWeight="600">{item.username}</Text>
-                  <Text color="cardText">
-                    {dayjs(item.created_at).fromNow()}
-                  </Text>
-                </HStack>
-                <Text variant="body">{item.question}</Text>
-              </VStack>
-            </Box>
+            <Pressable
+              onPress={() => {
+                navigate('QuestionDetail', {questionId: item.id});
+              }}>
+              <Box
+                backgroundColor="cardBackground"
+                my="xsY"
+                px="xs"
+                py="xsY"
+                borderRadius="m">
+                <VStack rowGap="xsY">
+                  <HStack alignItems="center" justifyContent="space-between">
+                    <Text
+                      fontWeight="600"
+                      color={item.user_id === user?.id ? 'brand' : 'cardText'}>
+                      {item.username}
+                    </Text>
+                    <Text color="cardText">
+                      {dayjs(item.created_at).fromNow()}
+                    </Text>
+                  </HStack>
+                  <Text variant="body">{item.question}</Text>
+                </VStack>
+              </Box>
+            </Pressable>
           )}
         />
       </Flex>

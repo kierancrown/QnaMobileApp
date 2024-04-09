@@ -4,6 +4,7 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {setUsernameCache} from 'app/redux/slices/authSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
 import {useDispatch, useSelector} from 'react-redux';
+import {Username} from 'app/lib/supabase/types';
 
 export const useUsername = () => {
   const {user} = useUser();
