@@ -1,6 +1,7 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useState} from 'react';
 import {Session, User} from '@supabase/supabase-js';
 import {supabase} from '../';
+import useMount from 'app/hooks/useMount';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -14,7 +15,7 @@ export const AuthContextProvider = (props: any) => {
   const [userSession, setUserSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  useMount(() => {
     supabase.auth.getSession().then(({data: {session}}) => {
       setUserSession(session);
       setUser(session?.user ?? null);
@@ -31,7 +32,7 @@ export const AuthContextProvider = (props: any) => {
     return () => {
       authListener.subscription;
     };
-  }, []);
+  });
 
   const value = {
     userSession,

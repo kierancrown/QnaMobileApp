@@ -8,6 +8,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import ThemeProvider from './wrappers/ThemeProvider';
+import {AuthContextProvider} from './lib/supabase/context/auth';
 
 const gestureStyle = {flex: 1};
 
@@ -18,7 +19,9 @@ const App: FC = () => {
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <ThemeProvider>
-              <RootStack />
+              <AuthContextProvider>
+                <RootStack />
+              </AuthContextProvider>
             </ThemeProvider>
           </PersistGate>
         </Provider>
