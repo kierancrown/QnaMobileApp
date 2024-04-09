@@ -9,7 +9,107 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never;
+      questions: {
+        Row: {
+          attachments: Json[] | null;
+          created_at: string;
+          id: number;
+          nsfw: boolean;
+          popularity: number;
+          question: string;
+          tags: number[];
+          user_id: string;
+        };
+        Insert: {
+          attachments?: Json[] | null;
+          created_at?: string;
+          id?: number;
+          nsfw?: boolean;
+          popularity?: number;
+          question: string;
+          tags: number[];
+          user_id?: string;
+        };
+        Update: {
+          attachments?: Json[] | null;
+          created_at?: string;
+          id?: number;
+          nsfw?: boolean;
+          popularity?: number;
+          question?: string;
+          tags?: number[];
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_questions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      responses: {
+        Row: {
+          created_at: string;
+          id: number;
+          popularity: number;
+          question_id: number;
+          response: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          popularity?: number;
+          question_id: number;
+          response: string;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          popularity?: number;
+          question_id?: number;
+          response?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_responses_question_id_fkey';
+            columns: ['question_id'];
+            isOneToOne: false;
+            referencedRelation: 'questions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_responses_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      tags: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
