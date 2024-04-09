@@ -1,20 +1,30 @@
 import React, {FC} from 'react';
-import {SafeAreaView, StyleSheet, Text} from 'react-native';
+import RootStack from './navigation/RootStack';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {persistor, store} from './redux/store';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+
+import ThemeProvider from './wrappers/ThemeProvider';
+
+const gestureStyle = {flex: 1};
 
 const App: FC = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>Ask Me Anything </Text>
-    </SafeAreaView>
+    <GestureHandlerRootView style={gestureStyle}>
+      <SafeAreaProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <ThemeProvider>
+              <RootStack />
+            </ThemeProvider>
+          </PersistGate>
+        </Provider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default App;
