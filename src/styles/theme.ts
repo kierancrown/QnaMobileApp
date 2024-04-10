@@ -65,6 +65,7 @@ const palette = {
 
   black: '#0B0B0B',
   white: '#F0F2F3',
+  none: 'transparent',
 };
 
 const theme = createTheme({
@@ -101,6 +102,7 @@ const theme = createTheme({
     // Common
     white: palette.white,
     black: palette.black,
+    none: palette.none,
   },
   spacing: {
     xxxsMinus: s(-2),
@@ -151,6 +153,7 @@ const theme = createTheme({
     ll: s(36),
     xxl: s(48),
     xxxl: s(64),
+    xxxxl: s(96),
   },
   textVariants: {
     extraLargeTemp: {

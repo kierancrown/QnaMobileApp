@@ -1,12 +1,12 @@
 import React, {FC} from 'react';
 import {Flex} from 'ui';
 
-import {Header} from 'app/components/common/Header/CustomHeader';
+import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
 
 const SearchScreen: FC = () => {
   return (
     <Flex>
-      <Header title="Search" />
+      <LargeTitleHeader title="Discover" />
       {/* Content */}
     </Flex>
   );

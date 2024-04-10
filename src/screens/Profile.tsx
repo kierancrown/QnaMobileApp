@@ -1,19 +1,19 @@
-import {Alert, Button} from 'react-native';
+import {Alert} from 'react-native';
 import React, {FC} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
-import {Center, Flex, HStack, Text} from 'ui';
+import {Center, Flex, Text, VStack, Button, HStack} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import {useUsername} from 'app/hooks/useUsername';
-import {Header} from 'app/components/common/Header/CustomHeader';
 
-import CircleUserIcon from 'app/assets/icons/CircleUser.svg';
-import {ScrollView} from 'react-native-gesture-handler';
+import EyesIcon from 'app/assets/icons/Eyes.svg';
+import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
+import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,6 +21,8 @@ const ProfileScreen: FC = () => {
 
   const {user} = useUser();
   const {username, updateUsername} = useUsername();
+
+  const bottomListPadding = useBottomPadding();
 
   const login = () => {
     dispatch(resetAuth());
@@ -56,41 +58,39 @@ const ProfileScreen: FC = () => {
     );
   };
 
-  return (
-    <Flex>
-      <Header
-        title={username ? username : 'Profile'}
-        leftButton={
-          <HStack flex={1} alignItems="center" justifyContent="flex-start">
-            <Button
-              title={user ? 'Logout' : 'Login'}
-              onPress={login}
-              color={theme.colors.brand}
-            />
-          </HStack>
-        }
-      />
-      {user && (
-        <Flex>
-          <Button
-            title="Update Username"
-            onPress={updateUserPrompt}
-            color={theme.colors.brand}
-          />
-        </Flex>
-      )}
+  return !user ? (
+    <Center
+      flex={1}
+      style={{
+        paddingBottom: bottomListPadding,
+        paddingTop: bottomListPadding / 2,
+      }}>
+      <VStack rowGap="sY" px="l">
+        <EyesIcon
+          fill={theme.colors.foreground}
+          width={theme.iconSizes.xxxxl}
+          height={theme.iconSizes.xxxxl}
+        />
+        <Text variant="header" textAlign="left">
+          {"You're currently\nannoymous"}
+        </Text>
+        <Text variant="subheader" color="cardText" textAlign="left">
+          Login to ask questions and get answers
+        </Text>
 
-      {!user && (
-        <Flex>
-          <ScrollView>
-            <Center px="xxxl" pt="xxlY" flexDirection="column" rowGap="mY">
-              <CircleUserIcon fill={theme.colors.cardText} />
-              <Text variant="title" color="cardText">
-                No User Logged In
-              </Text>
-            </Center>
-          </ScrollView>
-        </Flex>
+        <HStack>
+          <Button title="Login" mt="lY" />
+        </HStack>
+      </VStack>
+    </Center>
+  ) : (
+    <Flex>
+      <LargeTitleHeader title="Profile" subtitle={username} />
+      {user && (
+        <Center flex={1} style={{paddingBottom: bottomListPadding}}>
+          <Button title={user ? 'Logout' : 'Login'} onPress={login} />
+          <Button title="Update Username" onPress={updateUserPrompt} />
+        </Center>
       )}
     </Flex>
   );

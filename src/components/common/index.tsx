@@ -5,6 +5,7 @@ export {default as Icon} from './Icon';
 export {default as Text} from './Text';
 export {default as VStack} from './VStack';
 export {default as Flex} from './Flex';
+export {default as Button} from './Button';
 export {default as SafeAreaView} from './SafeAreaView';
 
 import CustomBackdrop from './Sheets/Backdrop';
