@@ -118,6 +118,22 @@ const QuestionDetail: FC = () => {
     });
   };
 
+  const deleteQuestion = async () => {
+    if (!question || !user || question.user_id !== user.id) {
+      Alert.alert('Error', 'You cannot delete this question');
+      return;
+    }
+    const {error} = await supabase
+      .from('questions')
+      .delete()
+      .eq('id', question.id);
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      goBack();
+    }
+  };
+
   return (
     <Flex>
       {questionId && question != null ? (
@@ -161,7 +177,12 @@ const QuestionDetail: FC = () => {
             </Box>
             <Flex p="s">
               <VStack rowGap="xsY">
-                <Text variant="medium">{question.question}</Text>
+                <HStack alignItems="center" justifyContent="space-between">
+                  <Text variant="medium">{question.question}</Text>
+                  {question.user_id === user?.id && (
+                    <Button title="Delete" onPress={deleteQuestion} />
+                  )}
+                </HStack>
                 <HStack justifyContent="space-between">
                   <Text variant="small" color="cardText">
                     {dayjs(question.created_at).fromNow()}
