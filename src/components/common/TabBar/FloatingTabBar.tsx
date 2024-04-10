@@ -15,7 +15,7 @@ import {useTheme} from '@shopify/restyle';
 import staticTheme, {Theme} from 'app/styles/theme';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
-import PlusIcon from 'app/assets/icons/Plus.svg';
+import PlusIcon from 'app/assets/icons/actions/Plus.svg';
 import {Pressable, StyleProp, ViewStyle} from 'react-native';
 import Animated, {
   useAnimatedStyle,

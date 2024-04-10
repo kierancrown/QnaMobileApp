@@ -24,6 +24,7 @@ import {Platform, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Color from 'color';
 import AskQuestionSheet from 'app/components/sheets/AskQuestionSheet';
+import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -68,6 +69,7 @@ const TabBarContainer = (props: TabBarContainerProps) => {
 };
 
 export default function TabStack() {
+  const {triggerHaptic} = useHaptics();
   const insets = useSafeAreaInsets();
   const theme = useTheme<Theme>();
   const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
@@ -79,6 +81,10 @@ export default function TabStack() {
         tabBar={props => (
           <TabBarContainer
             onCtaPress={() => {
+              triggerHaptic({
+                iOS: HapticFeedbackTypes.impactMedium,
+                android: HapticFeedbackTypes.impactMedium,
+              }).then();
               setQuestionSheetOpen(true);
             }}
             {...props}

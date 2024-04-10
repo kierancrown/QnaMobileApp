@@ -1,6 +1,6 @@
 import {Alert, Pressable} from 'react-native';
 import React, {FC, useState} from 'react';
-import {Box, Flex, HStack, Text, VStack} from 'ui';
+import {Flex} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -18,6 +18,7 @@ import {
 } from 'app/lib/supabase/queries/questions';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
+import QuestionItem from 'app/components/QuestionItem';
 
 dayjs.extend(relativeTime);
 
@@ -49,7 +50,7 @@ const Questions: FC = () => {
   return (
     <Flex>
       <LargeTitleHeader title="Questions" collapsed={false} />
-      <Flex px="s">
+      <Flex>
         <FlashList
           data={questions}
           keyExtractor={item => item.id.toString()}
@@ -69,31 +70,16 @@ const Questions: FC = () => {
               onPress={() => {
                 navigate('QuestionDetail', {questionId: item.id});
               }}>
-              <Box
-                backgroundColor="cardBackground"
-                my="xsY"
-                px="xs"
-                py="xsY"
-                borderRadius="m">
-                <VStack rowGap="xsY">
-                  <HStack alignItems="center" justifyContent="space-between">
-                    <Text
-                      fontWeight="600"
-                      color={item.user_id === user?.id ? 'brand' : 'cardText'}>
-                      {item.username}
-                    </Text>
-                    <Text color="cardText">
-                      {dayjs(item.created_at).fromNow()}
-                    </Text>
-                  </HStack>
-                  <Text variant="body">{item.question}</Text>
-                  <HStack rowGap="xsY">
-                    <Text color="cardText">
-                      Upvotes: {item.question_upvotes_count?.count || 0}
-                    </Text>
-                  </HStack>
-                </VStack>
-              </Box>
+              <QuestionItem
+                username={item.username}
+                question={item.question}
+                answerCount={0}
+                voteCount={item.question_upvotes_count?.count || 0}
+                timestamp={item.created_at}
+                liked={false}
+                nsfw={item.nsfw}
+                isOwner={user?.id === item.user_id}
+              />
             </Pressable>
           )}
         />

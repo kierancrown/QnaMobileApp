@@ -230,6 +230,11 @@ const theme = createTheme({
       fontSize: mvs(16),
       lineHeight: mvs(18),
     },
+    questionBody: {
+      fontWeight: '500',
+      fontSize: mvs(14),
+      lineHeight: mvs(18),
+    },
     body: {
       fontSize: mvs(16),
       lineHeight: mvs(24),
@@ -237,6 +242,18 @@ const theme = createTheme({
     small: {
       fontWeight: '500',
       fontSize: mvs(14),
+    },
+    smaller: {
+      fontWeight: '500',
+      fontSize: mvs(13),
+    },
+    tag: {
+      fontWeight: 'bold',
+      fontSize: mvs(12),
+    },
+    username: {
+      fontWeight: '600',
+      fontSize: mvs(12),
     },
     tiny: {
       fontWeight: '600',
