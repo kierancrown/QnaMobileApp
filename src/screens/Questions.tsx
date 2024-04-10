@@ -16,9 +16,12 @@ import {RefreshControl} from 'react-native-gesture-handler';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {useUsername} from 'app/hooks/useUsername';
-import {Question} from 'app/lib/supabase/types';
 import {useNavigation} from '@react-navigation/native';
 import {MainStackNavigationProp} from 'app/navigation/MainStack';
+import {
+  QuestionsWithCount,
+  questionsWithCountQuery,
+} from 'app/lib/supabase/queries/questions';
 
 dayjs.extend(relativeTime);
 
@@ -29,19 +32,21 @@ const Questions: FC = () => {
   const {user} = useUser();
   const {username, updateUsername} = useUsername();
 
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
 
   const refreshQuestions = async () => {
     setLoading(true);
-    const {data, error} = await supabase
-      .from('questions')
-      .select('*')
-      .order('created_at', {ascending: false});
+
+    const {data, error} = await questionsWithCountQuery;
+
+    console.log('data', JSON.stringify(data, null, 2));
+
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      setQuestions(data || []);
+      const questionsWithCount: QuestionsWithCount = data;
+      setQuestions(questionsWithCount || []);
     }
     setLoading(false);
   };
@@ -86,7 +91,13 @@ const Questions: FC = () => {
           })
           .select();
         if (data) {
-          setQuestions([data[0], ...questions]);
+          setQuestions([
+            {
+              ...data[0],
+              question_upvotes_count: {count: 0},
+            },
+            ...questions,
+          ]);
         }
         if (error) {
           Alert.alert('Error', error.message);
@@ -187,6 +198,11 @@ const Questions: FC = () => {
                     </Text>
                   </HStack>
                   <Text variant="body">{item.question}</Text>
+                  <HStack rowGap="xsY">
+                    <Text color="cardText">
+                      Upvotes: {item.question_upvotes_count?.count || 0}
+                    </Text>
+                  </HStack>
                 </VStack>
               </Box>
             </Pressable>

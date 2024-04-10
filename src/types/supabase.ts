@@ -45,6 +45,35 @@ export type Database = {
           },
         ]
       }
+      question_upvotes_count: {
+        Row: {
+          count: number
+          id: number
+          question_id: number
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          id?: number
+          question_id: number
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          id?: number
+          question_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_question_upvotes_count_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: true
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questions: {
         Row: {
           attachments: Json[] | null

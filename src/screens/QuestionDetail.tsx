@@ -1,5 +1,5 @@
 import {ActivityIndicator, Alert, Button, RefreshControl} from 'react-native';
-import React, {FC, useState} from 'react';
+import React, {FC, useCallback, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -34,6 +34,8 @@ const QuestionDetail: FC = () => {
   const {goBack} = useNavigation();
 
   const [question, setQuestion] = useState<Question | null>(null);
+  const [iUpvoted, setIUpvoted] = useState<boolean>(false);
+  const [upvotes, setUpvotes] = useState<number>(0);
   const [responses, setResponses] = useState<Response[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -69,6 +71,43 @@ const QuestionDetail: FC = () => {
       setQuestion(data?.[0] || null);
     }
   };
+
+  const fetchUpvoteCount = useCallback(async () => {
+    if (!question) {
+      return;
+    }
+
+    // Get count
+    const {data: countData, error} = await supabase
+      .from('question_upvotes_count')
+      .select('count')
+      .eq('question_id', question.id)
+      .single();
+    if (error) {
+      Alert.alert('Error', error.message);
+    }
+    setUpvotes(countData?.count || 0);
+
+    // Get upvoted state
+    if (user) {
+      const {data, error: err} = await supabase
+        .from('question_upvotes')
+        .select('created_at')
+        .eq('question_id', question.id)
+        .eq('user_id', user.id);
+      if (err) {
+        Alert.alert('Error', err.message);
+      } else {
+        setIUpvoted(data?.length > 0);
+      }
+    }
+  }, [question, user]);
+
+  useEffect(() => {
+    if (question) {
+      fetchUpvoteCount();
+    }
+  }, [fetchUpvoteCount, question]);
 
   useMount(refreshResponses);
   useMount(fetchQuestion);
@@ -134,6 +173,33 @@ const QuestionDetail: FC = () => {
     }
   };
 
+  const upvoteQuestion = async () => {
+    if (!question || !user) {
+      Alert.alert('Error', 'You must be logged in to upvote');
+      return;
+    }
+    if (iUpvoted) {
+      const {error} = await supabase
+        .from('question_upvotes')
+        .delete()
+        .eq('question_id', question.id)
+        .eq('user_id', user.id);
+
+      if (error) {
+        Alert.alert('Error', error.message);
+      }
+    } else {
+      const {error} = await supabase
+        .from('question_upvotes')
+        .insert({question_id: question.id, user_id: user.id});
+
+      if (error) {
+        Alert.alert('Error', error.message);
+      }
+    }
+    fetchUpvoteCount();
+  };
+
   return (
     <Flex>
       {questionId && question != null ? (
@@ -182,6 +248,15 @@ const QuestionDetail: FC = () => {
                   {question.user_id === user?.id && (
                     <Button title="Delete" onPress={deleteQuestion} />
                   )}
+                </HStack>
+                <HStack alignItems="center" justifyContent="space-between">
+                  <Text>
+                    {upvotes} {upvotes === 1 ? 'upvote' : 'upvotes'}
+                  </Text>
+                  <Button
+                    title={iUpvoted ? 'Upvoted' : 'Upvote'}
+                    onPress={upvoteQuestion}
+                  />
                 </HStack>
                 <HStack justifyContent="space-between">
                   <Text variant="small" color="cardText">
