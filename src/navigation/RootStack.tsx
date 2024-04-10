@@ -8,10 +8,10 @@ import {useTheme} from '@shopify/restyle';
 import {Theme} from 'app/styles/theme';
 import {useUser} from 'app/lib/supabase/context/auth';
 
-import MainStack from './MainStack';
 import AuthStack from './AuthStack';
 import {useSelector} from 'react-redux';
 import {RootState} from 'app/redux/store';
+import TabStack from './TabStack';
 
 const RootStack = () => {
   const colorScheme = useColorScheme();
@@ -39,7 +39,7 @@ const RootStack = () => {
               text: theme.colors.foreground,
             },
           }}>
-          {skipAuth || user ? <MainStack /> : <AuthStack />}
+          {skipAuth || user ? <TabStack /> : <AuthStack />}
         </NavigationContainer>
       </SafeAreaProvider>
     </>

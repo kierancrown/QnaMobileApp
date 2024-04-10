@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {useUsername} from 'app/hooks/useUsername';
 import {useNavigation} from '@react-navigation/native';
-import {MainStackNavigationProp} from 'app/navigation/MainStack';
+import {HomeStackNavigationProp} from 'app/navigation/HomeStack';
 import {
   QuestionsWithCount,
   questionsWithCountQuery,
@@ -27,7 +27,7 @@ dayjs.extend(relativeTime);
 
 const Questions: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {navigate} = useNavigation<MainStackNavigationProp>();
+  const {navigate} = useNavigation<HomeStackNavigationProp>();
   const theme = useTheme<Theme>();
   const {user} = useUser();
   const {username, updateUsername} = useUsername();

@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {useUsername} from 'app/hooks/useUsername';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
-import {MainStackParamList} from 'app/navigation/MainStack';
+import {HomeStackParamList} from 'app/navigation/HomeStack';
 import {Question, Response} from 'app/lib/supabase/types';
 
 dayjs.extend(relativeTime);
@@ -29,7 +29,7 @@ const QuestionDetail: FC = () => {
 
   const {
     params: {questionId},
-  } = useRoute<RouteProp<MainStackParamList, 'QuestionDetail'>>();
+  } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
 
   const {goBack} = useNavigation();
 

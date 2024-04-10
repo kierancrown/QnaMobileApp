@@ -6,18 +6,18 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import QuestionsScreen from '../screens/Questions';
 import QuestionDetailScreen from '../screens/QuestionDetail';
 
-export type MainStackNavigationProp =
-  NativeStackNavigationProp<MainStackParamList>;
+export type HomeStackNavigationProp =
+  NativeStackNavigationProp<HomeStackParamList>;
 
-export type MainStackParamList = {
+export type HomeStackParamList = {
   Auth: undefined;
   Questions: undefined;
   QuestionDetail: {questionId: number};
 };
 
-const Stack = createNativeStackNavigator<MainStackParamList>();
+const Stack = createNativeStackNavigator<HomeStackParamList>();
 
-const MainStack = () => {
+const HomeStack = () => {
   return (
     <Stack.Navigator
       initialRouteName="Questions"
@@ -28,4 +28,4 @@ const MainStack = () => {
   );
 };
 
-export default MainStack;
+export default HomeStack;
