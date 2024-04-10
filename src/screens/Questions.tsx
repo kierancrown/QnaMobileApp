@@ -1,14 +1,10 @@
-import {Alert, Button, Pressable} from 'react-native';
+import {Alert, Pressable} from 'react-native';
 import React, {FC, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from 'app/redux/store';
-import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
 import {Box, Flex, HStack, Text, VStack} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
-import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
 import {FlashList} from '@shopify/flash-list';
 import {RefreshControl} from 'react-native-gesture-handler';
@@ -20,15 +16,16 @@ import {
   QuestionsWithCount,
   questionsWithCountQuery,
 } from 'app/lib/supabase/queries/questions';
-import {Header} from 'app/components/common/Header/CustomHeader';
+import {useBottomPadding} from 'app/hooks/useBottomPadding';
+import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
 
 dayjs.extend(relativeTime);
 
 const Questions: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const {navigate} = useNavigation<HomeStackNavigationProp>();
   const theme = useTheme<Theme>();
   const {user} = useUser();
+  const bottomListPadding = useBottomPadding(theme.spacing.mY);
 
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
@@ -51,75 +48,56 @@ const Questions: FC = () => {
 
   useMount(refreshQuestions);
 
-  const login = () => {
-    dispatch(resetAuth());
-    if (user) {
-      supabase.auth.signOut();
-      dispatch(resetCache());
-    }
-  };
-
-  const showPostNew = () => {
-    if (!user) {
-      Alert.alert(
-        'Login Required',
-        'You must be logged in to post a question',
-        [
-          {
-            text: 'Login',
-            onPress: login,
-            style: 'default',
-          },
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-        ],
-      );
-      return;
-    }
-    Alert.prompt('New Question', 'Enter your question', async question => {
-      if (question) {
-        const {data, error} = await supabase
-          .from('questions')
-          .insert({
-            username: 'kieran',
-            question: question,
-            tags: [],
-          })
-          .select();
-        if (data) {
-          setQuestions([
-            {
-              ...data[0],
-              question_upvotes_count: {count: 0},
-            },
-            ...questions,
-          ]);
-        }
-        if (error) {
-          Alert.alert('Error', error.message);
-        } else {
-          Alert.alert('Success', 'Question posted');
-        }
-      }
-    });
-  };
+  // const showPostNew = () => {
+  //   if (!user) {
+  //     Alert.alert(
+  //       'Login Required',
+  //       'You must be logged in to post a question',
+  //       [
+  //         {
+  //           text: 'Login',
+  //           onPress: login,
+  //           style: 'default',
+  //         },
+  //         {
+  //           text: 'Cancel',
+  //           style: 'cancel',
+  //         },
+  //       ],
+  //     );
+  //     return;
+  //   }
+  //   Alert.prompt('New Question', 'Enter your question', async question => {
+  //     if (question) {
+  //       const {data, error} = await supabase
+  //         .from('questions')
+  //         .insert({
+  //           username: 'kieran',
+  //           question: question,
+  //           tags: [],
+  //         })
+  //         .select();
+  //       if (data) {
+  //         setQuestions([
+  //           {
+  //             ...data[0],
+  //             question_upvotes_count: {count: 0},
+  //           },
+  //           ...questions,
+  //         ]);
+  //       }
+  //       if (error) {
+  //         Alert.alert('Error', error.message);
+  //       } else {
+  //         Alert.alert('Success', 'Question posted');
+  //       }
+  //     }
+  //   });
+  // };
 
   return (
     <Flex>
-      <Header
-        title="Questions"
-        rightButton={
-          <HStack flex={1} alignItems="center" justifyContent="flex-end">
-            <Button
-              title="New"
-              onPress={showPostNew}
-              color={theme.colors.brand}
-            />
-          </HStack>
-        }
-      />
+      <LargeTitleHeader title="Questions" collapsed={false} />
       <Flex px="s">
         <FlashList
           data={questions}
@@ -131,7 +109,9 @@ const Questions: FC = () => {
           onRefresh={refreshQuestions}
           contentContainerStyle={{
             paddingTop: theme.spacing.sY,
+            paddingBottom: bottomListPadding,
           }}
+          scrollEventThrottle={16}
           estimatedItemSize={100}
           renderItem={({item}) => (
             <Pressable

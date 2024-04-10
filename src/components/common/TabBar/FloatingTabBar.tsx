@@ -12,7 +12,7 @@ import {
 
 import {Box, Center, HStack, VStack} from 'ui';
 import {useTheme} from '@shopify/restyle';
-import {Theme} from 'app/styles/theme';
+import staticTheme, {Theme} from 'app/styles/theme';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 import PlusIcon from 'app/assets/icons/Plus.svg';
@@ -26,6 +26,8 @@ interface FloatTabBarProps {
 
 const ICON_SIZE = 24;
 const CTA_SIZE = 72;
+
+export const ESTIMATED_TABBAR_HEIGHT = ICON_SIZE + staticTheme.spacing.sY * 2;
 
 export const FloatingTabBar: FC<FloatTabBarProps> = ({
   state,
