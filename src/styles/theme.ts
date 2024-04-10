@@ -69,38 +69,38 @@ const palette = {
 
 const theme = createTheme({
   colors: {
-    brand: palette.primary[600],
+    brand: palette.primary.DEFAULT,
     // Actions
-    successfulAction: palette.successfulActionLight,
-    destructiveAction: palette.destructiveActionLight,
-    bookmarkAction: palette.bookmarkActionLight,
+    successfulAction: palette.successfulActionDark,
+    destructiveAction: palette.destructiveActionDark,
+    bookmarkAction: palette.bookmarkActionDark,
     // Backgrounds
-    mainBackground: palette.white,
-    cardBackground: palette.lightSecondaryBackground,
+    mainBackground: palette.black,
+    cardBackground: palette.darkSecondaryBackground,
+    backdrop: palette.primary[800],
     sheetBackdrop: palette.sheetBackdropDark,
-    backdrop: palette.primary[200],
     // Text
-    foreground: palette.black,
+    foreground: palette.white,
     secondary: palette.secondaryText,
-    secondaryBrand: palette.primary[800],
-    cardText: palette.cardTextLight,
+    secondaryBrand: palette.primary[200],
+    cardText: palette.cardTextDark,
     // Input
-    inputBackground: palette.inputBackgroundLight,
-    inputPlaceholder: palette.inputPlaceholderLight,
+    inputBackground: palette.inputBackgroundDark,
+    inputPlaceholder: palette.inputPlaceholderDark,
     // Segment control
-    segmentBackground: palette.segmentBackgroundLight,
-    segmentItemBackground: palette.segmentItemBackgroundLight,
-    segmentItemText: palette.segmentItemTextLight,
-    segmentItemTextSelected: palette.segmentItemTextSelectedLight,
+    segmentBackground: palette.segmentBackgroundDark,
+    segmentItemBackground: palette.segmentItemBackgroundDark,
+    segmentItemText: palette.segmentItemTextDark,
+    segmentItemTextSelected: palette.segmentItemTextSelectedDark,
     // Dividers
-    divider: palette.dividerLight,
+    divider: palette.dividerDark,
     // Outline
-    outline: palette.dividerDark,
+    outline: palette.dividerLight,
+    // Skeleton
+    skeleton: palette.skeletonDark,
     // Common
     white: palette.white,
     black: palette.black,
-    // Skeleton
-    skeleton: palette.skeletonLight,
   },
   spacing: {
     xxxsMinus: s(-2),
@@ -246,41 +246,7 @@ const theme = createTheme({
   },
 });
 
-const darkTheme: Theme = {
-  ...theme,
-  colors: {
-    ...theme.colors,
-    brand: palette.primary.DEFAULT,
-    // Actions
-    successfulAction: palette.successfulActionDark,
-    destructiveAction: palette.destructiveActionDark,
-    bookmarkAction: palette.bookmarkActionDark,
-    // Backgrounds
-    mainBackground: palette.black,
-    cardBackground: palette.darkSecondaryBackground,
-    backdrop: palette.primary[800],
-    // Text
-    foreground: palette.white,
-    secondaryBrand: palette.primary[200],
-    cardText: palette.cardTextDark,
-    // Input
-    inputBackground: palette.inputBackgroundDark,
-    inputPlaceholder: palette.inputPlaceholderDark,
-    // Segment control
-    segmentBackground: palette.segmentBackgroundDark,
-    segmentItemBackground: palette.segmentItemBackgroundDark,
-    segmentItemText: palette.segmentItemTextDark,
-    segmentItemTextSelected: palette.segmentItemTextSelectedDark,
-    // Dividers
-    divider: palette.dividerDark,
-    // Outline
-    outline: palette.dividerLight,
-    // Skeleton
-    skeleton: palette.skeletonDark,
-  },
-};
-
 export type Theme = typeof theme;
 export const useAppTheme = () => useTheme<Theme>();
-export {theme, darkTheme};
+export {theme};
 export default theme;

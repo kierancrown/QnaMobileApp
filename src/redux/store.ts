@@ -11,7 +11,6 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import themeSettingsSlice from './slices/themeSettingsSlice';
 import globalSheetsSlice from './slices/globalSheetsSlice';
 import authSlice from './slices/authSlice';
 
@@ -22,7 +21,6 @@ const persistConfig = {
 
 const reducers = combineReducers({
   auth: authSlice,
-  theme: themeSettingsSlice,
 });
 
 const nonPersistedReducers = combineReducers({

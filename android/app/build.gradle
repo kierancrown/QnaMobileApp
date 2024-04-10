@@ -76,7 +76,7 @@ android {
 
     namespace "com.ama"
     defaultConfig {
-        applicationId "com.ama"
+        applicationId "co.askthat.qna"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
