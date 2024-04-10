@@ -10,19 +10,20 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {Pressable, StyleSheet, Keyboard} from 'react-native';
+import {Pressable, StyleSheet, Keyboard, Alert} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Animated, {
   SharedValue,
   interpolate,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import ChevronUp from 'app/assets/arrows/chevron-up.svg';
+import ChevronUp from 'app/assets/icons/arrows/chevron-up.svg';
 import Icon from 'app/components/common/Icon';
 import {Box, Flex, Button, Center} from 'ui';
 import SegmentedControl from '../../SegmentedControl';
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
 import {Edges, SafeAreaView} from 'react-native-safe-area-context';
+import {supabase} from 'app/lib/supabase';
 
 interface ILocationsSheetContentProps {
   onLoading?: (loading: boolean) => void;
@@ -74,11 +75,13 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
   const dismissSheet = useCallback(() => {
     dismissKeyboard();
     onDismiss?.();
+    fullReset();
   }, [onDismiss]);
 
   const fullReset = () => {
     setQuestion('');
     setSelectedType(0);
+    setLoading(false);
   };
 
   const dismissKeyboard = () => {
@@ -89,11 +92,37 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
     inputRef.current?.focus();
   };
 
+  useEffect(() => {
+    if (open) {
+      focusInput();
+    }
+  }, [open]);
+
   const submit = () => {
     if (question.trim().length === 0) {
       return;
     }
     setLoading(true);
+    supabase
+      .from('questions')
+      .insert({
+        username: 'kieran',
+        question: question,
+        tags: [],
+      })
+      .select()
+      .then(({data, error}) => {
+        if (data) {
+          // TODO: add new message to top of list
+        }
+        if (error) {
+          Alert.alert('Error', error.message);
+        } else {
+          // TODO: Show success message
+          dismissSheet();
+        }
+        setLoading(false);
+      });
   };
 
   const animatedChevronStyles = useAnimatedStyle(() => {
@@ -116,7 +145,7 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
               </Center>
             </Pressable>
             <Flex />
-            <Text variant="navbarTitle">{t('sheet-feedback--title')}</Text>
+            <Text variant="navbarTitle">Submit Question</Text>
             <Flex />
             <Center>
               <Box width={theme.spacing.l} height={theme.spacing.l} />
@@ -124,10 +153,7 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
           </HStack>
 
           <SegmentedControl
-            segments={[
-              t('sheet-feedback--segmented-control-feedback'),
-              t('sheet-feedback--segmented-control-bug'),
-            ]}
+            segments={['Question', 'Poll']}
             currentIndex={selectedType}
             containerMargin={theme.spacing.m}
             onChange={setSelectedType}

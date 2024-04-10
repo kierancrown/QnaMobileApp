@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import {
   BottomTabBarProps,
   createBottomTabNavigator,
@@ -23,6 +23,7 @@ import {Box} from 'app/components/common';
 import {Platform, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Color from 'color';
+import AskQuestionSheet from 'app/components/sheets/AskQuestionSheet';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -33,7 +34,11 @@ export type TabStackParamList = {
 
 const Tab = createBottomTabNavigator<TabStackParamList>();
 
-const TabBarContainer = (props: BottomTabBarProps) => {
+interface TabBarContainerProps extends BottomTabBarProps {
+  onCtaPress: () => void;
+}
+
+const TabBarContainer = (props: TabBarContainerProps) => {
   const {bottom} = useSafeAreaInsets();
   const theme = useTheme<Theme>();
   const bottomColor = Color(theme.colors.mainBackground).alpha(0.9).hexa();
@@ -65,12 +70,20 @@ const TabBarContainer = (props: BottomTabBarProps) => {
 export default function TabStack() {
   const insets = useSafeAreaInsets();
   const theme = useTheme<Theme>();
+  const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
 
   return (
     <>
       <Tab.Navigator
         // eslint-disable-next-line react/no-unstable-nested-components
-        tabBar={props => <TabBarContainer {...props} />}
+        tabBar={props => (
+          <TabBarContainer
+            onCtaPress={() => {
+              setQuestionSheetOpen(true);
+            }}
+            {...props}
+          />
+        )}
         screenOptions={{
           headerShown: false,
           tabBarLabelStyle: {
@@ -121,6 +134,13 @@ export default function TabStack() {
           />
         </Tab.Group>
       </Tab.Navigator>
+
+      <AskQuestionSheet
+        open={questionSheetOpen}
+        onClose={() => {
+          setQuestionSheetOpen(false);
+        }}
+      />
     </>
   );
 }

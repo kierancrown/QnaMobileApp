@@ -1,7 +1,7 @@
 import React, {FC, useCallback, useMemo, useRef, useState} from 'react';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, {WINDOW_HEIGHT} from '@gorhom/bottom-sheet';
 import Screen from './Content';
-import {Dimensions, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import theme from 'app/styles/theme';
 import {useSharedValue} from 'react-native-reanimated';
@@ -13,7 +13,6 @@ interface AskQuestionSheetProps {
   onClose?: () => void;
 }
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   open = false,
   onClose,
@@ -23,7 +22,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const topSafeAreaInset = useSafeAreaInsets().top;
   const [loading, setLoading] = useState(false);
   const snapPoints = useMemo(
-    () => [SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.m],
+    () => [WINDOW_HEIGHT - topSafeAreaInset - theme.spacing.m],
     [topSafeAreaInset],
   );
 
@@ -45,7 +44,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
       animatedIndex={animatedPosition}
       enablePanDownToClose={!loading}
       keyboardBehavior="extend"
-      maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
+      maxDynamicContentSize={WINDOW_HEIGHT - topSafeAreaInset}
       onChange={handleSheetChanges}
       backdropComponent={CustomBackdrop}
       handleComponent={null}

@@ -82,11 +82,12 @@ const Button = ({
       <Animated.View style={animatedStyle}>
         <Box
           backgroundColor={buttonBackgroundColor}
+          opacity={disabled ? 0.6 : 1}
           borderRadius="m"
           px={variant === 'text' ? 'none' : 'm'}
           py={variant === 'text' ? 'none' : 'sY'}
           {...rest}>
-          <HStack alignItems="center" columnGap="xxs">
+          <HStack alignItems="center" justifyContent="center" columnGap="xxs">
             {loading ? (
               <ActivityIndicator
                 size="small"

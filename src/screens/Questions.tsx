@@ -46,53 +46,6 @@ const Questions: FC = () => {
 
   useMount(refreshQuestions);
 
-  // const showPostNew = () => {
-  //   if (!user) {
-  //     Alert.alert(
-  //       'Login Required',
-  //       'You must be logged in to post a question',
-  //       [
-  //         {
-  //           text: 'Login',
-  //           onPress: login,
-  //           style: 'default',
-  //         },
-  //         {
-  //           text: 'Cancel',
-  //           style: 'cancel',
-  //         },
-  //       ],
-  //     );
-  //     return;
-  //   }
-  //   Alert.prompt('New Question', 'Enter your question', async question => {
-  //     if (question) {
-  //       const {data, error} = await supabase
-  //         .from('questions')
-  //         .insert({
-  //           username: 'kieran',
-  //           question: question,
-  //           tags: [],
-  //         })
-  //         .select();
-  //       if (data) {
-  //         setQuestions([
-  //           {
-  //             ...data[0],
-  //             question_upvotes_count: {count: 0},
-  //           },
-  //           ...questions,
-  //         ]);
-  //       }
-  //       if (error) {
-  //         Alert.alert('Error', error.message);
-  //       } else {
-  //         Alert.alert('Success', 'Question posted');
-  //       }
-  //     }
-  //   });
-  // };
-
   return (
     <Flex>
       <LargeTitleHeader title="Questions" collapsed={false} />

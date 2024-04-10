@@ -27,6 +27,7 @@ interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
   descriptors: BottomTabDescriptorMap;
   navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
+  onCtaPress?: () => void;
 }
 
 const ICON_SIZE = 24;
@@ -38,6 +39,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   state,
   descriptors,
   navigation,
+  onCtaPress,
 }) => {
   const theme = useTheme<Theme>();
   const activeColor = theme.colors.brand;
@@ -146,7 +148,10 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
         })}
       </HStack>
       <Animated.View style={[ctaStyles, animatedStyle]}>
-        <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
+        <Pressable
+          onPress={onCtaPress}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}>
           <Center
             width={CTA_SIZE}
             height={CTA_SIZE}
