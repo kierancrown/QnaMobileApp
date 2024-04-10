@@ -3,8 +3,7 @@ import React, {FC, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
-import {Box, Center, Flex, HStack, Text, VStack} from 'ui';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Box, Flex, HStack, Text, VStack} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -21,6 +20,7 @@ import {
   QuestionsWithCount,
   questionsWithCountQuery,
 } from 'app/lib/supabase/queries/questions';
+import {Header} from 'app/components/common/Header/CustomHeader';
 
 dayjs.extend(relativeTime);
 
@@ -108,32 +108,18 @@ const Questions: FC = () => {
 
   return (
     <Flex>
-      <Box
-        backgroundColor="cardBackground"
-        borderColor="segmentBackground"
-        borderBottomWidth={1}>
-        <SafeAreaView edges={['top', 'left', 'right']}>
-          <HStack py="xxsY" px="xs">
-            <HStack flex={1} alignItems="center" justifyContent="flex-start">
-              <Button
-                title={user ? 'Logout' : 'Login'}
-                onPress={login}
-                color={theme.colors.brand}
-              />
-            </HStack>
-            <Center flex={2}>
-              <Text variant="medium">Questions</Text>
-            </Center>
-            <HStack flex={1} alignItems="center" justifyContent="flex-end">
-              <Button
-                title="New"
-                onPress={showPostNew}
-                color={theme.colors.brand}
-              />
-            </HStack>
+      <Header
+        title="Questions"
+        rightButton={
+          <HStack flex={1} alignItems="center" justifyContent="flex-end">
+            <Button
+              title="New"
+              onPress={showPostNew}
+              color={theme.colors.brand}
+            />
           </HStack>
-        </SafeAreaView>
-      </Box>
+        }
+      />
       <Flex px="s">
         <FlashList
           data={questions}

@@ -3,14 +3,17 @@ import React, {FC} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
-import {Box, Center, Flex, HStack, Text} from 'ui';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Center, Flex, HStack, Text} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import {useUsername} from 'app/hooks/useUsername';
+import {Header} from 'app/components/common/Header/CustomHeader';
+
+import CircleUserIcon from 'app/assets/icons/CircleUser.svg';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -55,37 +58,40 @@ const ProfileScreen: FC = () => {
 
   return (
     <Flex>
-      <Box
-        backgroundColor="cardBackground"
-        borderColor="segmentBackground"
-        borderBottomWidth={1}>
-        <SafeAreaView edges={['top', 'left', 'right']}>
-          <HStack py="xxsY" px="xs">
-            <HStack flex={1} alignItems="center" justifyContent="flex-start">
-              <Button
-                title={user ? 'Logout' : 'Login'}
-                onPress={login}
-                color={theme.colors.brand}
-              />
-            </HStack>
-            <Center flex={2}>
-              <Text variant="medium">{username ? username : 'Profile'}</Text>
-            </Center>
-            <HStack flex={1} alignItems="center" justifyContent="flex-end">
-              <Button
-                title="UU"
-                onPress={updateUserPrompt}
-                color={theme.colors.brand}
-              />
-            </HStack>
+      <Header
+        title={username ? username : 'Profile'}
+        leftButton={
+          <HStack flex={1} alignItems="center" justifyContent="flex-start">
+            <Button
+              title={user ? 'Logout' : 'Login'}
+              onPress={login}
+              color={theme.colors.brand}
+            />
           </HStack>
-        </SafeAreaView>
-      </Box>
-      <Flex>
-        <Center>
-          <Text variant="medium">Hello</Text>
-        </Center>
-      </Flex>
+        }
+      />
+      {user && (
+        <Flex>
+          <Button
+            title="Update Username"
+            onPress={updateUserPrompt}
+            color={theme.colors.brand}
+          />
+        </Flex>
+      )}
+
+      {!user && (
+        <Flex>
+          <ScrollView>
+            <Center px="xxxl" pt="xxlY" flexDirection="column" rowGap="mY">
+              <CircleUserIcon fill={theme.colors.cardText} />
+              <Text variant="title" color="cardText">
+                No User Logged In
+              </Text>
+            </Center>
+          </ScrollView>
+        </Flex>
+      )}
     </Flex>
   );
 };
