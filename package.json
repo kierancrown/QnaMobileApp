@@ -9,7 +9,7 @@
     "start": "react-native start",
     "test": "jest",
     "adb": "adb reverse tcp:8081 tcp:8081",
-    "gen-icon": "iconset create ./assets/icon.png",
+    "icongen": "iconset create ./assets/icon.png",
     "codegen": "supabase gen types typescript --project-id \"rvnfizvcmzyorjkzgchr\" --schema public > src/types/supabase.ts",
     "xcode": "open ios/*.xcworkspace"
   },

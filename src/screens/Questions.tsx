@@ -35,8 +35,6 @@ const Questions: FC = () => {
 
     const {data, error} = await questionsWithCountQuery;
 
-    console.log('data', JSON.stringify(data, null, 2));
-
     if (error) {
       Alert.alert('Error', error.message);
     } else {
