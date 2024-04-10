@@ -1,4 +1,4 @@
-import {Pressable} from 'react-native';
+import {ActivityIndicator, Pressable} from 'react-native';
 import {BoxProps} from '@shopify/restyle';
 import React from 'react';
 import {Theme} from 'app/styles/theme';
@@ -9,6 +9,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import HStack from './HStack';
 
 export interface ButtonProps extends BoxProps<Theme> {
   animateOnPress?: boolean;
@@ -16,6 +17,8 @@ export interface ButtonProps extends BoxProps<Theme> {
   onLongPress?: () => void;
   variant?: 'primary' | 'text' | 'danger';
   title?: string;
+  loading?: boolean;
+  disabled?: boolean;
   testID?: string;
 }
 
@@ -25,6 +28,8 @@ const Button = ({
   title,
   onLongPress,
   onPress,
+  loading,
+  disabled,
   ...rest
 }: ButtonProps) => {
   const opacity = useSharedValue(1);
@@ -68,6 +73,7 @@ const Button = ({
 
   return (
     <Pressable
+      disabled={disabled || loading}
       hitSlop={8}
       onPress={onPress}
       onLongPress={onLongPress}
@@ -80,11 +86,19 @@ const Button = ({
           px={variant === 'text' ? 'none' : 'm'}
           py={variant === 'text' ? 'none' : 'sY'}
           {...rest}>
-          <Text
-            variant="headline"
-            color={variant === 'text' ? 'brand' : 'white'}>
-            {title}
-          </Text>
+          <HStack alignItems="center" columnGap="xxs">
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={variant === 'text' ? 'brand' : 'white'}
+              />
+            ) : null}
+            <Text
+              variant="headline"
+              color={variant === 'text' ? 'brand' : 'white'}>
+              {title}
+            </Text>
+          </HStack>
         </Box>
       </Animated.View>
     </Pressable>
