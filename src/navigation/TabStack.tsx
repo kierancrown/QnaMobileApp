@@ -2,14 +2,18 @@ import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import {useTheme} from '@shopify/restyle';
+import {Theme} from 'app/styles/theme';
+
 import HomeTabStack from './HomeStack';
+import SearchTabStack from './SearchStack';
+import InboxTabStack from './InboxStack';
+import ProfileTabStack from './ProfileStack';
 
 import HomeTabBarIcon from 'app/components/common/TabBar/Icons/HomeTabBarIcon';
 import SearchTabBarIcon from 'app/components/common/TabBar/Icons/SearchTabBarIcon';
 import InboxTabBarIcon from 'app/components/common/TabBar/Icons/InboxTabBarIcon';
 import ProfileTabBarIcon from 'app/components/common/TabBar/Icons/ProfileTabBarIcon';
-import {useTheme} from '@shopify/restyle';
-import {Theme} from 'app/styles/theme';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -47,7 +51,7 @@ export default function TabStack() {
             name="HomeTab"
             options={{
               tabBarIcon: HomeTabBarIcon,
-              title: 'Questions',
+              title: 'Home',
             }}
             component={HomeTabStack}
           />
@@ -57,7 +61,7 @@ export default function TabStack() {
               tabBarIcon: SearchTabBarIcon,
               title: 'Search',
             }}
-            component={HomeTabStack}
+            component={SearchTabStack}
           />
           <Tab.Screen
             name="InobxTab"
@@ -65,7 +69,7 @@ export default function TabStack() {
               tabBarIcon: InboxTabBarIcon,
               title: 'Inbox',
             }}
-            component={HomeTabStack}
+            component={InboxTabStack}
           />
           <Tab.Screen
             name="ProfileTab"
@@ -73,7 +77,7 @@ export default function TabStack() {
               tabBarIcon: ProfileTabBarIcon,
               title: 'Profile',
             }}
-            component={HomeTabStack}
+            component={ProfileTabStack}
           />
         </Tab.Group>
       </Tab.Navigator>

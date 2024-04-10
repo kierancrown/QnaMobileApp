@@ -15,7 +15,6 @@ import {FlashList} from '@shopify/flash-list';
 import {RefreshControl} from 'react-native-gesture-handler';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import {useUsername} from 'app/hooks/useUsername';
 import {useNavigation} from '@react-navigation/native';
 import {HomeStackNavigationProp} from 'app/navigation/HomeStack';
 import {
@@ -30,7 +29,6 @@ const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
   const theme = useTheme<Theme>();
   const {user} = useUser();
-  const {username, updateUsername} = useUsername();
 
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
@@ -108,32 +106,6 @@ const Questions: FC = () => {
     });
   };
 
-  const updateUserPrompt = () => {
-    if (!user) {
-      Alert.alert('Login Required', 'You must be logged in to update username');
-      return;
-    }
-    Alert.prompt(
-      'Update Username',
-      'Enter your new username',
-      async newUsername => {
-        if (newUsername) {
-          try {
-            const success = await updateUsername(newUsername);
-            if (success) {
-              Alert.alert('Success', 'Username updated');
-            } else {
-              Alert.alert('Error', 'Failed to update username');
-            }
-          } catch (error) {
-            const err = error as Error;
-            Alert.alert('Error', err.message);
-          }
-        }
-      },
-    );
-  };
-
   return (
     <Flex>
       <Box
@@ -209,16 +181,6 @@ const Questions: FC = () => {
           )}
         />
       </Flex>
-      <SafeAreaView edges={['bottom', 'left', 'right']}>
-        <Center px="m">
-          <Button
-            title="Update username"
-            onPress={updateUserPrompt}
-            color={theme.colors.brand}
-          />
-          <Text>{username}</Text>
-        </Center>
-      </SafeAreaView>
     </Flex>
   );
 };
