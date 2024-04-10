@@ -79,7 +79,7 @@ const ProfileScreen: FC = () => {
         </Text>
 
         <HStack>
-          <Button title="Login" mt="lY" />
+          <Button title="Login" mt="lY" onPress={login} />
         </HStack>
       </VStack>
     </Center>

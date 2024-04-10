@@ -17,6 +17,11 @@ import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 import PlusIcon from 'app/assets/icons/Plus.svg';
 import {Pressable, StyleProp, ViewStyle} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -38,10 +43,38 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const activeColor = theme.colors.brand;
   const inactiveColor = theme.colors.cardText;
 
+  const opacity = useSharedValue(1);
+  const scale = useSharedValue(1);
+
   const ctaStyles: StyleProp<ViewStyle> = {
     position: 'absolute',
     top: -theme.spacing.xsY,
     left: (WINDOW_WIDTH - theme.spacing.l * 2 - CTA_SIZE) / 2,
+  };
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{scale: scale.value}],
+    };
+  }, []);
+
+  const onPressIn = () => {
+    opacity.value = withTiming(0.88, {
+      duration: 100,
+    });
+    scale.value = withTiming(0.92, {
+      duration: 66,
+    });
+  };
+
+  const onPressOut = () => {
+    opacity.value = withTiming(1, {
+      duration: 88,
+    });
+    scale.value = withTiming(1, {
+      duration: 66,
+    });
   };
 
   return (
@@ -112,25 +145,27 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           );
         })}
       </HStack>
-      <Pressable style={ctaStyles}>
-        <Center
-          width={CTA_SIZE}
-          height={CTA_SIZE}
-          backgroundColor="brand"
-          shadowColor="black"
-          shadowOffset={{
-            width: 0,
-            height: 2,
-          }}
-          shadowOpacity={0.33}
-          borderRadius="pill">
-          <PlusIcon
-            width={ICON_SIZE * 1.2}
-            height={ICON_SIZE * 1.2}
-            fill={theme.colors.white}
-          />
-        </Center>
-      </Pressable>
+      <Animated.View style={[ctaStyles, animatedStyle]}>
+        <Pressable onPressIn={onPressIn} onPressOut={onPressOut}>
+          <Center
+            width={CTA_SIZE}
+            height={CTA_SIZE}
+            backgroundColor="brand"
+            shadowColor="black"
+            shadowOffset={{
+              width: 0,
+              height: 2,
+            }}
+            shadowOpacity={0.33}
+            borderRadius="pill">
+            <PlusIcon
+              width={ICON_SIZE * 1.2}
+              height={ICON_SIZE * 1.2}
+              fill={theme.colors.white}
+            />
+          </Center>
+        </Pressable>
+      </Animated.View>
     </Box>
   );
 };

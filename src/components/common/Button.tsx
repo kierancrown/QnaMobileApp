@@ -47,10 +47,10 @@ const Button = ({
   const onPressIn = () => {
     if (animateOnPress) {
       opacity.value = withTiming(0.88, {
-        duration: 33,
+        duration: 100,
       });
-      scale.value = withTiming(0.96, {
-        duration: 33,
+      scale.value = withTiming(0.95, {
+        duration: 66,
       });
     }
   };
@@ -58,7 +58,7 @@ const Button = ({
   const onPressOut = () => {
     if (animateOnPress) {
       opacity.value = withTiming(1, {
-        duration: 46,
+        duration: 88,
       });
       scale.value = withTiming(1, {
         duration: 46,
