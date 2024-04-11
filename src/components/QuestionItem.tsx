@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {Box, Center, Flex, HStack, Text, VStack} from './common';
+import {Box, Center, HStack, Text, VStack} from './common';
 import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -46,7 +46,7 @@ dayjs.updateLocale('en', {
   },
 });
 
-const ICON_SIZE = 16;
+const ICON_SIZE = 13;
 
 const QuestionItem: FC<QuestionItemProps> = ({
   username,
@@ -105,7 +105,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
               height={ICON_SIZE}
             />
           )}
-          <Text color="cardText" variant="small">
+          <Text color="cardText" variant="smaller">
             {votes}
           </Text>
         </HStack>
@@ -115,19 +115,18 @@ const QuestionItem: FC<QuestionItemProps> = ({
             width={ICON_SIZE}
             height={ICON_SIZE}
           />
-          <Text color="cardText" variant="small">
+          <Text color="cardText" variant="smaller">
             {answerCount}
           </Text>
         </HStack>
-        <Flex />
         <HStack alignItems="center" columnGap="xxs">
           <TimeIcon
             fill={theme.colors.cardText}
-            width={ICON_SIZE * 0.8}
-            height={ICON_SIZE * 0.8}
+            width={ICON_SIZE}
+            height={ICON_SIZE}
           />
           <Text color="cardText" variant="smaller">
-            {dayjs(timestamp).fromNow()}
+            {dayjs(timestamp).fromNow(true)}
           </Text>
         </HStack>
       </HStack>
