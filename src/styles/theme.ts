@@ -16,6 +16,20 @@ const palette = {
     900: '#010100',
     950: '#000000',
   },
+  Grey: {
+    DEFAULT: '#737373',
+    50: '#DADADA',
+    100: '#CFCFCF',
+    200: '#B8B8B8',
+    300: '#A1A1A1',
+    400: '#8A8A8A',
+    500: '#737373',
+    600: '#5C5C5C',
+    700: '#454545',
+    800: '#403E3B',
+    900: '#2A2927',
+    950: '#141210',
+  },
 
   secondaryText: '#ddd',
 
@@ -71,6 +85,10 @@ const palette = {
 const theme = createTheme({
   colors: {
     brand: palette.primary.DEFAULT,
+    // TabBar
+    tabBarBackground: palette.Grey[800],
+    tabBarIconInactive: palette.Grey[300],
+    tabBarIconActive: palette.primary.DEFAULT,
     // Actions
     successfulAction: palette.successfulActionDark,
     destructiveAction: palette.destructiveActionDark,

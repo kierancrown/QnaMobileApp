@@ -42,8 +42,8 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   onCtaPress,
 }) => {
   const theme = useTheme<Theme>();
-  const activeColor = theme.colors.brand;
-  const inactiveColor = theme.colors.cardText;
+  const activeColor = theme.colors.tabBarIconActive;
+  const inactiveColor = theme.colors.tabBarIconInactive;
 
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
@@ -89,7 +89,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
         px="m"
         columnGap="l"
         borderRadius="pill"
-        backgroundColor="cardBackground"
+        backgroundColor="tabBarBackground"
         shadowColor="black"
         shadowOffset={{
           width: 0,
@@ -155,7 +155,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           <Center
             width={CTA_SIZE}
             height={CTA_SIZE}
-            backgroundColor="brand"
+            backgroundColor="tabBarIconActive"
             shadowColor="black"
             shadowOffset={{
               width: 0,

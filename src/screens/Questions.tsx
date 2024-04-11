@@ -56,8 +56,10 @@ const Questions: FC = () => {
 
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const refreshQuestions = async () => {
+  const refreshQuestions = async (initialLoad = false) => {
+    setRefreshing(!initialLoad);
     setLoading(true);
 
     const {data, error} = await questionsWithCountQuery;
@@ -71,7 +73,9 @@ const Questions: FC = () => {
     setLoading(false);
   };
 
-  useMount(refreshQuestions);
+  useMount(() => {
+    refreshQuestions(true);
+  });
 
   return (
     <Flex>
@@ -83,7 +87,7 @@ const Questions: FC = () => {
         refreshControl={
           <RefreshControl refreshing={false} onRefresh={refreshQuestions} />
         }
-        refreshing={loading}
+        refreshing={refreshing}
         onRefresh={refreshQuestions}
         contentContainerStyle={{
           paddingTop: theme.spacing.sY,
