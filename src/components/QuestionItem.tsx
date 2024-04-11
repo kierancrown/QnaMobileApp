@@ -1,8 +1,6 @@
 import React, {FC} from 'react';
 import {Box, Center, HStack, Text, VStack} from './common';
 import dayjs from 'dayjs';
-import updateLocale from 'dayjs/plugin/updateLocale';
-import relativeTime from 'dayjs/plugin/relativeTime';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartIcon from 'app/assets/icons/actions/Heart.svg';
@@ -31,27 +29,6 @@ interface QuestionItemProps {
   nsfw?: boolean;
   tags?: string[];
 }
-
-dayjs.extend(relativeTime);
-dayjs.extend(updateLocale);
-
-dayjs.updateLocale('en', {
-  relativeTime: {
-    future: 'in %s',
-    past: '%s ago',
-    s: 'just now',
-    m: '1m',
-    mm: '%dm',
-    h: '1h',
-    hh: '%dh',
-    d: '1d',
-    dd: '%dd',
-    M: '1mo',
-    MM: '%dmo',
-    y: '1yr',
-    yy: '%dyr',
-  },
-});
 
 const ICON_SIZE = 13;
 
@@ -114,12 +91,12 @@ const QuestionItem: FC<QuestionItemProps> = ({
           </Text>
           <VStack rowGap="xsY">
             <HStack alignItems="center" justifyContent="space-between">
-              <Text
-                variant="username"
-                fontWeight="400"
-                color={isOwner ? 'brand' : 'foreground'}>
+              <Text variant="username" fontWeight="400">
                 Asked by{' '}
-                <Text variant="username" fontWeight="600">
+                <Text
+                  variant="username"
+                  fontWeight="600"
+                  color={isOwner ? 'brand' : 'foreground'}>
                   {username}
                 </Text>
               </Text>

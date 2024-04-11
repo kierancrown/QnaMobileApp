@@ -7,8 +7,6 @@ import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import useMount from 'app/hooks/useMount';
 import {RefreshControl} from 'react-native-gesture-handler';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import {useNavigation} from '@react-navigation/native';
 import {HomeStackNavigationProp} from 'app/navigation/HomeStack';
 import {
@@ -24,6 +22,7 @@ import {
   ScalingView,
   FlashListWithHeaders,
 } from '@codeherence/react-native-header';
+
 import {SharedValue} from 'react-native-reanimated';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
@@ -45,8 +44,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => (
     </ScalingView>
   </LargeHeader>
 );
-
-dayjs.extend(relativeTime);
 
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
