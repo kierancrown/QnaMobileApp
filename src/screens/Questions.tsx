@@ -1,4 +1,4 @@
-import {Alert, Pressable} from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
 import React, {FC, useState} from 'react';
 import {Center, Flex, Text} from 'ui';
 
@@ -70,6 +70,7 @@ const Questions: FC = () => {
       const questionsWithCount: QuestionsWithCount = data;
       setQuestions(questionsWithCount || []);
     }
+    setRefreshing(false);
     setLoading(false);
   };
 
@@ -79,28 +80,32 @@ const Questions: FC = () => {
 
   return (
     <Flex>
-      <FlashListWithHeaders
-        HeaderComponent={HeaderComponent}
-        LargeHeaderComponent={LargeHeaderComponent}
-        data={questions}
-        keyExtractor={item => item.id.toString()}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={refreshQuestions} />
-        }
-        refreshing={refreshing}
-        onRefresh={refreshQuestions}
-        contentContainerStyle={{
-          paddingTop: theme.spacing.sY,
-          paddingBottom: bottomListPadding,
-        }}
-        scrollEventThrottle={16}
-        estimatedItemSize={100}
-        renderItem={({item}) => (
-          <Pressable
-            onPress={() => {
-              navigate('QuestionDetail', {questionId: item.id});
-            }}>
+      {loading && !refreshing ? (
+        <Center flex={1}>
+          <ActivityIndicator size="small" color={theme.colors.brand} />
+        </Center>
+      ) : (
+        <FlashListWithHeaders
+          HeaderComponent={HeaderComponent}
+          LargeHeaderComponent={LargeHeaderComponent}
+          data={questions}
+          keyExtractor={item => item.id.toString()}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={refreshQuestions} />
+          }
+          refreshing={refreshing}
+          onRefresh={refreshQuestions}
+          contentContainerStyle={{
+            paddingTop: theme.spacing.sY,
+            paddingBottom: bottomListPadding,
+          }}
+          scrollEventThrottle={16}
+          estimatedItemSize={100}
+          renderItem={({item}) => (
             <QuestionItem
+              onPress={() => {
+                navigate('QuestionDetail', {questionId: item.id});
+              }}
               username={item.username}
               question={item.question}
               answerCount={0}
@@ -110,9 +115,9 @@ const Questions: FC = () => {
               nsfw={item.nsfw}
               isOwner={user?.id === item.user_id}
             />
-          </Pressable>
-        )}
-      />
+          )}
+        />
+      )}
     </Flex>
   );
 };
