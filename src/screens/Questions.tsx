@@ -24,6 +24,7 @@ import {
 } from '@codeherence/react-native-header';
 
 import {SharedValue} from 'react-native-reanimated';
+import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
   <Header
@@ -50,6 +51,7 @@ const Questions: FC = () => {
   const theme = useTheme<Theme>();
   const {user} = useUser();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
+  const {triggerHaptic} = useHaptics();
 
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
@@ -101,6 +103,7 @@ const Questions: FC = () => {
           renderItem={({item}) => (
             <QuestionItem
               onPress={() => {
+                triggerHaptic(HapticFeedbackTypes.selection).then();
                 navigate('QuestionDetail', {questionId: item.id});
               }}
               username={item.username}

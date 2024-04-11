@@ -7,7 +7,7 @@ import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
 import BookmarkIcon from 'app/assets/icons/actions/Bookmark.svg';
 import BookmarkOutlineIcon from 'app/assets/icons/actions/Bookmark-Outline.svg';
 import AnswerIcon from 'app/assets/icons/actions/Comment.svg';
-import ShareIcon from 'app/assets/icons/actions/Share.svg';
+import ShareIcon from 'app/assets/icons/actions/arrow-up-from-bracket.svg';
 
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'app/styles/theme';
@@ -15,6 +15,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
+import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 
 interface ActionBarIconProps {
   active?: boolean;
@@ -44,6 +45,12 @@ const ActionBarIcon: FC<ActionBarIconProps> = ({
 }) => {
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
+  const {triggerHaptic} = useHaptics();
+
+  const internalOnPress = async () => {
+    await triggerHaptic(HapticFeedbackTypes.selection);
+    onPress?.();
+  };
 
   const onPressIn = () => {
     opacity.value = 0.66;
@@ -65,7 +72,7 @@ const ActionBarIcon: FC<ActionBarIconProps> = ({
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
-        onPress={onPress}
+        onPress={internalOnPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}>
         <Center
