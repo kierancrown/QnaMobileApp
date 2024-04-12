@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {FC, createContext, useContext, useEffect, useState} from 'react';
-import {NativeScrollEvent} from 'react-native';
+import {BackHandler, NativeScrollEvent} from 'react-native';
 import {SharedValue, runOnJS, useSharedValue} from 'react-native-reanimated';
 
 interface TabBarContextData {
@@ -75,9 +75,9 @@ export const useTabBar = () => {
   return context;
 };
 
-export const useTabBarAnimation = () => {
+export const useTabBarAnimation = (scrollToTop?: () => void) => {
   const navigation = useNavigation();
-  const {setScrollY, setContentSize} = useTabBar();
+  const {setScrollY, setContentSize, scrollY, hideThreshold} = useTabBar();
 
   const scrollHandlerWorklet = (evt: NativeScrollEvent) => {
     'worklet';
@@ -85,6 +85,22 @@ export const useTabBarAnimation = () => {
     runOnJS(setContentSize)(maxScrollY);
     runOnJS(setScrollY)(evt.contentOffset.y);
   };
+
+  useEffect(() => {
+    const handler = () => {
+      console.log('scrollY.value', scrollY.value);
+      if (parseInt(scrollY.value.toFixed(), 10) > hideThreshold) {
+        scrollToTop?.();
+        return true;
+      }
+      return false;
+    };
+
+    BackHandler.addEventListener('hardwareBackPress', handler);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handler);
+    };
+  }, [scrollY, navigation, scrollToTop, hideThreshold]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {

@@ -5,7 +5,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {FC, useState} from 'react';
+import React, {FC, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -197,7 +197,13 @@ const QuestionDetail: FC = () => {
   const {user} = useUser();
   const {username} = useUsername();
 
-  const {scrollHandlerWorklet} = useTabBarAnimation();
+  const scrollRef = useRef(null);
+  const {scrollHandlerWorklet} = useTabBarAnimation(() => {
+    if (scrollRef.current) {
+      // @ts-ignore
+      scrollRef.current.scrollToOffset({offset: 0, animated: true});
+    }
+  });
 
   const {
     params: {questionId},
@@ -277,6 +283,7 @@ const QuestionDetail: FC = () => {
         HeaderComponent={HeaderComponent}
         LargeHeaderComponent={LargeHeaderComponent}
         data={responses}
+        ref={scrollRef}
         keyExtractor={item => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={false} onRefresh={refreshResponses} />

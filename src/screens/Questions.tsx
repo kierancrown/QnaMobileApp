@@ -1,5 +1,5 @@
 import {ActivityIndicator, Alert, StyleProp, ViewStyle} from 'react-native';
-import React, {FC, useState} from 'react';
+import React, {FC, useRef, useState} from 'react';
 import {Center, Flex, Text} from 'ui';
 
 import {Theme} from 'app/styles/theme';
@@ -69,8 +69,14 @@ const Questions: FC = () => {
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const scrollRef = useRef(null);
 
-  const {scrollHandlerWorklet} = useTabBarAnimation();
+  const {scrollHandlerWorklet} = useTabBarAnimation(() => {
+    if (scrollRef.current) {
+      // @ts-ignore
+      scrollRef.current.scrollToOffset({offset: 0, animated: true});
+    }
+  });
 
   const refreshQuestions = async (initialLoad = false) => {
     setRefreshing(!initialLoad);
@@ -100,6 +106,7 @@ const Questions: FC = () => {
         </Center>
       ) : (
         <FlashListWithHeaders
+          ref={scrollRef}
           HeaderComponent={HeaderComponent}
           LargeHeaderComponent={LargeHeaderComponent}
           data={questions}
