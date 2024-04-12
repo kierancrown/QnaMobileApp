@@ -1,5 +1,4 @@
 import React, {FC, Fragment} from 'react';
-
 import {
   BottomTabDescriptorMap,
   BottomTabNavigationEventMap,
@@ -9,19 +8,19 @@ import {
   ParamListBase,
   TabNavigationState,
 } from '@react-navigation/native';
-
 import {Box, Center, HStack, VStack} from 'ui';
 import {useTheme} from '@shopify/restyle';
 import staticTheme, {Theme} from 'app/styles/theme';
-import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
-
 import PlusIcon from 'app/assets/icons/actions/Plus.svg';
 import {Pressable, StyleProp, ViewStyle} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {useTabBar} from 'app/context/tabBarContext';
+import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -48,13 +47,28 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
 
+  const {scrollDirection} = useTabBar();
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const hideTabBar = scrollDirection === 'down';
+    return {
+      transform: [
+        {
+          translateY: hideTabBar
+            ? withTiming(ESTIMATED_TABBAR_HEIGHT * 2)
+            : withSpring(0),
+        },
+      ],
+    };
+  }, [scrollDirection]);
+
   const ctaStyles: StyleProp<ViewStyle> = {
     position: 'absolute',
     top: -theme.spacing.xsY,
     left: (WINDOW_WIDTH - theme.spacing.l * 2 - CTA_SIZE) / 2,
   };
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const ctaAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
       transform: [{scale: scale.value}],
@@ -80,7 +94,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   };
 
   return (
-    <Box>
+    <Animated.View style={animatedStyle}>
       <HStack
         width="100%"
         justifyContent="space-around"
@@ -147,7 +161,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           );
         })}
       </HStack>
-      <Animated.View style={[ctaStyles, animatedStyle]}>
+      <Animated.View style={[ctaStyles, ctaAnimatedStyle]}>
         <Pressable
           onPress={onCtaPress}
           onPressIn={onPressIn}
@@ -171,6 +185,6 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           </Center>
         </Pressable>
       </Animated.View>
-    </Box>
+    </Animated.View>
   );
 };

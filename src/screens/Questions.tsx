@@ -25,6 +25,8 @@ import {
 
 import {SharedValue} from 'react-native-reanimated';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
+import {useTabBar} from 'app/context/tabBarContext';
+import {FlashList} from '@shopify/flash-list';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
   <Header
@@ -57,6 +59,8 @@ const Questions: FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const {setScrollY} = useTabBar();
+
   const refreshQuestions = async (initialLoad = false) => {
     setRefreshing(!initialLoad);
     setLoading(true);
@@ -84,9 +88,11 @@ const Questions: FC = () => {
           <ActivityIndicator size="small" color={theme.colors.brand} />
         </Center>
       ) : (
-        <FlashListWithHeaders
-          HeaderComponent={HeaderComponent}
-          LargeHeaderComponent={LargeHeaderComponent}
+        <FlashList
+          scrollEventThrottle={16}
+          onScroll={({nativeEvent}) => {
+            setScrollY(nativeEvent.contentOffset.y);
+          }}
           data={questions}
           keyExtractor={item => item.id.toString()}
           refreshControl={
@@ -95,10 +101,9 @@ const Questions: FC = () => {
           refreshing={refreshing}
           onRefresh={refreshQuestions}
           contentContainerStyle={{
-            paddingTop: theme.spacing.sY,
+            paddingTop: bottomListPadding,
             paddingBottom: bottomListPadding,
           }}
-          scrollEventThrottle={16}
           estimatedItemSize={100}
           renderItem={({item}) => (
             <QuestionItem
@@ -117,6 +122,38 @@ const Questions: FC = () => {
             />
           )}
         />
+        // <FlashListWithHeaders
+        //   HeaderComponent={HeaderComponent}
+        //   LargeHeaderComponent={LargeHeaderComponent}
+        //   data={questions}
+        //   keyExtractor={item => item.id.toString()}
+        //   refreshControl={
+        //     <RefreshControl refreshing={false} onRefresh={refreshQuestions} />
+        //   }
+        //   refreshing={refreshing}
+        //   onRefresh={refreshQuestions}
+        //   contentContainerStyle={{
+        //     paddingTop: theme.spacing.sY,
+        //     paddingBottom: bottomListPadding,
+        //   }}
+        //   estimatedItemSize={100}
+        //   renderItem={({item}) => (
+        //     <QuestionItem
+        //       onPress={() => {
+        //         triggerHaptic(HapticFeedbackTypes.selection).then();
+        //         navigate('QuestionDetail', {questionId: item.id});
+        //       }}
+        //       username={item.username}
+        //       question={item.question}
+        //       answerCount={0}
+        //       voteCount={item.question_upvotes_count?.count || 0}
+        //       timestamp={item.created_at}
+        //       liked={false}
+        //       nsfw={item.nsfw}
+        //       isOwner={user?.id === item.user_id}
+        //     />
+        //   )}
+        // />
       )}
     </Flex>
   );

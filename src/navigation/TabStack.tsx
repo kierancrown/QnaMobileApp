@@ -25,6 +25,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Color from 'color';
 import AskQuestionSheet from 'app/components/sheets/AskQuestionSheet';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
+import {TabBarProvider} from 'app/context/tabBarContext';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -75,7 +76,7 @@ export default function TabStack() {
   const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
 
   return (
-    <>
+    <TabBarProvider>
       <Tab.Navigator
         // eslint-disable-next-line react/no-unstable-nested-components
         tabBar={props => (
@@ -147,6 +148,6 @@ export default function TabStack() {
           setQuestionSheetOpen(false);
         }}
       />
-    </>
+    </TabBarProvider>
   );
 }
