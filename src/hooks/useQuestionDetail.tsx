@@ -27,40 +27,46 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
     [questionLoading, deleteLoading],
   );
 
-  const fetchUpvoteCount = useCallback(async () => {
-    setUpvoteCountLoading(true);
-    // Get count
-    if (question) {
-      const {data: countData, error: e} = await supabase
-        .from('question_upvotes_count')
-        .select('count')
-        .eq('question_id', question.id)
-        .single();
-      if (e) {
-        setError(e.message);
+  const fetchUpvoteCount = useCallback(
+    async (id?: number) => {
+      setUpvoteCountLoading(true);
+      // Get count
+      if (id || question) {
+        const {data: countData, error: e} = await supabase
+          .from('question_upvotes_count')
+          .select('count')
+          .eq('question_id', id ?? question!.id)
+          .single();
+        if (e) {
+          setError(e.message);
+        }
+        setUpvotes(countData?.count || 0);
       }
-      setUpvotes(countData?.count || 0);
-    }
-    setUpvoteCountLoading(false);
-  }, [question]);
+      setUpvoteCountLoading(false);
+    },
+    [question],
+  );
 
-  const fetchUpvotedStatus = useCallback(async () => {
-    setUpvoteLoading(true);
-    // Get upvoted status
-    if (question && user) {
-      const {data, error: e} = await supabase
-        .from('question_upvotes')
-        .select('id')
-        .eq('question_id', question.id)
-        .eq('user_id', user.id);
-      if (e) {
-        setError(e.message);
-      } else {
-        setHasUpvoted(data?.length > 0);
+  const fetchUpvotedStatus = useCallback(
+    async (id?: number) => {
+      setUpvoteLoading(true);
+      // Get upvoted status
+      if ((id || question) && user) {
+        const {data, error: e} = await supabase
+          .from('question_upvotes')
+          .select('id')
+          .eq('question_id', id ?? question!.id)
+          .eq('user_id', user.id);
+        if (e) {
+          setError(e.message);
+        } else {
+          setHasUpvoted(data?.length > 0);
+        }
       }
-    }
-    setUpvoteLoading(false);
-  }, [question, user]);
+      setUpvoteLoading(false);
+    },
+    [question, user],
+  );
 
   const upvoteQuestion = async () => {
     if (!question || !user) {
@@ -90,8 +96,8 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
         return false;
       }
     }
-    await fetchUpvotedStatus();
-    await fetchUpvoteCount();
+    await fetchUpvotedStatus(question.id);
+    await fetchUpvoteCount(question.id);
     return true;
   };
 
@@ -126,6 +132,8 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
       setError(e.message);
     } else {
       setQuestion(data?.[0] || null);
+      await fetchUpvoteCount(data?.[0]?.id);
+      await fetchUpvotedStatus(data?.[0]?.id);
     }
     setQuestionLoading(false);
   };
