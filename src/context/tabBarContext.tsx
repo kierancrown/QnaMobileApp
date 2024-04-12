@@ -4,11 +4,13 @@ import {SharedValue, useSharedValue} from 'react-native-reanimated';
 interface TabBarContextData {
   lastScrollY: SharedValue<number>;
   scrollY: SharedValue<number>;
+  scrollContentSize: number;
   scrollDirection: 'up' | 'down';
   hideThreshold: number;
 
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
+  setContentSize: (value: number) => void;
 }
 
 interface TabBarProviderProps {
@@ -20,14 +22,17 @@ const TabBarContext = createContext<TabBarContextData>({} as TabBarContextData);
 export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
   const lastScrollY = useSharedValue(0);
   const scrollY = useSharedValue(0);
+  const [scrollContentSize, setContentSize] = useState<number>(0);
 
   const [hideThreshold, setHideThreshold] = useState<number>(40);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
 
   const setScrollY = (value: number) => {
+    console.log({scrollContentSize, value});
+
     // Calculate the direction of the scroll
     let direction: 'up' | 'down' = 'up';
-    if (value <= 0) {
+    if (value <= 0 || value >= scrollContentSize - hideThreshold / 2) {
       setScrollDirection(direction);
       return;
     }
@@ -45,11 +50,6 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
       lastScrollY.value = scrollY.value;
       // Update the scrollY value
       scrollY.value = value;
-    } else {
-      // If the scroll amount is less than the hide threshold, ignore the scroll
-      console.log(
-        'Scroll amount is less than the hide threshold. Ignoring the scroll.',
-      );
     }
   };
 
@@ -58,9 +58,11 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
       value={{
         scrollY,
         lastScrollY,
+        scrollContentSize,
         scrollDirection,
         hideThreshold,
         setHideThreshold,
+        setContentSize,
         setScrollY,
       }}>
       {children}
