@@ -1,4 +1,4 @@
-package com.ama
+package co.askthat.qna
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -1,4 +1,4 @@
-package com.ama
+package co.askthat.qna
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
