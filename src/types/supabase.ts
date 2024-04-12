@@ -181,6 +181,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_metadata: {
+        Row: {
+          id: number
+          profile_picture_key: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: number
+          profile_picture_key?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          id?: number
+          profile_picture_key?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_user_metadata_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usernames: {
         Row: {
           active: boolean

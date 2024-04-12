@@ -15,6 +15,10 @@ import EyesIcon from 'app/assets/icons/Eyes.svg';
 import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
+import {launchImageLibrary} from 'react-native-image-picker';
+import {decode} from 'base64-arraybuffer';
+import Avatar from 'app/components/common/Avatar';
+
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
@@ -58,6 +62,51 @@ const ProfileScreen: FC = () => {
     );
   };
 
+  const presentImagePicker = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: true,
+        quality: 0.5,
+      },
+      response => {
+        const imageBuffer = response.assets?.[0].base64;
+        if (!imageBuffer) {
+          console.log('No image selected');
+          return;
+        }
+        // TODO: Fix duplicate image error
+        supabase.storage
+          .from('user_profile_pictures')
+          .upload(`public/${user?.id}.jpg`, decode(imageBuffer), {
+            contentType: response.assets?.[0].type ?? 'image/jpg',
+          })
+          .then(({data, error}) => {
+            console.log(data, error);
+            if (!error && data) {
+              const url = data.path;
+              supabase
+                .from('user_metadata')
+                .upsert(
+                  {
+                    user_id: user?.id,
+                    profile_picture_key: url,
+                  },
+                  {onConflict: 'user_id'},
+                )
+                .then(({error: e}) => {
+                  if (e) {
+                    console.error('Error updating profile picture', e);
+                  } else {
+                    Alert.alert('Success', 'Profile picture updated');
+                  }
+                });
+            }
+          });
+      },
+    );
+  };
+
   return !user ? (
     <Center
       flex={1}
@@ -87,9 +136,12 @@ const ProfileScreen: FC = () => {
     <Flex>
       <LargeTitleHeader title="Profile" subtitle={username} />
       {user && (
-        <Center flex={1} style={{paddingBottom: bottomListPadding}}>
+        <Center flex={1} style={{paddingBottom: bottomListPadding}} rowGap="mY">
           <Button title={user ? 'Logout' : 'Login'} onPress={login} />
           <Button title="Update Username" onPress={updateUserPrompt} />
+          <Button title="Change Avatar" onPress={presentImagePicker} />
+
+          <Avatar size="xxxxl" />
         </Center>
       )}
     </Flex>
