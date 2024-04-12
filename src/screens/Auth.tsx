@@ -1,4 +1,4 @@
-import {Alert, StyleSheet, TextInput} from 'react-native';
+import {Alert, StyleSheet} from 'react-native';
 import React, {FC, useState} from 'react';
 import {Text, Center, SafeAreaView, VStack, Button} from 'ui';
 import {supabase} from 'app/lib/supabase';
@@ -7,6 +7,9 @@ import {AppDispatch} from 'app/redux/store';
 import {skipAuth} from 'app/redux/slices/authSlice';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
+
+import Logo from 'app/assets/Logo.svg';
+import Input from 'app/components/common/TextInput';
 
 const Auth: FC = () => {
   const [email, setEmail] = useState('');
@@ -38,37 +41,17 @@ const Auth: FC = () => {
   return (
     <SafeAreaView>
       <Center flex={1} rowGap="mY" mx="l">
-        <Text variant="header">Login</Text>
+        <Logo width={theme.iconSizes.logo} height={theme.iconSizes.logo} />
         <VStack width="100%">
-          <TextInput
+          <Input
             value={email}
             onChangeText={setEmail}
-            style={[
-              styles.input,
-              {
-                color: theme.colors.foreground,
-                backgroundColor: theme.colors.inputBackground,
-              },
-            ]}
-            placeholderTextColor={theme.colors.inputPlaceholder}
-            cursorColor={theme.colors.foreground}
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
             editable={!loading}
           />
-          {/* <TextInput
-            value={password}
-            onChangeText={setPassword}
-            style={[styles.input, {color: theme.colors.foreground}]}
-            cursorColor={theme.colors.foreground}
-            placeholder="Password"
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          /> */}
         </VStack>
 
         <Button
@@ -78,27 +61,15 @@ const Auth: FC = () => {
           onPress={sendMagicLink}
         />
 
-        {/* <Button
-          title="Login"
-          disabled={!email.trim().length || !password.trim().length || loading}
-          onPress={login}
-        /> */}
-        <Button title="Skip Login" onPress={skipLogin} disabled={loading} />
+        <Button
+          title="Skip Login"
+          variant="text"
+          onPress={skipLogin}
+          disabled={loading}
+        />
       </Center>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    padding: 8,
-    marginVertical: 8,
-    width: '100%',
-    borderRadius: 8,
-    lineHeight: 20,
-    fontSize: 16,
-  },
-});
 
 export default Auth;
