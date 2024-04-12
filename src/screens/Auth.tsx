@@ -1,6 +1,6 @@
-import {Alert, Button, StyleSheet, TextInput} from 'react-native';
+import {Alert, StyleSheet, TextInput} from 'react-native';
 import React, {FC, useState} from 'react';
-import {Text, Center, SafeAreaView, VStack} from 'ui';
+import {Text, Center, SafeAreaView, VStack, Button} from 'ui';
 import {supabase} from 'app/lib/supabase';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
@@ -10,7 +10,6 @@ import {useTheme} from '@shopify/restyle';
 
 const Auth: FC = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const theme = useTheme<Theme>();
@@ -21,11 +20,13 @@ const Auth: FC = () => {
     dispatch(skipAuth());
   };
 
-  const login = async () => {
+  const sendMagicLink = async () => {
     setLoading(true);
-    const {error} = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const {error} = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: 'qna://login',
+      },
     });
     setLoading(false);
     if (error) {
@@ -42,7 +43,14 @@ const Auth: FC = () => {
           <TextInput
             value={email}
             onChangeText={setEmail}
-            style={[styles.input, {color: theme.colors.foreground}]}
+            style={[
+              styles.input,
+              {
+                color: theme.colors.foreground,
+                backgroundColor: theme.colors.inputBackground,
+              },
+            ]}
+            placeholderTextColor={theme.colors.inputPlaceholder}
             cursorColor={theme.colors.foreground}
             placeholder="Email"
             keyboardType="email-address"
@@ -50,7 +58,7 @@ const Auth: FC = () => {
             autoCorrect={false}
             editable={!loading}
           />
-          <TextInput
+          {/* <TextInput
             value={password}
             onChangeText={setPassword}
             style={[styles.input, {color: theme.colors.foreground}]}
@@ -60,20 +68,22 @@ const Auth: FC = () => {
             autoCapitalize="none"
             autoCorrect={false}
             editable={!loading}
-          />
+          /> */}
         </VStack>
+
         <Button
+          title="Magic Link"
+          disabled={!email.trim().length}
+          loading={loading}
+          onPress={sendMagicLink}
+        />
+
+        {/* <Button
           title="Login"
           disabled={!email.trim().length || !password.trim().length || loading}
           onPress={login}
-          color={theme.colors.brand}
-        />
-        <Button
-          title="Skip Login"
-          onPress={skipLogin}
-          disabled={loading}
-          color={theme.colors.brand}
-        />
+        /> */}
+        <Button title="Skip Login" onPress={skipLogin} disabled={loading} />
       </Center>
     </SafeAreaView>
   );
@@ -85,6 +95,9 @@ const styles = StyleSheet.create({
     padding: 8,
     marginVertical: 8,
     width: '100%',
+    borderRadius: 8,
+    lineHeight: 20,
+    fontSize: 16,
   },
 });
 
