@@ -30,8 +30,6 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
 
   const setScrollY = (value: number) => {
-    console.log({scrollContentSize, value});
-
     // Calculate the direction of the scroll
     let direction: 'up' | 'down' = 'up';
     if (value <= 0 || value >= scrollContentSize - hideThreshold / 2) {

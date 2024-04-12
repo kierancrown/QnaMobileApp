@@ -1,4 +1,4 @@
-import {ActivityIndicator, Alert} from 'react-native';
+import {ActivityIndicator, Alert, StyleProp, ViewStyle} from 'react-native';
 import React, {FC, useState} from 'react';
 import {Center, Flex, Text} from 'ui';
 
@@ -39,13 +39,25 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
   />
 );
 
-const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => (
-  <LargeHeader>
-    <ScalingView scrollY={scrollY}>
-      <Text variant="largeHeader">Questions</Text>
-    </ScalingView>
-  </LargeHeader>
-);
+const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
+  const theme = useTheme<Theme>();
+  const headerStyle: StyleProp<ViewStyle> = {
+    paddingVertical: 0,
+    marginBottom: theme.spacing.mY,
+  };
+  return (
+    <LargeHeader headerStyle={headerStyle}>
+      <ScalingView scrollY={scrollY}>
+        <Text
+          variant="largeHeader"
+          marginVertical="none"
+          paddingVertical="none">
+          Questions
+        </Text>
+      </ScalingView>
+    </LargeHeader>
+  );
+};
 
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
