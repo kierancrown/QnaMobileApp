@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "yarn emulator; react-native run-android",
+    "emulator": "emulator -avd Pixel_6_Pro_API_33 >/dev/null 2>&1 &",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",

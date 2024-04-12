@@ -129,6 +129,8 @@ const theme = createTheme({
     cardBackground: palette.darkSecondaryBackground,
     backdrop: palette.primary[800],
     sheetBackdrop: palette.sheetBackdropDark,
+    // Button
+    buttonDisabled: palette.Grey[800],
     // Text
     foreground: palette.white,
     secondary: palette.secondaryText,

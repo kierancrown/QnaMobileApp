@@ -17,6 +17,7 @@ export interface ButtonProps extends BoxProps<Theme> {
   onLongPress?: () => void;
   variant?: 'primary' | 'text' | 'danger';
   title?: string;
+  fullWidth?: boolean;
   loading?: boolean;
   disabled?: boolean;
   testID?: string;
@@ -26,6 +27,7 @@ const Button = ({
   animateOnPress = true,
   variant = 'primary',
   title,
+  fullWidth,
   onLongPress,
   onPress,
   loading,
@@ -36,7 +38,9 @@ const Button = ({
   const scale = useSharedValue(1);
 
   const buttonBackgroundColor: keyof Theme['colors'] =
-    variant === 'text'
+    disabled || loading
+      ? 'buttonDisabled'
+      : variant === 'text'
       ? 'none'
       : variant === 'danger'
       ? 'destructiveAction'
@@ -82,6 +86,7 @@ const Button = ({
       <Animated.View style={animatedStyle}>
         <Box
           backgroundColor={buttonBackgroundColor}
+          alignSelf={fullWidth ? 'stretch' : 'flex-start'}
           opacity={disabled ? 0.6 : 1}
           borderRadius="m"
           px={variant === 'text' ? 'none' : 'm'}

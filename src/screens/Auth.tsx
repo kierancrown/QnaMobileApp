@@ -1,6 +1,6 @@
-import {Alert, StyleSheet} from 'react-native';
+import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
 import React, {FC, useState} from 'react';
-import {Text, Center, SafeAreaView, VStack, Button} from 'ui';
+import {Text, Center, SafeAreaView, VStack, Button, HStack, Flex} from 'ui';
 import {supabase} from 'app/lib/supabase';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
@@ -40,36 +40,59 @@ const Auth: FC = () => {
 
   return (
     <SafeAreaView>
-      <Center flex={1} rowGap="mY" mx="l">
-        <Logo width={theme.iconSizes.logo} height={theme.iconSizes.logo} />
-        <VStack width="100%">
-          <Input
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.select({
+          ios: 'padding',
+          android: undefined,
+        })}>
+        <VStack flex={1} mx="l" py="lY">
+          <VStack flex={1} rowGap="xxlY">
+            <Center>
+              <Logo
+                width={theme.iconSizes.logo}
+                height={theme.iconSizes.logo}
+              />
+            </Center>
+
+            <Input
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading}
+            />
+          </VStack>
+
+          <VStack rowGap="lY">
+            <Button
+              title="Magic Link"
+              disabled={!email.trim().length}
+              loading={loading}
+              onPress={sendMagicLink}
+              fullWidth
+            />
+
+            <Button
+              title="Skip Login"
+              variant="text"
+              onPress={skipLogin}
+              disabled={loading}
+              alignSelf="center"
+            />
+          </VStack>
         </VStack>
-
-        <Button
-          title="Magic Link"
-          disabled={!email.trim().length}
-          loading={loading}
-          onPress={sendMagicLink}
-        />
-
-        <Button
-          title="Skip Login"
-          variant="text"
-          onPress={skipLogin}
-          disabled={loading}
-        />
-      </Center>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+});
 
 export default Auth;
