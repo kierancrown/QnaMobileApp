@@ -1,5 +1,7 @@
-import React, {FC, createContext, useContext, useState} from 'react';
-import {SharedValue, useSharedValue} from 'react-native-reanimated';
+import {useNavigation} from '@react-navigation/native';
+import React, {FC, createContext, useContext, useEffect, useState} from 'react';
+import {NativeScrollEvent} from 'react-native';
+import {SharedValue, runOnJS, useSharedValue} from 'react-native-reanimated';
 
 interface TabBarContextData {
   lastScrollY: SharedValue<number>;
@@ -73,4 +75,26 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
 export const useTabBar = () => {
   const context = useContext(TabBarContext);
   return context;
+};
+
+export const useTabBarAnimation = () => {
+  const navigation = useNavigation();
+  const {setScrollY, setContentSize} = useTabBar();
+
+  const scrollHandlerWorklet = (evt: NativeScrollEvent) => {
+    'worklet';
+    const maxScrollY = evt.contentSize.height - evt.layoutMeasurement.height;
+    runOnJS(setContentSize)(maxScrollY);
+    runOnJS(setScrollY)(evt.contentOffset.y);
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setScrollY(0);
+    });
+
+    return unsubscribe;
+  }, [navigation, setScrollY]);
+
+  return {scrollHandlerWorklet};
 };

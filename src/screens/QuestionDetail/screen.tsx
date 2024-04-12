@@ -1,7 +1,6 @@
 import {
   ActivityIndicator,
   Alert,
-  NativeScrollEvent,
   RefreshControl,
   StyleProp,
   ViewStyle,
@@ -11,7 +10,7 @@ import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
 import {Box, Center, Flex, HStack, Text, VStack} from 'ui';
-import {SharedValue, runOnJS} from 'react-native-reanimated';
+import {SharedValue} from 'react-native-reanimated';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -40,7 +39,7 @@ import {formatNumber} from 'app/utils/numberFormatter';
 import ActionBar from './components/ActionBar';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
-import {useTabBar} from 'app/context/tabBarContext';
+import {useTabBarAnimation} from 'app/context/tabBarContext';
 
 const ICON_SIZE = 13;
 const BACK_ICON_SIZE = 24;
@@ -198,6 +197,8 @@ const QuestionDetail: FC = () => {
   const {user} = useUser();
   const {username} = useUsername();
 
+  const {scrollHandlerWorklet} = useTabBarAnimation();
+
   const {
     params: {questionId},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
@@ -206,7 +207,6 @@ const QuestionDetail: FC = () => {
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const [loading, setLoading] = useState(true);
   const [responsesLoading, setResponsesLoading] = useState(true);
-  const {setContentSize, setScrollY} = useTabBar();
 
   const refreshResponses = async () => {
     setResponsesLoading(true);
@@ -269,13 +269,6 @@ const QuestionDetail: FC = () => {
         }
       }
     });
-  };
-
-  const scrollHandlerWorklet = (evt: NativeScrollEvent) => {
-    'worklet';
-    const maxScrollY = evt.contentSize.height - evt.layoutMeasurement.height;
-    runOnJS(setContentSize)(maxScrollY);
-    runOnJS(setScrollY)(evt.contentOffset.y);
   };
 
   return (

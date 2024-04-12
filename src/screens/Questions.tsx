@@ -1,4 +1,4 @@
-import {ActivityIndicator, Alert, NativeScrollEvent} from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
 import React, {FC, useState} from 'react';
 import {Center, Flex, Text} from 'ui';
 
@@ -23,9 +23,9 @@ import {
   FlashListWithHeaders,
 } from '@codeherence/react-native-header';
 
-import {SharedValue, runOnJS} from 'react-native-reanimated';
+import {SharedValue} from 'react-native-reanimated';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
-import {useTabBar} from 'app/context/tabBarContext';
+import {useTabBarAnimation} from 'app/context/tabBarContext';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
   <Header
@@ -58,7 +58,7 @@ const Questions: FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const {setScrollY, setContentSize} = useTabBar();
+  const {scrollHandlerWorklet} = useTabBarAnimation();
 
   const refreshQuestions = async (initialLoad = false) => {
     setRefreshing(!initialLoad);
@@ -79,13 +79,6 @@ const Questions: FC = () => {
   useMount(() => {
     refreshQuestions(true);
   });
-
-  const scrollHandlerWorklet = (evt: NativeScrollEvent) => {
-    'worklet';
-    const maxScrollY = evt.contentSize.height - evt.layoutMeasurement.height;
-    runOnJS(setContentSize)(maxScrollY);
-    runOnJS(setScrollY)(evt.contentOffset.y);
-  };
 
   return (
     <Flex>
