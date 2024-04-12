@@ -38,7 +38,7 @@ const Button = ({
   const scale = useSharedValue(1);
 
   const buttonBackgroundColor: keyof Theme['colors'] =
-    disabled || loading
+    (disabled || loading) && variant !== 'text'
       ? 'buttonDisabled'
       : variant === 'text'
       ? 'none'
@@ -87,7 +87,7 @@ const Button = ({
         <Box
           backgroundColor={buttonBackgroundColor}
           alignSelf={fullWidth ? 'stretch' : 'flex-start'}
-          opacity={disabled ? 0.6 : 1}
+          opacity={disabled || loading ? 0.6 : 1}
           borderRadius="m"
           px={variant === 'text' ? 'none' : 'm'}
           py={variant === 'text' ? 'none' : 'sY'}

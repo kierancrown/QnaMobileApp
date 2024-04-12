@@ -1,6 +1,6 @@
 import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
-import React, {FC, useState} from 'react';
-import {Text, Center, SafeAreaView, VStack, Button, HStack, Flex} from 'ui';
+import React, {FC, useMemo, useState} from 'react';
+import {Center, SafeAreaView, VStack, Button} from 'ui';
 import {supabase} from 'app/lib/supabase';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
@@ -10,9 +10,16 @@ import {useTheme} from '@shopify/restyle';
 
 import Logo from 'app/assets/Logo.svg';
 import Input from 'app/components/common/TextInput';
+import {verifyEmail} from 'app/utils/emailVerification';
+import MagicLinkSentSheet from 'app/components/sheets/MagicLinkSentSheet';
 
 const Auth: FC = () => {
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [magicLinkSentTimestamp, setMagicLinkSentTimestamp] = useState(0);
   const [email, setEmail] = useState('');
+  const validEmail = useMemo(() => {
+    return verifyEmail(email);
+  }, [email]);
   const [loading, setLoading] = useState(false);
 
   const theme = useTheme<Theme>();
@@ -35,57 +42,71 @@ const Auth: FC = () => {
     if (error) {
       Alert.alert('Login Error', error.message);
       return;
+    } else {
+      setMagicLinkSentTimestamp(Date.now());
+      setMagicLinkSent(true);
     }
   };
 
   return (
-    <SafeAreaView>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.select({
-          ios: 'padding',
-          android: undefined,
-        })}>
-        <VStack flex={1} mx="l" py="lY">
-          <VStack flex={1} rowGap="xxlY">
-            <Center>
-              <Logo
-                width={theme.iconSizes.logo}
-                height={theme.iconSizes.logo}
+    <>
+      <SafeAreaView>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.select({
+            ios: 'padding',
+            android: undefined,
+          })}>
+          <VStack flex={1} mx="l" py="lY">
+            <VStack flex={1} rowGap="xxlY">
+              <Center>
+                <Logo
+                  width={theme.iconSizes.logo}
+                  height={theme.iconSizes.logo}
+                />
+              </Center>
+
+              <Input
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!loading}
               />
-            </Center>
+            </VStack>
 
-            <Input
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!loading}
-            />
+            <VStack rowGap="lY">
+              <Button
+                title="Magic Link"
+                disabled={!validEmail}
+                loading={loading}
+                onPress={sendMagicLink}
+                fullWidth
+              />
+
+              <Button
+                title="Skip Login"
+                variant="text"
+                onPress={skipLogin}
+                disabled={loading}
+                alignSelf="center"
+              />
+            </VStack>
           </VStack>
-
-          <VStack rowGap="lY">
-            <Button
-              title="Magic Link"
-              disabled={!email.trim().length}
-              loading={loading}
-              onPress={sendMagicLink}
-              fullWidth
-            />
-
-            <Button
-              title="Skip Login"
-              variant="text"
-              onPress={skipLogin}
-              disabled={loading}
-              alignSelf="center"
-            />
-          </VStack>
-        </VStack>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+      <MagicLinkSentSheet
+        open={magicLinkSent}
+        onClose={() => {
+          setMagicLinkSent(false);
+        }}
+        sentTimestamp={magicLinkSentTimestamp}
+        onResend={sendMagicLink}
+        resending={loading}
+      />
+    </>
   );
 };
 
