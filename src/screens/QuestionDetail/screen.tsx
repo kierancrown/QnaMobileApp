@@ -40,6 +40,7 @@ import ActionBar from './components/ActionBar';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {useTabBarAnimation} from 'app/context/tabBarContext';
+import Username from 'app/components/Username';
 
 const ICON_SIZE = 13;
 const BACK_ICON_SIZE = 24;
@@ -124,16 +125,16 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
               )}
             </Text>
             <VStack rowGap="xsY">
-              <HStack alignItems="center" justifyContent="space-between">
+              <HStack alignItems="center">
                 <Text variant="username" fontWeight="400">
                   Asked by{' '}
-                  <Text
-                    variant="username"
-                    fontWeight="600"
-                    color={isOwner ? 'brand' : 'foreground'}>
-                    {question.username}
-                  </Text>
                 </Text>
+                <Username
+                  variant="username"
+                  fontWeight="600"
+                  username={question.user_metadata?.username ?? 'Anyonymous'}
+                  isVerified={question.user_metadata?.verified ?? false}
+                />
               </HStack>
               <HStack alignItems="center" columnGap="s">
                 <HStack alignItems="center" columnGap="xxs">

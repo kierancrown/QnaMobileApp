@@ -1,8 +1,11 @@
 import {useUser} from 'app/lib/supabase/context/auth';
-import {Question} from 'app/lib/supabase/types';
 import {useCallback, useMemo, useState} from 'react';
 import useMount from './useMount';
 import {supabase} from 'app/lib/supabase';
+import {
+  QuestionsDetail,
+  questionDetailQuery,
+} from 'app/lib/supabase/queries/questionDetail';
 
 interface UseQuestionDetailProps {
   questionId: number;
@@ -13,7 +16,7 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
 
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [upvotes, setUpvotes] = useState(0);
-  const [question, setQuestion] = useState<Question | null>(null);
+  const [question, setQuestion] = useState<QuestionsDetail[0] | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -123,15 +126,12 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
 
   const fetchQuestion = async () => {
     setQuestionLoading(true);
-    const {data, error: e} = await supabase
-      .from('questions')
-      .select('*')
-      .eq('id', questionId);
+    const {data, error: e} = await questionDetailQuery.eq('id', questionId);
 
     if (e) {
       setError(e.message);
     } else {
-      setQuestion(data?.[0] || null);
+      setQuestion(data[0] ?? null);
       await fetchUpvoteCount(data?.[0]?.id);
       await fetchUpvotedStatus(data?.[0]?.id);
     }
