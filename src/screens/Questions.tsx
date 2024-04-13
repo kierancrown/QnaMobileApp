@@ -71,11 +71,13 @@ const Questions: FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef(null);
 
-  const {scrollHandlerWorklet} = useTabBarAnimation(() => {
-    if (scrollRef.current) {
-      // @ts-ignore
-      scrollRef.current.scrollToOffset({offset: 0, animated: true});
-    }
+  const {scrollHandlerWorklet} = useTabBarAnimation({
+    scrollToTop: () => {
+      if (scrollRef.current) {
+        // @ts-ignore
+        scrollRef.current.scrollToOffset({offset: 0, animated: true});
+      }
+    },
   });
 
   const refreshQuestions = async (initialLoad = false) => {

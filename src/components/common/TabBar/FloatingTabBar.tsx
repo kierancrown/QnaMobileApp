@@ -47,7 +47,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
 
-  const {scrollDirection} = useTabBar();
+  const {scrollDirection, emitTabPress} = useTabBar();
 
   const animatedStyle = useAnimatedStyle(() => {
     const hideTabBar = scrollDirection === 'down';
@@ -118,6 +118,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           const isFocused = state.index === index;
 
           const onPress = async () => {
+            emitTabPress && emitTabPress(route.name);
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,

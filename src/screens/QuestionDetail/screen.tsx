@@ -198,11 +198,13 @@ const QuestionDetail: FC = () => {
   const {username} = useUsername();
 
   const scrollRef = useRef(null);
-  const {scrollHandlerWorklet} = useTabBarAnimation(() => {
-    if (scrollRef.current) {
-      // @ts-ignore
-      scrollRef.current.scrollToOffset({offset: 0, animated: true});
-    }
+  const {scrollHandlerWorklet} = useTabBarAnimation({
+    scrollToTop: () => {
+      if (scrollRef.current) {
+        // @ts-ignore
+        scrollRef.current.scrollToOffset({offset: 0, animated: true});
+      }
+    },
   });
 
   const {

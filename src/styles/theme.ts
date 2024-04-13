@@ -136,6 +136,7 @@ const theme = createTheme({
     secondary: palette.secondaryText,
     secondaryBrand: palette.primary[200],
     cardText: palette.cardTextDark,
+    verifiedBadge: palette.primary[500],
     // Input
     inputBackground: palette.inputBackgroundDark,
     inputPlaceholder: palette.inputPlaceholderDark,

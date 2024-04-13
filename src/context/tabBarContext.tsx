@@ -13,6 +13,10 @@ interface TabBarContextData {
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
   setContentSize: (value: number) => void;
+
+  emitTabPress: (tabName: string) => void;
+  addTabPressListener: (listener: (tabName: string) => void) => void;
+  removeTabPressListener: (listener: (tabName: string) => void) => void;
 }
 
 interface TabBarProviderProps {
@@ -28,6 +32,8 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
 
   const [hideThreshold, setHideThreshold] = useState<number>(40);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
+
+  const [listeners, setListeners] = useState<((tabName: string) => void)[]>([]);
 
   const setScrollY = (value: number) => {
     // Calculate the direction of the scroll
@@ -53,6 +59,23 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
     }
   };
 
+  const emitTabPress = (tabName: string) => {
+    // Emitting tab press event
+    console.log('Tab Pressed:', tabName);
+    // Notify all subscribers
+    listeners.forEach(listener => listener(tabName));
+  };
+
+  const addTabPressListener = (listener: (tabName: string) => void) => {
+    setListeners(prevListeners => [...prevListeners, listener]);
+  };
+
+  const removeTabPressListener = (listener: (tabName: string) => void) => {
+    setListeners(prevListeners =>
+      prevListeners.filter(prevListener => prevListener !== listener),
+    );
+  };
+
   return (
     <TabBarContext.Provider
       value={{
@@ -61,6 +84,9 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
         scrollContentSize,
         scrollDirection,
         hideThreshold,
+        emitTabPress,
+        addTabPressListener,
+        removeTabPressListener,
         setHideThreshold,
         setContentSize,
         setScrollY,
@@ -75,7 +101,11 @@ export const useTabBar = () => {
   return context;
 };
 
-export const useTabBarAnimation = (scrollToTop?: () => void) => {
+interface UseTabBarAnimationProps {
+  scrollToTop?: () => void;
+}
+
+export const useTabBarAnimation = ({scrollToTop}: UseTabBarAnimationProps) => {
   const navigation = useNavigation();
   const {setScrollY, setContentSize, scrollY, hideThreshold} = useTabBar();
 
@@ -111,4 +141,24 @@ export const useTabBarAnimation = (scrollToTop?: () => void) => {
   }, [navigation, setScrollY]);
 
   return {scrollHandlerWorklet};
+};
+
+interface UseTabPressProps {
+  onTabPress: (tabName: string) => void;
+}
+
+export const useTabPress = ({onTabPress}: UseTabPressProps) => {
+  const {addTabPressListener, removeTabPressListener} = useTabBar();
+
+  useEffect(() => {
+    const listener = (tabName: string) => {
+      onTabPress(tabName);
+    };
+
+    addTabPressListener(listener);
+
+    return () => {
+      removeTabPressListener(listener);
+    };
+  }, [addTabPressListener, onTabPress, removeTabPressListener]);
 };

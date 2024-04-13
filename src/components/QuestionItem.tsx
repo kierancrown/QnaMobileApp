@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {Pressable} from 'react-native';
+import Username from './Username';
 
 interface QuestionItemProps {
   onPress: () => void;
@@ -41,7 +42,6 @@ const QuestionItem: FC<QuestionItemProps> = ({
   timestamp,
   liked,
   nsfw,
-  isOwner,
 }) => {
   const theme = useTheme<Theme>();
   const votes = formatNumber(voteCount);
@@ -90,16 +90,15 @@ const QuestionItem: FC<QuestionItemProps> = ({
             )}
           </Text>
           <VStack rowGap="xsY">
-            <HStack alignItems="center" justifyContent="space-between">
+            <HStack alignItems="center">
               <Text variant="username" fontWeight="400">
                 Asked by{' '}
-                <Text
-                  variant="username"
-                  fontWeight="600"
-                  color={isOwner ? 'brand' : 'foreground'}>
-                  {username}
-                </Text>
               </Text>
+              <Username
+                variant="username"
+                fontWeight="600"
+                username={username}
+              />
             </HStack>
             <HStack alignItems="center" columnGap="s">
               <HStack alignItems="center" columnGap="xxs">

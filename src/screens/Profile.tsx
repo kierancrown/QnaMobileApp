@@ -3,7 +3,7 @@ import React, {FC} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
-import {Center, Flex, Text, VStack, Button, HStack} from 'ui';
+import {Center, Flex, Text, VStack, Button, HStack, SafeAreaView} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -12,12 +12,12 @@ import {supabase} from 'app/lib/supabase';
 import {useUsername} from 'app/hooks/useUsername';
 
 import EyesIcon from 'app/assets/icons/Eyes.svg';
-import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
 import {launchImageLibrary} from 'react-native-image-picker';
 import {decode} from 'base64-arraybuffer';
 import Avatar from 'app/components/common/Avatar';
+import Username from 'app/components/Username';
 
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -107,44 +107,56 @@ const ProfileScreen: FC = () => {
     );
   };
 
-  return !user ? (
-    <Center
-      flex={1}
-      style={{
-        paddingBottom: bottomListPadding,
-        paddingTop: bottomListPadding / 2,
-      }}>
-      <VStack rowGap="sY" px="l">
-        <EyesIcon
-          fill={theme.colors.foreground}
-          width={theme.iconSizes.xxxxl}
-          height={theme.iconSizes.xxxxl}
-        />
-        <Text variant="header" textAlign="left">
-          {"You're currently\nannoymous"}
-        </Text>
-        <Text variant="subheader" color="cardText" textAlign="left">
-          Login to ask questions and get answers
-        </Text>
+  return (
+    <SafeAreaView>
+      {!user || !username ? (
+        <Center
+          flex={1}
+          style={{
+            paddingBottom: bottomListPadding,
+            paddingTop: bottomListPadding / 2,
+          }}>
+          <VStack rowGap="sY" px="l">
+            <EyesIcon
+              fill={theme.colors.foreground}
+              width={theme.iconSizes.xxxxl}
+              height={theme.iconSizes.xxxxl}
+            />
+            <Text variant="header" textAlign="left">
+              {"You're currently\nannoymous"}
+            </Text>
+            <Text variant="subheader" color="cardText" textAlign="left">
+              Login to ask questions and get answers
+            </Text>
 
-        <HStack>
-          <Button title="Login" mt="lY" onPress={login} />
-        </HStack>
-      </VStack>
-    </Center>
-  ) : (
-    <Flex>
-      <LargeTitleHeader title="Profile" subtitle={username} />
-      {user && (
-        <Center flex={1} style={{paddingBottom: bottomListPadding}} rowGap="mY">
-          <Button title={user ? 'Logout' : 'Login'} onPress={login} />
-          <Button title="Update Username" onPress={updateUserPrompt} />
-          <Button title="Change Avatar" onPress={presentImagePicker} />
-
-          <Avatar size="xxxxl" />
+            <HStack>
+              <Button title="Login" mt="lY" onPress={login} />
+            </HStack>
+          </VStack>
         </Center>
+      ) : (
+        <Flex>
+          <Username
+            variant="header"
+            color="foreground"
+            username={username}
+            isVerified
+          />
+          {user && (
+            <Center
+              flex={1}
+              style={{paddingBottom: bottomListPadding}}
+              rowGap="mY">
+              <Button title={user ? 'Logout' : 'Login'} onPress={login} />
+              <Button title="Update Username" onPress={updateUserPrompt} />
+              <Button title="Change Avatar" onPress={presentImagePicker} />
+
+              <Avatar size="xxxxl" />
+            </Center>
+          )}
+        </Flex>
       )}
-    </Flex>
+    </SafeAreaView>
   );
 };
 

@@ -24,6 +24,7 @@ import SegmentedControl from '../../SegmentedControl';
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
 import {Edges, SafeAreaView} from 'react-native-safe-area-context';
 import {supabase} from 'app/lib/supabase';
+import {useUsername} from 'app/hooks/useUsername';
 
 interface ILocationsSheetContentProps {
   onLoading?: (loading: boolean) => void;
@@ -44,6 +45,7 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
   const charsRemaining = useMemo(() => charLimit - question.length, [question]);
   const inputRef = useRef<TextInput>(null);
   const theme = useAppTheme();
+  const {username} = useUsername();
 
   const [selectedType, setSelectedType] = useState<number>(0);
   const [edges, setEdges] = useState<Edges>(['bottom', 'right', 'left']);
@@ -99,14 +101,14 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
   }, [open]);
 
   const submit = () => {
-    if (question.trim().length === 0) {
+    if (question.trim().length === 0 || !username) {
       return;
     }
     setLoading(true);
     supabase
       .from('questions')
       .insert({
-        username: 'kieran',
+        username,
         question: question,
         tags: [],
       })
