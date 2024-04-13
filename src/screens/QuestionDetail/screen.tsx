@@ -82,8 +82,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     useQuestionDetail({
       questionId,
     });
-  const {user} = useUser();
-  const isOwner = user?.id === question?.user_id;
   const theme = useTheme<Theme>();
 
   const [bookmarked, setBookmarked] = useState(false);
