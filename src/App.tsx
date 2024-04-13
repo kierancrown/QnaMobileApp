@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, useState} from 'react';
 import RootStack from './navigation/RootStack';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -13,6 +13,9 @@ import {AuthContextProvider} from './lib/supabase/context/auth';
 import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import SplashScreen from './screens/SplashScreen';
+import {SystemBars} from 'react-native-bars';
+import theme from './styles/theme';
 
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
@@ -35,23 +38,31 @@ dayjs.updateLocale('en', {
   },
 });
 
-const gestureStyle = {flex: 1};
+const gestureStyle = {flex: 1, backgroundColor: theme.colors.black};
 
 const App: FC = () => {
+  const [displaySplash, setDisplaySplash] = useState(true);
+
   return (
-    <GestureHandlerRootView style={gestureStyle}>
-      <SafeAreaProvider>
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            <ThemeProvider>
-              <AuthContextProvider>
-                <RootStack />
-              </AuthContextProvider>
-            </ThemeProvider>
-          </PersistGate>
-        </Provider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <>
+      <GestureHandlerRootView style={gestureStyle}>
+        <SafeAreaProvider>
+          <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+              <ThemeProvider>
+                <AuthContextProvider>
+                  <RootStack />
+                  {displaySplash && (
+                    <SplashScreen onDismiss={() => setDisplaySplash(false)} />
+                  )}
+                </AuthContextProvider>
+              </ThemeProvider>
+            </PersistGate>
+          </Provider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+      <SystemBars barStyle="dark-content" />
+    </>
   );
 };
 
