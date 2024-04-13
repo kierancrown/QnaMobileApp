@@ -80,33 +80,30 @@ export type Database = {
           created_at: string
           id: number
           nsfw: boolean
-          popularity: number
           question: string
           tags: number[]
           user_id: string
-          username: string
+          user_meta: number | null
         }
         Insert: {
           attachments?: Json[] | null
           created_at?: string
           id?: number
           nsfw?: boolean
-          popularity?: number
           question: string
           tags: number[]
           user_id?: string
-          username?: string
+          user_meta?: number | null
         }
         Update: {
           attachments?: Json[] | null
           created_at?: string
           id?: number
           nsfw?: boolean
-          popularity?: number
           question?: string
           tags?: number[]
           user_id?: string
-          username?: string
+          user_meta?: number | null
         }
         Relationships: [
           {
@@ -114,6 +111,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_questions_user_meta_fkey"
+            columns: ["user_meta"]
+            isOneToOne: false
+            referencedRelation: "user_metadata"
             referencedColumns: ["id"]
           },
         ]
@@ -187,18 +191,24 @@ export type Database = {
           profile_picture_key: string | null
           updated_at: string | null
           user_id: string
+          username: string | null
+          verified: boolean
         }
         Insert: {
           id?: number
           profile_picture_key?: string | null
           updated_at?: string | null
           user_id?: string
+          username?: string | null
+          verified?: boolean
         }
         Update: {
           id?: number
           profile_picture_key?: string | null
           updated_at?: string | null
           user_id?: string
+          username?: string | null
+          verified?: boolean
         }
         Relationships: [
           {
@@ -207,6 +217,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_user_metadata_username_fkey"
+            columns: ["username"]
+            isOneToOne: false
+            referencedRelation: "usernames"
+            referencedColumns: ["username"]
           },
         ]
       }

@@ -4,7 +4,6 @@ import {Center, Flex, Text} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
-import {useUser} from 'app/lib/supabase/context/auth';
 import useMount from 'app/hooks/useMount';
 import {RefreshControl} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
@@ -62,7 +61,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
   const theme = useTheme<Theme>();
-  const {user} = useUser();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
 
@@ -87,10 +85,15 @@ const Questions: FC = () => {
     const {data, error} = await questionsWithCountQuery;
 
     if (error) {
+      console.error(error);
       Alert.alert('Error', error.message);
     } else {
       const questionsWithCount: QuestionsWithCount = data;
       setQuestions(questionsWithCount || []);
+      console.log(
+        'questionsWithCount',
+        JSON.stringify(questionsWithCount, null, 2),
+      );
     }
     setRefreshing(false);
     setLoading(false);
@@ -130,14 +133,14 @@ const Questions: FC = () => {
                 triggerHaptic(HapticFeedbackTypes.selection).then();
                 navigate('QuestionDetail', {questionId: item.id});
               }}
-              username={item.username}
+              username={item.user_metadata?.username || 'Anonymous'}
               question={item.question}
               answerCount={0}
               voteCount={item.question_upvotes_count?.count || 0}
               timestamp={item.created_at}
               liked={false}
               nsfw={item.nsfw}
-              isOwner={user?.id === item.user_id}
+              userVerified={item.user_metadata?.verified || false}
             />
           )}
         />

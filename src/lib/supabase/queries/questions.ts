@@ -8,6 +8,11 @@ export const questionsWithCountQuery = supabase
   *,
   question_upvotes_count (
     count
+  ),
+  user_metadata (
+    verified,
+    profile_picture_key,
+    username
   )
 `,
   )

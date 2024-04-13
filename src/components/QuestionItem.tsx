@@ -29,6 +29,7 @@ interface QuestionItemProps {
   timestamp: string;
   nsfw?: boolean;
   tags?: string[];
+  userVerified?: boolean;
 }
 
 const ICON_SIZE = 13;
@@ -42,6 +43,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   timestamp,
   liked,
   nsfw,
+  userVerified,
 }) => {
   const theme = useTheme<Theme>();
   const votes = formatNumber(voteCount);
@@ -98,6 +100,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
                 variant="username"
                 fontWeight="600"
                 username={username}
+                isVerified={userVerified}
               />
             </HStack>
             <HStack alignItems="center" columnGap="s">
