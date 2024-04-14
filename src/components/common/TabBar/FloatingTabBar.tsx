@@ -15,7 +15,6 @@ import staticTheme, {Theme} from 'app/styles/theme';
 import {Pressable, StyleProp, ViewStyle} from 'react-native';
 import Animated, {
   interpolate,
-  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -103,11 +102,6 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
     return {
       opacity: opacity.value,
       transform: [{scale: scale.value}],
-      backgroundColor: interpolateColor(
-        fabChange.value,
-        [FabAction.ADD, FabAction.REPLY],
-        [theme.colors.tabBarIconActive, theme.colors.bookmarkAction],
-      ),
     };
   }, []);
 
