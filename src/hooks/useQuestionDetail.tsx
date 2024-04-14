@@ -43,7 +43,27 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
         } else {
           setHasUpvoted(data?.length > 0);
         }
+
+        const {data: totalCount, error: countErr} = await supabase
+          .from('question_metadata')
+          .select('upvote_count')
+          .eq('question_id', id ?? question!.id)
+          .single();
+
+        if (countErr) {
+          setError(countErr.message);
+        } else {
+          // @ts-ignore
+          setQuestion(q => ({
+            ...q!,
+            question_metadata: {
+              ...q!.question_metadata,
+              upvote_count: totalCount?.upvote_count,
+            },
+          }));
+        }
       }
+
       setUpvoteLoading(false);
     },
     [question, user],
@@ -77,8 +97,6 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
         return false;
       }
     }
-    // Refetch question
-    await fetchQuestion();
     await fetchUpvotedStatus(question.id);
     return true;
   };

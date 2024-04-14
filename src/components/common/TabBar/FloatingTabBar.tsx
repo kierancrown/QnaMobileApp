@@ -51,8 +51,15 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
 
-  const {scrollDirection, emitTabPress, fabAction} = useTabBar();
+  const {scrollDirection, fabEventEmitter, fabAction} = useTabBar();
   const fabChange = useSharedValue(fabAction);
+
+  const internalCtaPress = () => {
+    fabEventEmitter.emit('ctaPress');
+    onCtaPress &&
+      fabEventEmitter.listenerCount('ctaPress') === 0 &&
+      onCtaPress();
+  };
 
   const animatedStyle = useAnimatedStyle(() => {
     const hideTabBar = scrollDirection === 'down';
@@ -154,7 +161,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           const isFocused = state.index === index;
 
           const onPress = async () => {
-            emitTabPress && emitTabPress(route.name);
+            fabEventEmitter.emit('tabPress', route.name);
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
@@ -200,12 +207,13 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
       </HStack>
       <Animated.View style={[ctaStyles, ctaAnimatedStyle]}>
         <Pressable
-          onPress={onCtaPress}
+          onPress={internalCtaPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}>
           <Center
             width={CTA_SIZE}
             height={CTA_SIZE}
+            backgroundColor="tabBarIconActive"
             shadowColor="black"
             shadowOffset={{
               width: 0,

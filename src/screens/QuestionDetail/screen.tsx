@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -109,28 +109,9 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     flex: 1,
   };
 
-  const showAnswer = () => {
-    if (!user) {
-      return;
-    }
-    Alert.prompt('New Answer', 'Enter your response', async response => {
-      if (response) {
-        const {error} = await supabase
-          .from('responses')
-          .insert({
-            question_id: questionId,
-            response: response,
-          })
-          .select();
-
-        if (error) {
-          Alert.alert('Error', error.message);
-        } else {
-          Alert.alert('Success', 'Response posted');
-        }
-      }
-    });
-  };
+  useEffect(() => {
+    console.log('Question', JSON.stringify(question, null, 2));
+  }, [question]);
 
   useEffect(() => {
     // On navigation back, reset the fab action
@@ -220,7 +201,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
               <ActionBar
                 isLiked={hasUpvoted}
                 isBookmarked={bookmarked}
-                onAnswer={showAnswer}
                 onLike={async () => {
                   await upvoteQuestion();
                 }}
@@ -246,6 +226,7 @@ const QuestionDetail: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
   const {user} = useUser();
+  const {fabEventEmitter} = useTabBar();
 
   const scrollRef = useRef(null);
   const {scrollHandlerWorklet} = useTabBarAnimation({
@@ -281,11 +262,7 @@ const QuestionDetail: FC = () => {
 
   useMount(refreshResponses);
 
-  const login = () => {
-    dispatch(resetAuth());
-  };
-
-  const showAnswer = () => {
+  const showAnswer = useCallback(() => {
     if (!user) {
       Alert.alert(
         'Login Required',
@@ -293,7 +270,9 @@ const QuestionDetail: FC = () => {
         [
           {
             text: 'Login',
-            onPress: login,
+            onPress: () => {
+              dispatch(resetAuth());
+            },
             style: 'default',
           },
           {
@@ -323,7 +302,14 @@ const QuestionDetail: FC = () => {
         }
       }
     });
-  };
+  }, [dispatch, questionId, responses, user]);
+
+  useEffect(() => {
+    fabEventEmitter.addListener('ctaPress', showAnswer);
+    return () => {
+      fabEventEmitter.removeAllListeners();
+    };
+  }, [fabEventEmitter, showAnswer]);
 
   const deleteAnswer = async (responseId: number) => {
     const {error} = await supabase

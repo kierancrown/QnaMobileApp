@@ -2,6 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import React, {FC, createContext, useContext, useEffect, useState} from 'react';
 import {BackHandler, NativeScrollEvent} from 'react-native';
 import {SharedValue, runOnJS, useSharedValue} from 'react-native-reanimated';
+import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
 export enum FabAction {
   ADD,
@@ -16,14 +17,12 @@ interface TabBarContextData {
   hideThreshold: number;
   fabAction: FabAction;
 
+  fabEventEmitter: EventEmitter;
+
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
   setContentSize: (value: number) => void;
   setFabAction: (value: FabAction) => void;
-
-  emitTabPress: (tabName: string) => void;
-  addTabPressListener: (listener: (tabName: string) => void) => void;
-  removeTabPressListener: (listener: (tabName: string) => void) => void;
 }
 
 interface TabBarProviderProps {
@@ -40,8 +39,6 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
 
   const [hideThreshold, setHideThreshold] = useState<number>(40);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
-
-  const [listeners, setListeners] = useState<((tabName: string) => void)[]>([]);
 
   const setScrollY = (value: number) => {
     // Calculate the direction of the scroll
@@ -67,22 +64,21 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
     }
   };
 
-  const emitTabPress = (tabName: string) => {
-    // Emitting tab press event
-    console.log('Tab Pressed:', tabName);
-    // Notify all subscribers
-    listeners.forEach(listener => listener(tabName));
-  };
+  // Create a new event emitter instance
+  const fabEventEmitter = new EventEmitter();
 
-  const addTabPressListener = (listener: (tabName: string) => void) => {
-    setListeners(prevListeners => [...prevListeners, listener]);
-  };
+  // const emitEvent = () => {
+  //   fabEventEmitter.emit('onCtaPress');
+  // };
 
-  const removeTabPressListener = (listener: (tabName: string) => void) => {
-    setListeners(prevListeners =>
-      prevListeners.filter(prevListener => prevListener !== listener),
-    );
-  };
+  // const addListener = callback => {
+  //   fabEventEmitter.addListener('eventName', callback);
+  // };
+
+  // // Function to remove listeners
+  // const removeListener = callback => {
+  //   fabEventEmitter.removeListener('eventName', callback);
+  // };
 
   return (
     <TabBarContext.Provider
@@ -93,9 +89,7 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
         scrollDirection,
         hideThreshold,
         fabAction,
-        emitTabPress,
-        addTabPressListener,
-        removeTabPressListener,
+        fabEventEmitter,
         setHideThreshold,
         setContentSize,
         setScrollY,
@@ -150,24 +144,4 @@ export const useTabBarAnimation = ({scrollToTop}: UseTabBarAnimationProps) => {
   }, [navigation, setScrollY]);
 
   return {scrollHandlerWorklet};
-};
-
-interface UseTabPressProps {
-  onTabPress: (tabName: string) => void;
-}
-
-export const useTabPress = ({onTabPress}: UseTabPressProps) => {
-  const {addTabPressListener, removeTabPressListener} = useTabBar();
-
-  useEffect(() => {
-    const listener = (tabName: string) => {
-      onTabPress(tabName);
-    };
-
-    addTabPressListener(listener);
-
-    return () => {
-      removeTabPressListener(listener);
-    };
-  }, [addTabPressListener, onTabPress, removeTabPressListener]);
 };
