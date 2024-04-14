@@ -1,9 +1,8 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {Username} from 'app/lib/supabase/types';
 
 export interface AuthState {
   skippedAuth: boolean;
-  username: Username | undefined;
+  username: string | undefined;
 }
 
 const initialState: AuthState = {
@@ -27,7 +26,7 @@ export const authSlice = createSlice({
     setUsernameCache: (
       state,
       action: {
-        payload: Username | undefined;
+        payload: string | undefined;
       },
     ) => {
       state.username = action.payload;

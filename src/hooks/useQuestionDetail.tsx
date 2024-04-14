@@ -107,6 +107,8 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
     setQuestionLoading(true);
     const {data, error: e} = await questionDetailQuery.eq('id', questionId);
 
+    console.log({data, error: e, questionId});
+
     if (e) {
       setError(e.message);
     } else {

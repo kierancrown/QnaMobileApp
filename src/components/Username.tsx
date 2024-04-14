@@ -7,7 +7,7 @@ import {Theme} from 'app/styles/theme';
 import {useUsername} from 'app/hooks/useUsername';
 
 interface UsernameProps extends TextProps<Theme> {
-  username: string;
+  username?: string;
   isVerified?: boolean;
 }
 
@@ -26,7 +26,7 @@ const Username: FC<UsernameProps> = ({username, isVerified, ...rest}) => {
           user?.username === username ? 'brand' : rest.color ?? 'foreground'
         }
         {...rest}>
-        {username}
+        {username ?? 'Anonymous'}
       </Text>
       {isVerified && (
         <BadgeIcon

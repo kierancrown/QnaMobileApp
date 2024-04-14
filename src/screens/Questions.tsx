@@ -25,6 +25,7 @@ import {
 import {SharedValue} from 'react-native-reanimated';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation} from 'app/context/tabBarContext';
+import {useUser} from 'app/lib/supabase/context/auth';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
   <Header
@@ -63,6 +64,7 @@ const Questions: FC = () => {
   const theme = useTheme<Theme>();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
+  const {user} = useUser();
 
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
@@ -137,6 +139,8 @@ const Questions: FC = () => {
               liked={false}
               nsfw={item.nsfw}
               userVerified={item.user_metadata?.verified || false}
+              isOwner={item.user_id === user?.id}
+              id={item.id}
             />
           )}
         />

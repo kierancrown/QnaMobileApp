@@ -15,11 +15,13 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {Pressable} from 'react-native';
+import {Alert, Pressable} from 'react-native';
 import Username from './Username';
+import {supabase} from 'app/lib/supabase';
 
 interface QuestionItemProps {
   onPress: () => void;
+  id: number;
   username: string;
   question: string;
   answerCount: number;
@@ -36,6 +38,7 @@ const ICON_SIZE = 13;
 
 const QuestionItem: FC<QuestionItemProps> = ({
   onPress,
+  id,
   username,
   question,
   answerCount,
@@ -44,6 +47,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   liked,
   nsfw,
   userVerified,
+  isOwner,
 }) => {
   const theme = useTheme<Theme>();
   const votes = formatNumber(voteCount);
@@ -65,8 +69,43 @@ const QuestionItem: FC<QuestionItemProps> = ({
     opacity.value = 1;
   };
 
+  const deleteSelf = () => {
+    if (isOwner) {
+      Alert.alert(
+        'Delete Question',
+        'Are you sure you want to delete this question?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              const {error} = await supabase
+                .from('questions')
+                .delete()
+                .eq('id', id);
+              if (error) {
+                console.error(error);
+                Alert.alert('Error', error.message);
+              } else {
+                Alert.alert('Success', 'Question deleted');
+              }
+            },
+          },
+        ],
+      );
+    }
+  };
+
   return (
-    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
+    <Pressable
+      onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      onLongPress={deleteSelf}>
       <Animated.View style={[animatedStyle]}>
         <VStack
           rowGap="sY"

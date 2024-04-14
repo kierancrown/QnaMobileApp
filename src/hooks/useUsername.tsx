@@ -4,7 +4,6 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {setUsernameCache} from 'app/redux/slices/authSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
 import {useDispatch, useSelector} from 'react-redux';
-import {Username} from 'app/lib/supabase/types';
 
 export const useUsername = () => {
   const {user} = useUser();
@@ -14,7 +13,7 @@ export const useUsername = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const setUsername = useCallback(
-    (value: Username | undefined) => {
+    (value: string | undefined) => {
       dispatch(setUsernameCache(value));
     },
     [dispatch],
@@ -26,17 +25,16 @@ export const useUsername = () => {
       return;
     }
     supabase
-      .from('usernames')
-      .select('*')
+      .from('user_metadata')
+      .select('username')
       .eq('user_id', user?.id)
-      .eq('active', true)
       .then(({data, error}) => {
         if (error) {
           console.error('Error getting username', error);
           return;
         }
-        if (data?.length > 0) {
-          setUsername(data[0]);
+        if (data.length && data[0].username) {
+          setUsername(data[0].username);
         }
       });
   }, [setUsername, user]);
@@ -48,7 +46,7 @@ export const useUsername = () => {
     // Insert new username
     const {data, error} = await supabase
       .from('usernames')
-      .insert([{user_id: user.id, username: newUsername, active: true}])
+      .insert([{user_id: user.id, username: newUsername}])
       .select();
     if (error) {
       if (error.code === '23505') {
@@ -56,22 +54,10 @@ export const useUsername = () => {
       } else {
         throw error;
       }
-    } else if (data.length) {
-      if (username) {
-        // Deactivate old username
-        const {error: err} = await supabase
-          .from('usernames')
-          .update({active: false})
-          .eq('id', username.id)
-          .select();
-        if (err) {
-          throw err;
-        }
-      }
-      setUsername(data[0]);
-      return true;
     }
+    setUsername(data[0].username);
+    return true;
   };
 
-  return {username: username?.username, updateUsername};
+  return {username, updateUsername};
 };
