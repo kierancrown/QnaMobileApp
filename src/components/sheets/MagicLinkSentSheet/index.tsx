@@ -1,5 +1,5 @@
 import React, {FC, useCallback, useRef} from 'react';
-import BottomSheet, {WINDOW_HEIGHT} from '@gorhom/bottom-sheet';
+import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import Content from './Content';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomBackground from './Background';
@@ -51,7 +51,7 @@ const MagicLinkSentSheet: FC<MagicLinkSentSheetProps> = ({
       enableDynamicSizing
       enablePanDownToClose
       keyboardBehavior="extend"
-      maxDynamicContentSize={WINDOW_HEIGHT - topSafeAreaInset}
+      maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
       onChange={handleSheetChanges}
       backdropComponent={CustomBackdrop}
       handleComponent={null}

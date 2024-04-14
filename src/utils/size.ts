@@ -1,4 +1,4 @@
-import {WINDOW_HEIGHT, WINDOW_WIDTH} from '@gorhom/bottom-sheet';
+import {SCREEN_HEIGHT, WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 const roundNumber = (num: number): number => {
   return Math.round(num);
@@ -9,7 +9,7 @@ const percentWidth = (percent: number): number => {
 };
 
 const percentHeight = (percent: number): number => {
-  return (WINDOW_HEIGHT * percent) / 100;
+  return (SCREEN_HEIGHT * percent) / 100;
 };
 
 export {roundNumber, percentWidth, percentHeight};
