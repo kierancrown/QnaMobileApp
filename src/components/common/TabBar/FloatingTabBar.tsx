@@ -1,4 +1,4 @@
-import React, {FC, Fragment} from 'react';
+import React, {FC, Fragment, useEffect} from 'react';
 import {
   BottomTabDescriptorMap,
   BottomTabNavigationEventMap,
@@ -11,16 +11,21 @@ import {
 import {Box, Center, HStack, VStack} from 'ui';
 import {useTheme} from '@shopify/restyle';
 import staticTheme, {Theme} from 'app/styles/theme';
-import PlusIcon from 'app/assets/icons/actions/Plus.svg';
+
 import {Pressable, StyleProp, ViewStyle} from 'react-native';
 import Animated, {
+  interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {useTabBar} from 'app/context/tabBarContext';
+import {FabAction, useTabBar} from 'app/context/tabBarContext';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
+
+import PlusIcon from 'app/assets/icons/actions/Plus.svg';
+import ReplyIcon from 'app/assets/icons/actions/Comment.svg';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -47,7 +52,8 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
 
-  const {scrollDirection, emitTabPress} = useTabBar();
+  const {scrollDirection, emitTabPress, fabAction} = useTabBar();
+  const fabChange = useSharedValue(fabAction);
 
   const animatedStyle = useAnimatedStyle(() => {
     const hideTabBar = scrollDirection === 'down';
@@ -66,14 +72,50 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
     position: 'absolute',
     top: -theme.spacing.xsY,
     left: (WINDOW_WIDTH - theme.spacing.l * 2 - CTA_SIZE) / 2,
+    borderRadius: theme.borderRadii.pill,
   };
+
+  const ctaIconStyles: StyleProp<ViewStyle> = {
+    position: 'absolute',
+  };
+
+  const addAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        fabChange.value,
+        [FabAction.ADD, FabAction.REPLY],
+        [1, 0],
+      ),
+    };
+  }, []);
+
+  const replyAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        fabChange.value,
+        [FabAction.ADD, FabAction.REPLY],
+        [0, 1],
+      ),
+    };
+  }, []);
 
   const ctaAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
       transform: [{scale: scale.value}],
+      backgroundColor: interpolateColor(
+        fabChange.value,
+        [FabAction.ADD, FabAction.REPLY],
+        [theme.colors.tabBarIconActive, theme.colors.bookmarkAction],
+      ),
     };
   }, []);
+
+  useEffect(() => {
+    fabChange.value = withTiming(fabAction, {
+      duration: 100,
+    });
+  }, [fabAction, fabChange]);
 
   const onPressIn = () => {
     opacity.value = withTiming(0.88, {
@@ -170,7 +212,6 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           <Center
             width={CTA_SIZE}
             height={CTA_SIZE}
-            backgroundColor="tabBarIconActive"
             shadowColor="black"
             shadowOffset={{
               width: 0,
@@ -178,11 +219,20 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
             }}
             shadowOpacity={0.33}
             borderRadius="pill">
-            <PlusIcon
-              width={ICON_SIZE * 1.2}
-              height={ICON_SIZE * 1.2}
-              fill={theme.colors.white}
-            />
+            <Animated.View style={[ctaIconStyles, addAnimatedStyle]}>
+              <PlusIcon
+                width={ICON_SIZE * 1.2}
+                height={ICON_SIZE * 1.2}
+                fill={theme.colors.white}
+              />
+            </Animated.View>
+            <Animated.View style={[ctaIconStyles, replyAnimatedStyle]}>
+              <ReplyIcon
+                width={ICON_SIZE * 1.2}
+                height={ICON_SIZE * 1.2}
+                fill={theme.colors.white}
+              />
+            </Animated.View>
           </Center>
         </Pressable>
       </Animated.View>

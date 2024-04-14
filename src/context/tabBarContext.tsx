@@ -3,16 +3,23 @@ import React, {FC, createContext, useContext, useEffect, useState} from 'react';
 import {BackHandler, NativeScrollEvent} from 'react-native';
 import {SharedValue, runOnJS, useSharedValue} from 'react-native-reanimated';
 
+export enum FabAction {
+  ADD,
+  REPLY,
+}
+
 interface TabBarContextData {
   lastScrollY: SharedValue<number>;
   scrollY: SharedValue<number>;
   scrollContentSize: number;
   scrollDirection: 'up' | 'down';
   hideThreshold: number;
+  fabAction: FabAction;
 
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
   setContentSize: (value: number) => void;
+  setFabAction: (value: FabAction) => void;
 
   emitTabPress: (tabName: string) => void;
   addTabPressListener: (listener: (tabName: string) => void) => void;
@@ -29,6 +36,7 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
   const lastScrollY = useSharedValue(0);
   const scrollY = useSharedValue(0);
   const [scrollContentSize, setContentSize] = useState<number>(0);
+  const [fabAction, setFabAction] = useState<FabAction>(FabAction.ADD);
 
   const [hideThreshold, setHideThreshold] = useState<number>(40);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
@@ -84,12 +92,14 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
         scrollContentSize,
         scrollDirection,
         hideThreshold,
+        fabAction,
         emitTabPress,
         addTabPressListener,
         removeTabPressListener,
         setHideThreshold,
         setContentSize,
         setScrollY,
+        setFabAction,
       }}>
       {children}
     </TabBarContext.Provider>

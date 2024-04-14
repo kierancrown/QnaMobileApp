@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {FC, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -19,7 +19,12 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
 import dayjs from 'dayjs';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
@@ -38,7 +43,11 @@ import {formatNumber} from 'app/utils/numberFormatter';
 import ActionBar from './components/ActionBar';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
-import {useTabBarAnimation} from 'app/context/tabBarContext';
+import {
+  FabAction,
+  useTabBar,
+  useTabBarAnimation,
+} from 'app/context/tabBarContext';
 import Username from 'app/components/Username';
 import {
   Responses,
@@ -86,6 +95,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   });
   const theme = useTheme<Theme>();
   const {user} = useUser();
+  const {setFabAction} = useTabBar();
 
   const [bookmarked, setBookmarked] = useState(false);
 
@@ -121,6 +131,17 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
       }
     });
   };
+
+  useEffect(() => {
+    // On navigation back, reset the fab action
+    return () => {
+      setFabAction(FabAction.ADD);
+    };
+  });
+
+  useFocusEffect(() => {
+    setFabAction(FabAction.REPLY);
+  });
 
   return (
     <LargeHeader headerStyle={headerStyle}>
