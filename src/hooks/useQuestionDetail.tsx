@@ -2,10 +2,7 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {useCallback, useMemo, useState} from 'react';
 import useMount from './useMount';
 import {supabase} from 'app/lib/supabase';
-import {
-  QuestionsDetail,
-  questionDetailQuery,
-} from 'app/lib/supabase/queries/questionDetail';
+import {QuestionsDetail} from 'app/lib/supabase/queries/questionDetail';
 
 interface UseQuestionDetailProps {
   questionId: number;
@@ -121,11 +118,27 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
     return false;
   };
 
-  const fetchQuestion = async () => {
+  const fetchQuestion = useCallback(async () => {
     setQuestionLoading(true);
-    const {data, error: e} = await questionDetailQuery.eq('id', questionId);
-
-    console.log({data, error: e, questionId});
+    const {data, error: e} = await supabase
+      .from('questions')
+      .select(
+        `
+      *,
+      user_metadata (
+        verified,
+        profile_picture_key,
+        username
+      ),
+      question_metadata (
+        upvote_count,
+        response_count,
+        view_count,
+        visible
+      )
+    `,
+      )
+      .eq('id', questionId);
 
     if (e) {
       setError(e.message);
@@ -134,7 +147,7 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
       await fetchUpvotedStatus(data?.[0]?.id);
     }
     setQuestionLoading(false);
-  };
+  }, [fetchUpvotedStatus, questionId]);
 
   useMount(fetchQuestion);
 

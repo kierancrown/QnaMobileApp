@@ -24,7 +24,7 @@ import {
 
 import {SharedValue} from 'react-native-reanimated';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
-import {useTabBarAnimation} from 'app/context/tabBarContext';
+import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
 import {useUser} from 'app/lib/supabase/context/auth';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
@@ -70,6 +70,15 @@ const Questions: FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef(null);
+  useTabPress({
+    tabName: 'HomeTab',
+    onPress: () => {
+      if (scrollRef.current) {
+        // @ts-ignore
+        scrollRef.current.scrollToOffset({offset: 0, animated: true});
+      }
+    },
+  });
 
   const {scrollHandlerWorklet} = useTabBarAnimation({
     scrollToTop: () => {

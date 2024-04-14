@@ -1,4 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {TabStackParamList} from 'app/navigation/TabStack';
 import React, {FC, createContext, useContext, useEffect, useState} from 'react';
 import {BackHandler, NativeScrollEvent} from 'react-native';
 import {SharedValue, runOnJS, useSharedValue} from 'react-native-reanimated';
@@ -67,19 +68,6 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
   // Create a new event emitter instance
   const fabEventEmitter = new EventEmitter();
 
-  // const emitEvent = () => {
-  //   fabEventEmitter.emit('onCtaPress');
-  // };
-
-  // const addListener = callback => {
-  //   fabEventEmitter.addListener('eventName', callback);
-  // };
-
-  // // Function to remove listeners
-  // const removeListener = callback => {
-  //   fabEventEmitter.removeListener('eventName', callback);
-  // };
-
   return (
     <TabBarContext.Provider
       value={{
@@ -144,4 +132,25 @@ export const useTabBarAnimation = ({scrollToTop}: UseTabBarAnimationProps) => {
   }, [navigation, setScrollY]);
 
   return {scrollHandlerWorklet};
+};
+
+interface UseTabPressProps {
+  tabName: keyof TabStackParamList;
+  onPress: () => void;
+}
+
+export const useTabPress = ({tabName, onPress}: UseTabPressProps) => {
+  const {fabEventEmitter} = useTabBar();
+
+  useFocusEffect(() => {
+    const listener = fabEventEmitter.addListener('tabPress', (name: string) => {
+      if (tabName === name) {
+        onPress();
+      }
+    });
+
+    return () => {
+      listener.remove();
+    };
+  });
 };

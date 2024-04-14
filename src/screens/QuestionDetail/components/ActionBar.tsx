@@ -6,7 +6,6 @@ import HeartIcon from 'app/assets/icons/actions/Heart.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
 import BookmarkIcon from 'app/assets/icons/actions/Bookmark.svg';
 import BookmarkOutlineIcon from 'app/assets/icons/actions/Bookmark-Outline.svg';
-import AnswerIcon from 'app/assets/icons/actions/Comment.svg';
 import ShareIcon from 'app/assets/icons/actions/arrow-up-from-bracket.svg';
 
 import {useTheme} from '@shopify/restyle';
@@ -30,7 +29,6 @@ interface ActionBarProps {
   isBookmarked: boolean;
   onLike?: () => void;
   onBookmark?: () => void;
-  onAnswer?: () => void;
   onShare?: () => void;
 }
 
@@ -91,7 +89,6 @@ const ActionBar: FC<ActionBarProps> = ({
   onLike,
   isBookmarked,
   onBookmark,
-  onAnswer,
   onShare,
 }) => {
   const theme = useTheme<Theme>();
@@ -130,17 +127,6 @@ const ActionBar: FC<ActionBarProps> = ({
         }
         activeIcon={
           <BookmarkOutlineIcon
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            fill={theme.colors.white}
-          />
-        }
-      />
-
-      <ActionBarIcon
-        onPress={onAnswer}
-        icon={
-          <AnswerIcon
             width={ICON_SIZE}
             height={ICON_SIZE}
             fill={theme.colors.white}

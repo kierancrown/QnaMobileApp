@@ -82,7 +82,6 @@ const ProfileScreen: FC = () => {
             contentType: response.assets?.[0].type ?? 'image/jpg',
           })
           .then(({data, error}) => {
-            console.log(data, error);
             if (!error && data) {
               const url = data.path;
               supabase

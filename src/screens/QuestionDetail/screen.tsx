@@ -49,10 +49,7 @@ import {
   useTabBarAnimation,
 } from 'app/context/tabBarContext';
 import Username from 'app/components/Username';
-import {
-  Responses,
-  questionResponsesQuery,
-} from 'app/lib/supabase/queries/questionResponses';
+import {Responses} from 'app/lib/supabase/queries/questionResponses';
 
 const ICON_SIZE = 13;
 const BACK_ICON_SIZE = 24;
@@ -94,7 +91,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     questionId,
   });
   const theme = useTheme<Theme>();
-  const {user} = useUser();
   const {setFabAction} = useTabBar();
 
   const [bookmarked, setBookmarked] = useState(false);
@@ -108,10 +104,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const scalingViewStyle: StyleProp<ViewStyle> = {
     flex: 1,
   };
-
-  useEffect(() => {
-    console.log('Question', JSON.stringify(question, null, 2));
-  }, [question]);
 
   useEffect(() => {
     // On navigation back, reset the fab action
@@ -249,7 +241,18 @@ const QuestionDetail: FC = () => {
 
   const refreshResponses = async () => {
     setResponsesLoading(true);
-    const {data, error} = await questionResponsesQuery
+    const {data, error} = await supabase
+      .from('responses')
+      .select(
+        `
+      *,
+      user_metadata (
+        verified,
+        profile_picture_key,
+        username
+      )
+    `,
+      )
       .eq('question_id', questionId)
       .order('created_at', {ascending: false});
     if (error) {
@@ -305,9 +308,9 @@ const QuestionDetail: FC = () => {
   }, [dispatch, questionId, responses, user]);
 
   useEffect(() => {
-    fabEventEmitter.addListener('ctaPress', showAnswer);
+    const listener = fabEventEmitter.addListener('ctaPress', showAnswer);
     return () => {
-      fabEventEmitter.removeAllListeners();
+      listener.remove();
     };
   }, [fabEventEmitter, showAnswer]);
 

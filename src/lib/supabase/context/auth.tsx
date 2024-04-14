@@ -69,8 +69,6 @@ export const AuthContextProvider = (props: any) => {
           .get('error_description')
           ?.replace(/\+/g, ' ');
 
-        console.log({error, errorCode, errorDescription});
-
         Alert.alert(`Error ${errorCode}`, errorDescription, [{text: 'OK'}], {
           cancelable: false,
         });

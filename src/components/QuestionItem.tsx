@@ -51,6 +51,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
 }) => {
   const theme = useTheme<Theme>();
   const votes = formatNumber(voteCount);
+  const answers = formatNumber(answerCount);
   const opacity = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -168,7 +169,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
                   height={ICON_SIZE}
                 />
                 <Text color="cardText" variant="smaller">
-                  {answerCount}
+                  {answers}
                 </Text>
               </HStack>
               <HStack alignItems="center" columnGap="xxs">
