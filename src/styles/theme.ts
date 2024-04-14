@@ -118,6 +118,7 @@ const theme = createTheme({
     tabBarBackground: palette.Grey[800],
     tabBarIconInactive: palette.Grey[300],
     tabBarIconActive: palette.primary.DEFAULT,
+    tabBarReplyIcon: palette.cerulean.DEFAULT,
     // Actions
     inactiveAction: palette.Grey[900],
     heartAction: palette['french-rose'][600],

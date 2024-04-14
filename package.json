@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "android": "yarn emulator; react-native run-android",
+    "build:android": "cd android && ./gradlew assembleRelease",
     "emulator": "emulator -avd Pixel_6_Pro_API_33 >/dev/null 2>&1 &",
     "ios": "react-native run-ios",
     "lint": "eslint .",

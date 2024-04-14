@@ -105,15 +105,12 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     flex: 1,
   };
 
-  useEffect(() => {
-    // On navigation back, reset the fab action
+  useFocusEffect(() => {
+    setFabAction(FabAction.REPLY);
+
     return () => {
       setFabAction(FabAction.ADD);
     };
-  });
-
-  useFocusEffect(() => {
-    setFabAction(FabAction.REPLY);
   });
 
   return (
