@@ -19,12 +19,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import ChevronUp from 'app/assets/icons/arrows/chevron-up.svg';
 import Icon from 'app/components/common/Icon';
-import {Box, Flex, Button, Center} from 'ui';
-import SegmentedControl from '../../SegmentedControl';
+import {Box, Button} from 'ui';
 import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
 import {Edges, SafeAreaView} from 'react-native-safe-area-context';
 import {supabase} from 'app/lib/supabase';
 import {useUsername} from 'app/hooks/useUsername';
+
+import PhotosIcon from 'app/assets/icons/compose/photos.svg';
+import CameraIcon from 'app/assets/icons/compose/camera.svg';
+import PollIcon from 'app/assets/icons/compose/poll.svg';
+import HashtagIcon from 'app/assets/icons/compose/hashtag.svg';
 
 interface ILocationsSheetContentProps {
   onLoading?: (loading: boolean) => void;
@@ -136,49 +140,21 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
   return (
     <Pressable style={styles.wrapper} onPress={dismissKeyboard}>
       <SafeAreaView style={styles.wrapper} edges={edges}>
-        <VStack flex={1} px="m">
-          <HStack alignItems="center" py="mY" px="xs" mb="s">
-            <Pressable hitSlop={16} onPress={dismissSheet}>
-              <Center>
-                <Animated.View style={animatedChevronStyles}>
-                  <Icon icon={<ChevronUp />} color="foreground" size="l" />
-                </Animated.View>
-              </Center>
-            </Pressable>
-            <Flex />
-            <Text variant="navbarTitle">Submit Question</Text>
-            <Flex />
-            <Center>
-              <Box width={theme.spacing.l} height={theme.spacing.l} />
-            </Center>
-          </HStack>
-
-          <SegmentedControl
-            segments={['Question', 'Poll']}
-            currentIndex={selectedType}
-            containerMargin={theme.spacing.m}
-            onChange={setSelectedType}
-          />
-
-          <VStack flex={1} my="xlY" rowGap="m">
+        <VStack flex={1} overflow="hidden">
+          <VStack flex={1} rowGap="mY">
             <Pressable onPress={focusInput}>
-              <Box
-                py="sY"
-                px="m"
-                backgroundColor="inputBackground"
-                borderRadius="l">
+              <Box pt="sY" px="m">
                 <BottomSheetTextInput
                   multiline
-                  placeholder='Start your question with "What if..." or "How do I..." etc'
+                  placeholder="What do you want to know?"
                   editable={!loading}
                   placeholderTextColor={theme.colors.inputPlaceholder}
                   ref={inputRef}
                   style={[
                     styles.input,
                     {
-                      ...theme.textVariants.largeInput,
+                      ...theme.textVariants.extraLargeInput,
                       color: theme.colors.foreground,
-                      minHeight: theme.spacing.xxxlY,
                     },
                   ]}
                   cursorColor={theme.colors.foreground}
@@ -188,13 +164,36 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
                 <Box
                   position="absolute"
                   right={theme.spacing.s}
-                  bottom={theme.spacing.sY}>
+                  bottom={theme.spacing.mY}>
                   <Text variant="tiny" color="inputPlaceholder">
                     {charsRemaining}
                   </Text>
                 </Box>
               </Box>
             </Pressable>
+
+            <HStack alignItems="center" px="m" columnGap="l">
+              <PhotosIcon
+                width={26}
+                height={26}
+                fill={theme.colors.inputPlaceholder}
+              />
+              <CameraIcon
+                width={26}
+                height={26}
+                fill={theme.colors.inputPlaceholder}
+              />
+              <PollIcon
+                width={26}
+                height={26}
+                fill={theme.colors.inputPlaceholder}
+              />
+              <HashtagIcon
+                width={26}
+                height={26}
+                fill={theme.colors.inputPlaceholder}
+              />
+            </HStack>
           </VStack>
 
           <Box py="sY">

@@ -6,7 +6,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import theme from 'app/styles/theme';
 import {useSharedValue} from 'react-native-reanimated';
 import CustomBackground from '../../common/Sheets/Background';
-import CustomBackdrop from '../../common/Sheets/Backdrop';
+import CustomBackdrop from './Backdrop';
 
 interface AskQuestionSheetProps {
   open?: boolean;
@@ -22,7 +22,9 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const topSafeAreaInset = useSafeAreaInsets().top;
   const [loading, setLoading] = useState(false);
   const snapPoints = useMemo(
-    () => [SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.m],
+    () => [
+      SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.xsY - theme.spacing.xxlY,
+    ],
     [topSafeAreaInset],
   );
 
