@@ -33,8 +33,8 @@ interface FloatTabBarProps {
   onCtaPress?: () => void;
 }
 
-const ICON_SIZE = 24;
-const CTA_SIZE = 72;
+export const ICON_SIZE = 24;
+export const CTA_SIZE = 72;
 
 export const ESTIMATED_TABBAR_HEIGHT = ICON_SIZE + staticTheme.spacing.sY * 2;
 
@@ -67,7 +67,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
       transform: [
         {
           translateY: hideTabBar
-            ? withTiming(ESTIMATED_TABBAR_HEIGHT * 2)
+            ? withTiming(ESTIMATED_TABBAR_HEIGHT * 3)
             : withSpring(0),
         },
       ],
@@ -76,7 +76,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
 
   const ctaStyles: StyleProp<ViewStyle> = {
     position: 'absolute',
-    top: -theme.spacing.xsY,
+    top: -(CTA_SIZE / 2 - ICON_SIZE / 2 - theme.spacing.sY),
     left: (WINDOW_WIDTH - theme.spacing.l * 2 - CTA_SIZE) / 2,
     borderRadius: theme.borderRadii.pill,
   };

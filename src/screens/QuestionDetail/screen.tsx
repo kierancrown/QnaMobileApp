@@ -290,12 +290,14 @@ const QuestionDetail: FC = () => {
       if (response) {
         const {data, error} = await supabase
           .from('responses')
+          // @ts-expect-error user_meta is not defined
           .insert({
             question_id: questionId,
             response: response,
           })
           .select();
         if (data != null) {
+          // @ts-expect-error user_meta is not defined
           setResponses([data[0], ...responses]);
         }
         if (error) {
