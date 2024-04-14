@@ -23,7 +23,7 @@ const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
 
-  const {user} = useUser();
+  const {user, logout} = useUser();
   const {username, updateUsername} = useUsername();
 
   const bottomListPadding = useBottomPadding();
@@ -109,7 +109,7 @@ const ProfileScreen: FC = () => {
 
   return (
     <SafeAreaView>
-      {!user || !username ? (
+      {!user ? (
         <Center
           flex={1}
           style={{
@@ -147,7 +147,7 @@ const ProfileScreen: FC = () => {
               flex={1}
               style={{paddingBottom: bottomListPadding}}
               rowGap="mY">
-              <Button title={user ? 'Logout' : 'Login'} onPress={login} />
+              <Button title={user ? 'Logout' : 'Login'} onPress={logout} />
               <Button title="Update Username" onPress={updateUserPrompt} />
               <Button title="Change Avatar" onPress={presentImagePicker} />
 

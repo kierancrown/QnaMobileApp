@@ -118,7 +118,6 @@ export const useTabBarAnimation = ({scrollToTop}: UseTabBarAnimationProps) => {
 
   useEffect(() => {
     const handler = () => {
-      console.log('scrollY.value', scrollY.value);
       if (parseInt(scrollY.value.toFixed(), 10) > hideThreshold) {
         scrollToTop?.();
         return true;

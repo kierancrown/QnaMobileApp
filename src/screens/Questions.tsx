@@ -90,10 +90,6 @@ const Questions: FC = () => {
     } else {
       const questionsWithCount: QuestionsWithCount = data;
       setQuestions(questionsWithCount || []);
-      console.log(
-        'questionsWithCount',
-        JSON.stringify(questionsWithCount, null, 2),
-      );
     }
     setRefreshing(false);
     setLoading(false);
@@ -135,8 +131,8 @@ const Questions: FC = () => {
               }}
               username={item.user_metadata?.username || 'Anonymous'}
               question={item.question}
-              answerCount={0}
-              voteCount={item.question_upvotes_count?.count || 0}
+              answerCount={item.question_metadata?.response_count || 0}
+              voteCount={item.question_metadata?.upvote_count || 0}
               timestamp={item.created_at}
               liked={false}
               nsfw={item.nsfw}

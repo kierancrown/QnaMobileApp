@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   Alert,
+  Pressable,
   RefreshControl,
   StyleProp,
   ViewStyle,
@@ -9,7 +10,7 @@ import React, {FC, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
-import {Box, Center, Flex, HStack, Text, VStack} from 'ui';
+import {Box, Button, Center, Flex, HStack, Text, VStack} from 'ui';
 import {SharedValue} from 'react-native-reanimated';
 
 import {Theme} from 'app/styles/theme';
@@ -18,10 +19,8 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
 import dayjs from 'dayjs';
-import {useUsername} from 'app/hooks/useUsername';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
-import {Response} from 'app/lib/supabase/types';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
@@ -41,6 +40,10 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {useTabBarAnimation} from 'app/context/tabBarContext';
 import Username from 'app/components/Username';
+import {
+  Responses,
+  questionResponsesQuery,
+} from 'app/lib/supabase/queries/questionResponses';
 
 const ICON_SIZE = 13;
 const BACK_ICON_SIZE = 24;
@@ -78,11 +81,11 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     params: {questionId},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
 
-  const {loading, question, hasUpvoted, upvotes, upvoteQuestion} =
-    useQuestionDetail({
-      questionId,
-    });
+  const {loading, question, hasUpvoted, upvoteQuestion} = useQuestionDetail({
+    questionId,
+  });
   const theme = useTheme<Theme>();
+  const {user} = useUser();
 
   const [bookmarked, setBookmarked] = useState(false);
 
@@ -94,6 +97,29 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
 
   const scalingViewStyle: StyleProp<ViewStyle> = {
     flex: 1,
+  };
+
+  const showAnswer = () => {
+    if (!user) {
+      return;
+    }
+    Alert.prompt('New Answer', 'Enter your response', async response => {
+      if (response) {
+        const {error} = await supabase
+          .from('responses')
+          .insert({
+            question_id: questionId,
+            response: response,
+          })
+          .select();
+
+        if (error) {
+          Alert.alert('Error', error.message);
+        } else {
+          Alert.alert('Success', 'Response posted');
+        }
+      }
+    });
   };
 
   return (
@@ -142,7 +168,9 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     height={ICON_SIZE}
                   />
                   <Text color="cardText" variant="smaller">
-                    {formatNumber(upvotes)}
+                    {formatNumber(
+                      question.question_metadata?.upvote_count || 0,
+                    )}
                   </Text>
                 </HStack>
                 <HStack alignItems="center" columnGap="xxs">
@@ -152,7 +180,9 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     height={ICON_SIZE}
                   />
                   <Text color="cardText" variant="smaller">
-                    0
+                    {formatNumber(
+                      question.question_metadata?.response_count || 0,
+                    )}
                   </Text>
                 </HStack>
                 <HStack alignItems="center" columnGap="xxs">
@@ -169,6 +199,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
               <ActionBar
                 isLiked={hasUpvoted}
                 isBookmarked={bookmarked}
+                onAnswer={showAnswer}
                 onLike={async () => {
                   await upvoteQuestion();
                 }}
@@ -194,7 +225,6 @@ const QuestionDetail: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
   const {user} = useUser();
-  const {username} = useUsername();
 
   const scrollRef = useRef(null);
   const {scrollHandlerWorklet} = useTabBarAnimation({
@@ -210,22 +240,19 @@ const QuestionDetail: FC = () => {
     params: {questionId},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
 
-  const [responses, setResponses] = useState<Response[]>([]);
+  const [responses, setResponses] = useState<Responses>([]);
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const [loading, setLoading] = useState(true);
   const [responsesLoading, setResponsesLoading] = useState(true);
 
   const refreshResponses = async () => {
     setResponsesLoading(true);
-    const {data, error} = await supabase
-      .from('responses')
-      .select('*')
+    const {data, error} = await questionResponsesQuery
       .eq('question_id', questionId)
       .order('created_at', {ascending: false});
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      // @ts-ignore
       setResponses(data || []);
     }
     setLoading(false);
@@ -262,7 +289,6 @@ const QuestionDetail: FC = () => {
           .from('responses')
           .insert({
             question_id: questionId,
-            username,
             response: response,
           })
           .select();
@@ -278,6 +304,18 @@ const QuestionDetail: FC = () => {
     });
   };
 
+  const deleteAnswer = async (responseId: number) => {
+    const {error} = await supabase
+      .from('responses')
+      .delete()
+      .eq('id', responseId);
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      setResponses(responses.filter(r => r.id !== responseId));
+    }
+  };
+
   return (
     <Flex>
       <FlashListWithHeaders
@@ -287,7 +325,7 @@ const QuestionDetail: FC = () => {
         ref={scrollRef}
         keyExtractor={item => item.id.toString()}
         refreshControl={
-          <RefreshControl refreshing={false} onRefresh={refreshResponses} />
+          <RefreshControl refreshing={loading} onRefresh={refreshResponses} />
         }
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
@@ -295,6 +333,7 @@ const QuestionDetail: FC = () => {
             <Text variant="medium" my="xlY" color="cardText">
               No responses yet
             </Text>
+            <Button onPress={showAnswer} variant="primary" title="Answer" />
           </Center>
         }
         refreshing={responsesLoading}
@@ -305,25 +344,48 @@ const QuestionDetail: FC = () => {
         }}
         estimatedItemSize={100}
         renderItem={({item}) => (
-          <Box
-            backgroundColor="cardBackground"
-            my="xsY"
-            px="xs"
-            mx="xs"
-            py="xsY"
-            borderRadius="m">
-            <VStack rowGap="xsY">
-              <HStack alignItems="center" justifyContent="space-between">
-                <Text
-                  fontWeight="600"
-                  color={item.user_id === user?.id ? 'brand' : 'cardText'}>
-                  {item.username}
-                </Text>
-                <Text color="cardText">{dayjs(item.created_at).fromNow()}</Text>
-              </HStack>
-              <Text variant="body">{item.response}</Text>
-            </VStack>
-          </Box>
+          <Pressable
+            onLongPress={() => {
+              if (item.user_id === user?.id) {
+                Alert.alert(
+                  'Delete Response',
+                  'Are you sure you want to delete this response?',
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Delete',
+                      style: 'destructive',
+                      onPress: () => deleteAnswer(item.id),
+                    },
+                  ],
+                );
+              }
+            }}>
+            <Box
+              backgroundColor="cardBackground"
+              my="xsY"
+              px="xs"
+              mx="xs"
+              py="xsY"
+              borderRadius="m">
+              <VStack rowGap="xsY">
+                <HStack alignItems="center" justifyContent="space-between">
+                  <Text
+                    fontWeight="600"
+                    color={item.user_id === user?.id ? 'brand' : 'cardText'}>
+                    {item.user_metadata?.username ?? 'Anonymous'}
+                  </Text>
+                  <Text color="cardText">
+                    {dayjs(item.created_at).fromNow()}
+                  </Text>
+                </HStack>
+                <Text variant="body">{item.response}</Text>
+              </VStack>
+            </Box>
+          </Pressable>
         )}
       />
     </Flex>

@@ -3,18 +3,24 @@ import {Session, User} from '@supabase/supabase-js';
 import {supabase} from '../';
 import useMount from 'app/hooks/useMount';
 import {Alert, Linking} from 'react-native';
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from 'app/redux/store';
+import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
 
 export const AuthContext = createContext<{
   user: User | null;
   session: Session | null;
+  logout: () => void;
 }>({
   user: null,
   session: null,
+  logout: () => {},
 });
 
 export const AuthContextProvider = (props: any) => {
   const [userSession, setUserSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
 
   useMount(() => {
     supabase.auth.getSession().then(({data: {session}}) => {
@@ -33,6 +39,16 @@ export const AuthContextProvider = (props: any) => {
       authListener.subscription;
     };
   });
+
+  const logout = () => {
+    supabase.auth.signOut().then(() => {
+      // Force reset of user and session
+      setUser(null);
+      setUserSession(null);
+      dispatch(resetAuth());
+      dispatch(resetCache());
+    });
+  };
 
   // Listen for auth deep links
   useMount(() => {
@@ -85,6 +101,7 @@ export const AuthContextProvider = (props: any) => {
   const value = {
     userSession,
     user,
+    logout,
   };
   return <AuthContext.Provider value={value} {...props} />;
 };

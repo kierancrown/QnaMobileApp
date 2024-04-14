@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      question_metadata: {
+        Row: {
+          id: number
+          question_id: number
+          response_count: number
+          updated_at: string
+          upvote_count: number
+          user_id: string
+          view_count: number
+          visible: boolean
+        }
+        Insert: {
+          id?: number
+          question_id: number
+          response_count?: number
+          updated_at?: string
+          upvote_count?: number
+          user_id?: string
+          view_count?: number
+          visible?: boolean
+        }
+        Update: {
+          id?: number
+          question_id?: number
+          response_count?: number
+          updated_at?: string
+          upvote_count?: number
+          user_id?: string
+          view_count?: number
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_question_metadata_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: true
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_question_metadata_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       question_upvotes: {
         Row: {
           created_at: string
@@ -45,35 +93,6 @@ export type Database = {
           },
         ]
       }
-      question_upvotes_count: {
-        Row: {
-          count: number
-          id: number
-          question_id: number
-          updated_at: string
-        }
-        Insert: {
-          count?: number
-          id?: number
-          question_id: number
-          updated_at?: string
-        }
-        Update: {
-          count?: number
-          id?: number
-          question_id?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_question_upvotes_count_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: true
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       questions: {
         Row: {
           attachments: Json[] | null
@@ -83,7 +102,7 @@ export type Database = {
           question: string
           tags: number[]
           user_id: string
-          user_meta: number | null
+          user_meta: number
         }
         Insert: {
           attachments?: Json[] | null
@@ -93,7 +112,7 @@ export type Database = {
           question: string
           tags: number[]
           user_id?: string
-          user_meta?: number | null
+          user_meta: number
         }
         Update: {
           attachments?: Json[] | null
@@ -103,7 +122,7 @@ export type Database = {
           question?: string
           tags?: number[]
           user_id?: string
-          user_meta?: number | null
+          user_meta?: number
         }
         Relationships: [
           {
@@ -126,29 +145,29 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          popularity: number
           question_id: number
           response: string
+          thread: number | null
           user_id: string
-          username: string
+          user_meta: number
         }
         Insert: {
           created_at?: string
           id?: number
-          popularity?: number
           question_id: number
           response: string
+          thread?: number | null
           user_id?: string
-          username?: string
+          user_meta: number
         }
         Update: {
           created_at?: string
           id?: number
-          popularity?: number
           question_id?: number
           response?: string
+          thread?: number | null
           user_id?: string
-          username?: string
+          user_meta?: number
         }
         Relationships: [
           {
@@ -159,10 +178,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "public_responses_thread_fkey"
+            columns: ["thread"]
+            isOneToOne: false
+            referencedRelation: "responses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "public_responses_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_responses_user_meta_fkey"
+            columns: ["user_meta"]
+            isOneToOne: false
+            referencedRelation: "user_metadata"
             referencedColumns: ["id"]
           },
         ]

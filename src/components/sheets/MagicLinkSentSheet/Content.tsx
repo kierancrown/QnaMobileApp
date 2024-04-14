@@ -3,6 +3,7 @@ import {Text, Button, VStack, Flex, Center} from 'ui';
 import {BottomSheetView} from '@gorhom/bottom-sheet';
 import {percentHeight} from 'app/utils/size';
 import {openInbox, getEmailClients} from 'react-native-email-link';
+import {isEmulatorSync} from 'react-native-device-info';
 import useMount from 'app/hooks/useMount';
 import dayjs from 'dayjs';
 
@@ -19,6 +20,9 @@ const Content: FC<IContentProps> = ({sentTimestamp, onResend, resending}) => {
   const resendTimestamp = dayjs(sentTimestamp).add(60, 'second').valueOf();
 
   useMount(() => {
+    if (isEmulatorSync()) {
+      return;
+    }
     getEmailClients().then(clients => {
       if (clients.length > 0) {
         setOpenEmailAvailable(true);

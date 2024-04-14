@@ -19,6 +19,8 @@ const RootStack = () => {
     (state: RootState) => state.persistent.auth.skippedAuth,
   );
 
+  console.log({skipAuth, user});
+
   return (
     <>
       <SafeAreaProvider>

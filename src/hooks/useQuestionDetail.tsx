@@ -15,39 +15,17 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
   const {user} = useUser();
 
   const [hasUpvoted, setHasUpvoted] = useState(false);
-  const [upvotes, setUpvotes] = useState(0);
   const [question, setQuestion] = useState<QuestionsDetail[0] | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
   const [questionLoading, setQuestionLoading] = useState(true);
   const [upvoteLoading, setUpvoteLoading] = useState(false);
-  const [upvoteCountLoading, setUpvoteCountLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const loading = useMemo(
     () => questionLoading || deleteLoading,
     [questionLoading, deleteLoading],
-  );
-
-  const fetchUpvoteCount = useCallback(
-    async (id?: number) => {
-      setUpvoteCountLoading(true);
-      // Get count
-      if (id || question) {
-        const {data: countData, error: e} = await supabase
-          .from('question_upvotes_count')
-          .select('count')
-          .eq('question_id', id ?? question!.id)
-          .single();
-        if (e) {
-          setError(e.message);
-        }
-        setUpvotes(countData?.count || 0);
-      }
-      setUpvoteCountLoading(false);
-    },
-    [question],
   );
 
   const fetchUpvotedStatus = useCallback(
@@ -99,8 +77,9 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
         return false;
       }
     }
+    // Refetch question
+    await fetchQuestion();
     await fetchUpvotedStatus(question.id);
-    await fetchUpvoteCount(question.id);
     return true;
   };
 
@@ -132,7 +111,6 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
       setError(e.message);
     } else {
       setQuestion(data[0] ?? null);
-      await fetchUpvoteCount(data?.[0]?.id);
       await fetchUpvotedStatus(data?.[0]?.id);
     }
     setQuestionLoading(false);
@@ -144,13 +122,11 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
     error,
     loading,
     question,
-    upvotes,
     hasUpvoted,
     upvoteQuestion,
     deleteQuestion,
     deleteLoading,
     upvoteLoading,
-    upvoteCountLoading,
     refetch: fetchQuestion,
   };
 };

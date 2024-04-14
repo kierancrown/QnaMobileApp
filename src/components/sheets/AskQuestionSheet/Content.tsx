@@ -108,7 +108,6 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
     supabase
       .from('questions')
       .insert({
-        username,
         question: question,
         tags: [],
       })

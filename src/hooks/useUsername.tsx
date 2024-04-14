@@ -48,7 +48,7 @@ export const useUsername = () => {
     // Insert new username
     const {data, error} = await supabase
       .from('usernames')
-      .insert([{user_id: user.id, username: newUsername}])
+      .insert([{user_id: user.id, username: newUsername, active: true}])
       .select();
     if (error) {
       if (error.code === '23505') {
