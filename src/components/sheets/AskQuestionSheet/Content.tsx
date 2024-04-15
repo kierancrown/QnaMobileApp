@@ -3,16 +3,25 @@ import Text from 'app/components/common/Text';
 import VStack from 'app/components/common/VStack';
 import {useAppTheme} from 'app/styles/theme';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Keyboard} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import {Pressable, StyleSheet, Keyboard, Alert} from 'react-native';
+import {
+  NativeViewGestureHandler,
+  ScrollView,
+  TextInput,
+} from 'react-native-gesture-handler';
 import {SharedValue} from 'react-native-reanimated';
 import {Box, Flex} from 'ui';
-import {BottomSheetTextInput, TouchableOpacity} from '@gorhom/bottom-sheet';
+import {
+  BottomSheetTextInput,
+  TouchableOpacity,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 import {Edges, SafeAreaView} from 'react-native-safe-area-context';
 
 import PhotosIcon from 'app/assets/icons/compose/photos.svg';
 import CameraIcon from 'app/assets/icons/compose/camera.svg';
 import PollIcon from 'app/assets/icons/compose/poll.svg';
+import PollFilledIcon from 'app/assets/icons/compose/pollFilled.svg';
 import HashtagIcon from 'app/assets/icons/compose/hashtag.svg';
 import {
   Asset,
@@ -20,6 +29,9 @@ import {
   launchCamera,
 } from 'react-native-image-picker';
 import PhotoPreview from './components/PhotoPreview';
+import PollContainer from './components/Poll';
+import Badge from 'app/components/common/Badge';
+import {percentHeight} from 'app/utils/size';
 
 interface ILocationsSheetContentProps {
   onLoading?: (loading: boolean) => void;
@@ -40,6 +52,7 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
   const charsRemaining = useMemo(() => charLimit - question.length, [question]);
   const [edges, setEdges] = useState<Edges>(['bottom', 'right', 'left']);
   const [photos, setPhotos] = useState<Asset[]>([]);
+  const [showPoll, setShowPoll] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [loading] = useState(false);
   const theme = useAppTheme();
@@ -98,20 +111,28 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
   }, [open]);
 
   const openPhotoLibrary = () => {
+    if (photos.length >= 5) {
+      Alert.alert('Maximum photos reached', 'You can only add 5 photos');
+      return;
+    }
     launchImageLibrary(
       {
         mediaType: 'photo',
         includeBase64: true,
         quality: 0.5,
-        selectionLimit: 5,
+        selectionLimit: 5 - photos.length,
       },
       response => {
-        setPhotos(response.assets || []);
+        setPhotos([...photos, ...(response.assets ?? [])]);
       },
     );
   };
 
   const openCamera = () => {
+    if (photos.length >= 5) {
+      Alert.alert('Maximum photos reached', 'You can only add 5 photos');
+      return;
+    }
     launchCamera(
       {
         mediaType: 'photo',
@@ -130,46 +151,44 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
     <Pressable style={styles.wrapper} onPress={dismissKeyboard}>
       <SafeAreaView style={styles.wrapper} edges={edges}>
         <VStack flex={1} overflow="hidden">
-          <VStack flex={1} rowGap="mY">
-            <Pressable onPress={focusInput}>
-              <Box pt="sY" px="m">
-                <BottomSheetTextInput
-                  multiline
-                  placeholder="What do you want to know?"
-                  keyboardType="twitter"
-                  editable={!loading}
-                  placeholderTextColor={theme.colors.inputPlaceholder}
-                  ref={inputRef}
-                  style={[
-                    styles.input,
-                    {
-                      ...theme.textVariants.extraLargeInput,
-                      color: theme.colors.foreground,
-                    },
-                  ]}
-                  cursorColor={theme.colors.foreground}
-                  onChangeText={setQuestion}
-                  value={question}
-                />
-              </Box>
-            </Pressable>
-
-            {photos.length > 0 ? (
-              <PhotoPreview
-                photos={photos}
-                removePhoto={(index: number) => {
-                  setPhotos(photos.filter((_, i) => i !== index));
-                }}
-              />
-            ) : (
-              <HStack alignItems="center" px="m" columnGap="l">
-                <TouchableOpacity hitSlop={8} onPress={openPhotoLibrary}>
-                  <PhotosIcon
-                    width={26}
-                    height={26}
-                    fill={theme.colors.inputPlaceholder}
+          <BottomSheetScrollView>
+            <VStack flex={1} rowGap="mY">
+              <Pressable onPress={focusInput}>
+                <Box pt="sY" px="m">
+                  <BottomSheetTextInput
+                    multiline
+                    placeholder="What do you want to know?"
+                    keyboardType="twitter"
+                    editable={!loading}
+                    placeholderTextColor={theme.colors.inputPlaceholder}
+                    ref={inputRef}
+                    style={[
+                      styles.input,
+                      {
+                        ...theme.textVariants.extraLargeInput,
+                        color: theme.colors.foreground,
+                      },
+                    ]}
+                    cursorColor={theme.colors.foreground}
+                    onChangeText={setQuestion}
+                    value={question}
                   />
-                </TouchableOpacity>
+                </Box>
+              </Pressable>
+
+              <HStack alignItems="center" px="m" columnGap="l">
+                <Badge
+                  text={photos.length.toString()}
+                  hidden={photos.length < 1}
+                  size={'small'}>
+                  <TouchableOpacity hitSlop={8} onPress={openPhotoLibrary}>
+                    <PhotosIcon
+                      width={26}
+                      height={26}
+                      fill={theme.colors.inputPlaceholder}
+                    />
+                  </TouchableOpacity>
+                </Badge>
                 <TouchableOpacity hitSlop={8} onPress={openCamera}>
                   <CameraIcon
                     width={26}
@@ -177,11 +196,23 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
                     fill={theme.colors.inputPlaceholder}
                   />
                 </TouchableOpacity>
-                <PollIcon
-                  width={26}
-                  height={26}
-                  fill={theme.colors.inputPlaceholder}
-                />
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => setShowPoll(!showPoll)}>
+                  {showPoll ? (
+                    <PollFilledIcon
+                      width={26}
+                      height={26}
+                      fill={theme.colors.inputPlaceholder}
+                    />
+                  ) : (
+                    <PollIcon
+                      width={26}
+                      height={26}
+                      fill={theme.colors.inputPlaceholder}
+                    />
+                  )}
+                </TouchableOpacity>
                 <HashtagIcon
                   width={26}
                   height={26}
@@ -192,8 +223,32 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
                   {charsRemaining}
                 </Text>
               </HStack>
-            )}
-          </VStack>
+
+              {showPoll ? (
+                <PollContainer />
+              ) : (
+                photos.length > 0 && (
+                  <Box height={percentHeight(20)}>
+                    <NativeViewGestureHandler disallowInterruption={true}>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{
+                          paddingHorizontal: theme.spacing.m,
+                        }}>
+                        <PhotoPreview
+                          photos={photos}
+                          removePhoto={(index: number) => {
+                            setPhotos(photos.filter((_, i) => i !== index));
+                          }}
+                        />
+                      </ScrollView>
+                    </NativeViewGestureHandler>
+                  </Box>
+                )
+              )}
+            </VStack>
+          </BottomSheetScrollView>
         </VStack>
       </SafeAreaView>
     </Pressable>

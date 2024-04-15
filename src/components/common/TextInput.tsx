@@ -60,11 +60,18 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
           {props.leftAdornment && <Box>{props.leftAdornment}</Box>}
           <TextInput
             ref={inputRef}
-            style={[inputStyle, textVariant]}
             placeholderTextColor={theme.colors.inputPlaceholder}
             cursorColor={theme.colors.brand}
             selectionColor={theme.colors.brand}
             {...props}
+            style={[
+              inputStyle,
+              textVariant,
+              // eslint-disable-next-line react-native/no-inline-styles
+              {
+                borderWidth: 0,
+              },
+            ]}
           />
           {props.rightAdornment && <Box>{props.rightAdornment}</Box>}
         </HStack>

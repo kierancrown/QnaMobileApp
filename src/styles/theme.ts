@@ -31,6 +31,20 @@ const palette = {
     900: '#2A2927',
     950: '#141210',
   },
+  flamingo: {
+    DEFAULT: '#EF4444',
+    50: '#FDEDED',
+    100: '#FCDADA',
+    200: '#F9B5B5',
+    300: '#F58F8F',
+    400: '#F26A6A',
+    500: '#EF4444',
+    600: '#E71414',
+    700: '#B30F0F',
+    800: '#800B0B',
+    900: '#4C0707',
+    950: '#320404',
+  },
   'french-rose': {
     DEFAULT: '#EC4899',
     50: '#FDEEF6',
@@ -132,6 +146,8 @@ const theme = createTheme({
     sheetBackdrop: palette.sheetBackdropDark,
     // Button
     buttonDisabled: palette.Grey[800],
+    // Badge
+    badgeBackground: palette.flamingo[600],
     // Text
     foreground: palette.white,
     secondary: palette.secondaryText,
@@ -252,6 +268,11 @@ const theme = createTheme({
     },
     smallBody: {
       fontSize: mvs(14),
+    },
+    smallInput: {
+      fontSize: mvs(14),
+      lineHeight: mvs(16),
+      fontFamily: fonts.semiBold,
     },
     largeInput: {
       fontSize: mvs(16),

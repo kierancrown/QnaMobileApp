@@ -27,8 +27,10 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const topSafeAreaInset = useSafeAreaInsets().top;
+
   const [loading, setLoading] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
+
   const theme = useAppTheme();
   const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
   const snapPoints = useMemo(
@@ -52,7 +54,6 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
 
   const onDismiss = () => {
     sheetRef.current?.close();
-    Keyboard.dismiss();
   };
 
   const buttonsContainerAnimatedStyle = useAnimatedStyle(() => ({
@@ -115,7 +116,12 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         onChange={handleSheetChanges}
         backdropComponent={CustomBackdrop}
         handleComponent={null}
-        backgroundComponent={CustomBackground}>
+        backgroundComponent={CustomBackground}
+        onAnimate={(fromIndex, toIndex) => {
+          if (fromIndex === 0 && toIndex === -1) {
+            Keyboard.dismiss();
+          }
+        }}>
         <Screen
           open={open}
           onLoading={setLoading}
