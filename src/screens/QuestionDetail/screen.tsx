@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
+import React, {FC, useCallback, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -306,12 +306,12 @@ const QuestionDetail: FC = () => {
     });
   }, [dispatch, questionId, responses, user]);
 
-  useEffect(() => {
+  useFocusEffect(() => {
     const listener = fabEventEmitter.addListener('ctaPress', showAnswer);
     return () => {
       listener.remove();
     };
-  }, [fabEventEmitter, showAnswer]);
+  });
 
   const deleteAnswer = async (responseId: number) => {
     const {error} = await supabase

@@ -17,6 +17,7 @@ export interface ButtonProps extends BoxProps<Theme> {
   onLongPress?: () => void;
   variant?: 'primary' | 'text' | 'danger';
   title?: string;
+  titleVariant?: keyof Theme['textVariants'];
   fullWidth?: boolean;
   loading?: boolean;
   disabled?: boolean;
