@@ -7,14 +7,18 @@ import {Pressable, StyleSheet, Keyboard} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {SharedValue} from 'react-native-reanimated';
 import {Box, Flex} from 'ui';
-import {BottomSheetTextInput} from '@gorhom/bottom-sheet';
+import {BottomSheetTextInput, TouchableOpacity} from '@gorhom/bottom-sheet';
 import {Edges, SafeAreaView} from 'react-native-safe-area-context';
 
 import PhotosIcon from 'app/assets/icons/compose/photos.svg';
 import CameraIcon from 'app/assets/icons/compose/camera.svg';
 import PollIcon from 'app/assets/icons/compose/poll.svg';
 import HashtagIcon from 'app/assets/icons/compose/hashtag.svg';
-import {Asset, launchImageLibrary} from 'react-native-image-picker';
+import {
+  Asset,
+  launchImageLibrary,
+  launchCamera,
+} from 'react-native-image-picker';
 import PhotoPreview from './components/PhotoPreview';
 
 interface ILocationsSheetContentProps {
@@ -107,6 +111,21 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
     );
   };
 
+  const openCamera = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        includeBase64: true,
+        quality: 0.5,
+      },
+      response => {
+        if (response.assets) {
+          setPhotos([...photos, response.assets[0]]);
+        }
+      },
+    );
+  };
+
   return (
     <Pressable style={styles.wrapper} onPress={dismissKeyboard}>
       <SafeAreaView style={styles.wrapper} edges={edges}>
@@ -144,18 +163,20 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
               />
             ) : (
               <HStack alignItems="center" px="m" columnGap="l">
-                <Pressable hitSlop={8} onPress={openPhotoLibrary}>
+                <TouchableOpacity hitSlop={8} onPress={openPhotoLibrary}>
                   <PhotosIcon
                     width={26}
                     height={26}
                     fill={theme.colors.inputPlaceholder}
                   />
-                </Pressable>
-                <CameraIcon
-                  width={26}
-                  height={26}
-                  fill={theme.colors.inputPlaceholder}
-                />
+                </TouchableOpacity>
+                <TouchableOpacity hitSlop={8} onPress={openCamera}>
+                  <CameraIcon
+                    width={26}
+                    height={26}
+                    fill={theme.colors.inputPlaceholder}
+                  />
+                </TouchableOpacity>
                 <PollIcon
                   width={26}
                   height={26}
