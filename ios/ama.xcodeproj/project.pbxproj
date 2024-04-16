@@ -20,8 +20,8 @@
 		36B04CA93E6842EFA2612E83 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DA48975596A42658E6BDB71 /* Roboto-Regular.ttf */; };
 		3BA918CDDDB5468CAC8A4BC0 /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6DC4A163E6714CEAABDBEA47 /* Roboto-Italic.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-ama-amaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-ama-amaTests.a */; };
+		795AE6612BCECA8300A02FC0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 795AE6602BCECA8300A02FC0 /* GoogleService-Info.plist */; };
 		798E83102BC9940800D30AC7 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 798E830F2BC9940800D30AC7 /* icon.png */; };
-		798EE6392BCEBE3600269E17 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 798EE6382BCEBE3600269E17 /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		90D33CF217A048829A6529B7 /* Roboto-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1506BFF81B9446BCB7AE2793 /* Roboto-BoldItalic.ttf */; };
 		A4D925B33E894904AF30461D /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3E94A19F9FC54E628E845058 /* Roboto-Bold.ttf */; };
@@ -63,8 +63,9 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-ama.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ama.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DA48975596A42658E6BDB71 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
 		6DC4A163E6714CEAABDBEA47 /* Roboto-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Italic.ttf"; path = "../assets/fonts/Roboto-Italic.ttf"; sourceTree = "<group>"; };
+		795AE6602BCECA8300A02FC0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		795AE6622BCECD5E00A02FC0 /* ama.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ama.entitlements; path = ama/ama.entitlements; sourceTree = "<group>"; };
 		798E830F2BC9940800D30AC7 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../assets/icon.png; sourceTree = "<group>"; };
-		798EE6382BCEBE3600269E17 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ama/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-ama-amaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ama-amaTests.release.xcconfig"; path = "Target Support Files/Pods-ama-amaTests/Pods-ama-amaTests.release.xcconfig"; sourceTree = "<group>"; };
 		9FF023F09034445C8F8CE5FF /* Roboto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Light.ttf"; path = "../assets/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; };
@@ -114,6 +115,7 @@
 		13B07FAE1A68108700A75B9A /* ama */ = {
 			isa = PBXGroup;
 			children = (
+				795AE6622BCECD5E00A02FC0 /* ama.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -144,7 +146,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				798EE6382BCEBE3600269E17 /* GoogleService-Info.plist */,
+				795AE6602BCECA8300A02FC0 /* GoogleService-Info.plist */,
 				798E830F2BC9940800D30AC7 /* icon.png */,
 				13B07FAE1A68108700A75B9A /* ama */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -301,7 +303,7 @@
 				90D33CF217A048829A6529B7 /* Roboto-BoldItalic.ttf in Resources */,
 				3BA918CDDDB5468CAC8A4BC0 /* Roboto-Italic.ttf in Resources */,
 				2D296B885E78472E852AAD4C /* Roboto-Light.ttf in Resources */,
-				798EE6392BCEBE3600269E17 /* GoogleService-Info.plist in Resources */,
+				795AE6612BCECA8300A02FC0 /* GoogleService-Info.plist in Resources */,
 				09EEE89C172F46F09A41BD66 /* Roboto-LightItalic.ttf in Resources */,
 				D6FC82012A7741188E424231 /* Roboto-Medium.ttf in Resources */,
 				A9B5833287D04B9F9B940E10 /* Roboto-MediumItalic.ttf in Resources */,
@@ -543,6 +545,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ama/ama.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44YT93HHZS;
 				ENABLE_BITCODE = NO;
@@ -573,6 +576,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ama/ama.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44YT93HHZS;
 				INFOPLIST_FILE = ama/Info.plist;
@@ -664,10 +668,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -735,10 +736,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
