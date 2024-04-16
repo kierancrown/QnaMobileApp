@@ -29,7 +29,7 @@ import {
   launchCamera,
 } from 'react-native-image-picker';
 import PhotoPreview from './components/PhotoPreview';
-import PollContainer from './components/Poll';
+import PollContainer, {PollOptionType} from './components/Poll';
 import Badge from 'app/components/common/Badge';
 import {percentHeight} from 'app/utils/size';
 
@@ -51,11 +51,14 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
 
   const charsRemaining = useMemo(() => charLimit - question.length, [question]);
   const [edges, setEdges] = useState<Edges>(['bottom', 'right', 'left']);
-  const [photos, setPhotos] = useState<Asset[]>([]);
-  const [showPoll, setShowPoll] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [loading] = useState(false);
   const theme = useAppTheme();
+
+  const [photos, setPhotos] = useState<Asset[]>([]);
+  const [pollOptions, setPollOptions] = useState<PollOptionType[]>([]);
+
+  const [showPoll, setShowPoll] = useState(false);
 
   useEffect(() => {
     onLoading?.(loading);
@@ -177,6 +180,13 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
               </Pressable>
 
               <HStack alignItems="center" px="m" columnGap="l">
+                <TouchableOpacity hitSlop={8} onPress={openCamera}>
+                  <CameraIcon
+                    width={26}
+                    height={26}
+                    fill={theme.colors.inputPlaceholder}
+                  />
+                </TouchableOpacity>
                 <Badge
                   text={photos.length.toString()}
                   hidden={photos.length < 1}
@@ -189,30 +199,38 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
                     />
                   </TouchableOpacity>
                 </Badge>
-                <TouchableOpacity hitSlop={8} onPress={openCamera}>
-                  <CameraIcon
-                    width={26}
-                    height={26}
-                    fill={theme.colors.inputPlaceholder}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  hitSlop={8}
-                  onPress={() => setShowPoll(!showPoll)}>
-                  {showPoll ? (
-                    <PollFilledIcon
-                      width={26}
-                      height={26}
-                      fill={theme.colors.inputPlaceholder}
-                    />
-                  ) : (
-                    <PollIcon
-                      width={26}
-                      height={26}
-                      fill={theme.colors.inputPlaceholder}
-                    />
-                  )}
-                </TouchableOpacity>
+
+                <Badge
+                  text={pollOptions.length.toString()}
+                  hidden={pollOptions.length < 1}
+                  size={'small'}>
+                  <TouchableOpacity
+                    hitSlop={8}
+                    onPress={() => {
+                      if (showPoll === false) {
+                        if (pollOptions.length <= 0) {
+                          setPollOptions([{name: 'Yes'}, {name: 'No'}]);
+                        } else {
+                          setPollOptions([]);
+                        }
+                      }
+                      setShowPoll(!showPoll);
+                    }}>
+                    {showPoll ? (
+                      <PollFilledIcon
+                        width={26}
+                        height={26}
+                        fill={theme.colors.inputPlaceholder}
+                      />
+                    ) : (
+                      <PollIcon
+                        width={26}
+                        height={26}
+                        fill={theme.colors.inputPlaceholder}
+                      />
+                    )}
+                  </TouchableOpacity>
+                </Badge>
                 <HashtagIcon
                   width={26}
                   height={26}
@@ -225,7 +243,14 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
               </HStack>
 
               {showPoll ? (
-                <PollContainer />
+                <PollContainer
+                  options={pollOptions}
+                  setOptions={setPollOptions}
+                  onRemovePoll={() => {
+                    setShowPoll(false);
+                    setPollOptions([]);
+                  }}
+                />
               ) : (
                 photos.length > 0 && (
                   <Box height={percentHeight(20)}>

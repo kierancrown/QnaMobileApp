@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "158171505962",
+    "project_id": "qna-rnapp",
+    "storage_bucket": "qna-rnapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158171505962:android:32042122783890cb662a53",
+        "android_client_info": {
+          "package_name": "co.askthat.qna"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdHTwTR--qmmUQunLdULvQJ-_sggFqdVY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

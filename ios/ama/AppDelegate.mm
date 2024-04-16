@@ -10,6 +10,8 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+  [FIRApp configure];
+  
   self.window.rootViewController.view.backgroundColor = [UIColor colorWithRed: 0.04 green: 0.04 blue: 0.04 alpha: 1.00];
   
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
