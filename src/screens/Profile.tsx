@@ -18,11 +18,15 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import {decode} from 'base64-arraybuffer';
 import Avatar from 'app/components/common/Avatar';
 import Username from 'app/components/Username';
+import {useNotification} from 'app/context/PushNotificationContext';
+
+import messaging from '@react-native-firebase/messaging';
 
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
 
+  const {requestPermission, unRegisterNotifications} = useNotification();
   const {user, logout} = useUser();
   const {username, updateUsername} = useUsername();
 
@@ -149,6 +153,34 @@ const ProfileScreen: FC = () => {
               <Button title={user ? 'Logout' : 'Login'} onPress={logout} />
               <Button title="Update Username" onPress={updateUserPrompt} />
               <Button title="Change Avatar" onPress={presentImagePicker} />
+
+              <Button
+                title="Request push notifications"
+                onPress={requestPermission}
+              />
+
+              <Button
+                title="APNS?"
+                onPress={() => {
+                  messaging()
+                    .getAPNSToken()
+                    .then(token => {
+                      if (!token) {
+                        Alert.alert('Error', 'No token found');
+                        return;
+                      }
+                      Alert.alert('APNS Token', token);
+                    })
+                    .catch(error => {
+                      Alert.alert('Error', error.message);
+                    });
+                }}
+              />
+
+              <Button
+                title="Unregister device token"
+                onPress={unRegisterNotifications}
+              />
 
               <Avatar size="xxxxl" />
             </Center>

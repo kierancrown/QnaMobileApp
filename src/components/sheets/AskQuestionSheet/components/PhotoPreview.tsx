@@ -2,13 +2,7 @@ import {Box, Center, HStack} from 'app/components/common';
 import {useAppTheme} from 'app/styles/theme';
 import {percentHeight} from 'app/utils/size';
 import React, {FC} from 'react';
-import {
-  Image,
-  ImageStyle,
-  StyleProp,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import {Image, ImageStyle, StyleProp, TouchableOpacity} from 'react-native';
 import {Asset} from 'react-native-image-picker';
 import CloseIcon from 'app/assets/icons/actions/Close.svg';
 
@@ -27,13 +21,6 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({photos, removePhoto}) => {
           height: '100%',
           aspectRatio:
             !photo.height || !photo.width ? 1 : photo.width / photo.height,
-        };
-
-        const shadowStyle: StyleProp<ViewStyle> = {
-          shadowColor: theme.colors.black,
-          shadowOffset: {width: -2, height: 2},
-          shadowOpacity: 0.66,
-          shadowRadius: 8,
         };
 
         return (
@@ -56,7 +43,6 @@ const PhotoPreview: FC<PhotoPreviewProps> = ({photos, removePhoto}) => {
                     width={theme.iconSizes.m}
                     height={theme.iconSizes.m}
                     fill={theme.colors.foreground}
-                    style={shadowStyle}
                   />
                 </Center>
               </TouchableOpacity>

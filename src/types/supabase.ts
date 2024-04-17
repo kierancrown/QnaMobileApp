@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      device_tokens: {
+        Row: {
+          created_at: string
+          device_token: string
+          id: number
+          type: Database["public"]["Enums"]["device_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_token: string
+          id?: number
+          type: Database["public"]["Enums"]["device_type"]
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          device_token?: string
+          id?: number
+          type?: Database["public"]["Enums"]["device_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_device_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       question_metadata: {
         Row: {
           id: number
@@ -300,7 +332,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      device_type: "ios" | "android" | "web"
     }
     CompositeTypes: {
       [_ in never]: never

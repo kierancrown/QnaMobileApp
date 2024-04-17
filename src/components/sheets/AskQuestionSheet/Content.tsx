@@ -154,7 +154,7 @@ const FeedbackSheetContent: FC<ILocationsSheetContentProps> = ({
     <Pressable style={styles.wrapper} onPress={dismissKeyboard}>
       <SafeAreaView style={styles.wrapper} edges={edges}>
         <VStack flex={1} overflow="hidden">
-          <BottomSheetScrollView keyboardShouldPersistTaps>
+          <BottomSheetScrollView keyboardShouldPersistTaps="always">
             <VStack flex={1} rowGap="mY">
               <Pressable onPress={focusInput}>
                 <Box pt="sY" px="m">

@@ -55,7 +55,7 @@ const Auth: FC = () => {
           style={styles.flex}
           behavior={Platform.select({
             ios: 'padding',
-            android: undefined,
+            android: 'padding',
           })}>
           <VStack flex={1} mx="l" py="lY">
             <VStack flex={1} rowGap="xxlY">

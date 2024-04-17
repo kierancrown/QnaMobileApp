@@ -6,6 +6,8 @@ import {Alert, Linking} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
+import {useNotification} from 'app/context/PushNotificationContext';
+import messaging from '@react-native-firebase/messaging';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -22,6 +24,8 @@ export const AuthContextProvider = (props: any) => {
   const [user, setUser] = useState<User | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
+  const {unRegisterNotifications, registerOnDatabase} = useNotification();
+
   useMount(() => {
     supabase.auth.getSession().then(({data: {session}}) => {
       setUserSession(session);
@@ -32,6 +36,20 @@ export const AuthContextProvider = (props: any) => {
       async (event, session) => {
         setUserSession(session);
         setUser(session?.user ?? null);
+
+        if (event === 'SIGNED_IN') {
+          setTimeout(async () => {
+            const token = await messaging().getToken();
+            // await on other Supabase function here
+            // this runs right after the callback has finished
+            await registerOnDatabase(token);
+          }, 0);
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setUserSession(null);
+          dispatch(resetAuth());
+          dispatch(resetCache());
+        }
       },
     );
 
@@ -40,14 +58,12 @@ export const AuthContextProvider = (props: any) => {
     };
   });
 
-  const logout = () => {
-    supabase.auth.signOut().then(() => {
-      // Force reset of user and session
-      setUser(null);
-      setUserSession(null);
-      dispatch(resetAuth());
-      dispatch(resetCache());
-    });
+  const logout = async () => {
+    const success = await unRegisterNotifications();
+    if (!success) {
+      console.log('Failed to unregister notifications');
+    }
+    await supabase.auth.signOut();
   };
 
   // Listen for auth deep links
@@ -72,6 +88,8 @@ export const AuthContextProvider = (props: any) => {
         Alert.alert(`Error ${errorCode}`, errorDescription, [{text: 'OK'}], {
           cancelable: false,
         });
+
+        console.log({error, errorCode, errorDescription});
 
         return;
       }
