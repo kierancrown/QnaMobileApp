@@ -27,7 +27,7 @@ const PushNotifications = () => {
 
   useMount(async () => {
     if (await checkPermission()) {
-      nextStep();
+      // nextStep();
     }
   });
 

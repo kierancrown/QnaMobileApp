@@ -30,7 +30,7 @@ const Avatar: FC<AvatarProps> = ({userId, size}) => {
         style={styles}
         resizeMode="cover"
         source={{
-          uri: profilePicture ?? 'https://i.pravatar.cc/300',
+          uri: profilePicture ?? require('app/assets/images/avatar.jpg'),
           cache: FastImage.cacheControl.web,
         }}
       />
