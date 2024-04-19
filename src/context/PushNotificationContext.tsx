@@ -143,11 +143,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     const onMessageReceived = async (message: any) => {
       console.log('Message received:', message);
       await notifee.displayNotification({
-        title: message.notification.title,
-        body: message.notification.body,
-        android: {
-          channelId: 'default',
-        },
+        ...message.notification,
+        android: {channelId: 'default'},
       });
     };
 

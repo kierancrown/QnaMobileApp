@@ -1,16 +1,16 @@
 import React from 'react';
-
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import AuthScreen from '../screens/Auth';
-
-export type AuthStackNavigationProp =
-  NativeStackNavigationProp<AuthStackParamList>;
+import AuthScreen from 'app/screens/Auth';
 
 export type AuthStackParamList = {
   Auth: undefined;
 };
+
+// Define the navigation prop type for the AuthStack
+export type AuthStackNavigationProp =
+  NativeStackNavigationProp<AuthStackParamList>;
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 

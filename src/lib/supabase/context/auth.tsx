@@ -5,7 +5,11 @@ import useMount from 'app/hooks/useMount';
 import {Alert, Linking} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
-import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
+import {
+  resetAuth,
+  resetCache,
+  showOnboarding,
+} from 'app/redux/slices/authSlice';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
 
@@ -68,13 +72,23 @@ export const AuthContextProvider = (props: any) => {
 
         if (event === 'SIGNED_IN') {
           setTimeout(async () => {
-            if (session) {
-              const sId = extractSessionId(session);
-              if (sId) {
-                silentTokenRegistration(sId, true);
-              }
+            // Check if onboarding is complete
+            const {data} = await supabase
+              .from('user_metadata')
+              .select('has_onboarded')
+              .eq('user_id', session?.user?.id ?? '')
+              .single();
+            console.log({data});
+            if (data?.has_onboarded == null) {
+              dispatch(showOnboarding());
             } else {
-              console.log('No session found');
+              // Register for push notifications
+              if (session) {
+                const sId = extractSessionId(session);
+                if (sId) {
+                  silentTokenRegistration(sId, true);
+                }
+              }
             }
           }, 0);
         } else if (event === 'SIGNED_OUT') {
@@ -92,10 +106,6 @@ export const AuthContextProvider = (props: any) => {
   });
 
   const logout = async ({allDevices = false, otherDevices = false}) => {
-    // const success = await unRegisterNotifications();
-    // if (!success) {
-    //   console.log('Failed to unregister notifications');
-    // }
     const {error} = await supabase.auth.signOut({
       scope: otherDevices ? 'others' : allDevices ? 'global' : 'local',
     });

@@ -10,6 +10,7 @@ import AuthStack from './AuthStack';
 import {useSelector} from 'react-redux';
 import {RootState} from 'app/redux/store';
 import TabStack from './TabStack';
+import OnboardingStack from './OnboardingStack';
 
 const RootStack = () => {
   const theme = useTheme<Theme>();
@@ -17,6 +18,9 @@ const RootStack = () => {
 
   const skipAuth = useSelector(
     (state: RootState) => state.persistent.auth.skippedAuth,
+  );
+  const showOnboarding = useSelector(
+    (state: RootState) => state.persistent.auth.showOnboarding,
   );
 
   return (
@@ -32,7 +36,15 @@ const RootStack = () => {
               text: theme.colors.foreground,
             },
           }}>
-          {skipAuth || user ? <TabStack /> : <AuthStack />}
+          {skipAuth || user ? (
+            showOnboarding ? (
+              <OnboardingStack />
+            ) : (
+              <TabStack />
+            )
+          ) : (
+            <AuthStack />
+          )}
         </NavigationContainer>
       </SafeAreaProvider>
     </>

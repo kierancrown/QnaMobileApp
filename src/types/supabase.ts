@@ -337,6 +337,7 @@ export type Database = {
       }
       user_metadata: {
         Row: {
+          has_onboarded: boolean
           id: number
           profile_picture_key: string | null
           updated_at: string | null
@@ -345,6 +346,7 @@ export type Database = {
           verified: boolean
         }
         Insert: {
+          has_onboarded?: boolean
           id?: number
           profile_picture_key?: string | null
           updated_at?: string | null
@@ -353,6 +355,7 @@ export type Database = {
           verified?: boolean
         }
         Update: {
+          has_onboarded?: boolean
           id?: number
           profile_picture_key?: string | null
           updated_at?: string | null

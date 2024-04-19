@@ -1,11 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 export interface AuthState {
+  showOnboarding: boolean;
   skippedAuth: boolean;
   username: string | undefined;
 }
 
 const initialState: AuthState = {
+  showOnboarding: false,
   skippedAuth: false,
   username: undefined,
 };
@@ -14,6 +16,12 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    showOnboarding: state => {
+      state.showOnboarding = true;
+    },
+    completeOnboarding: state => {
+      state.showOnboarding = false;
+    },
     skipAuth: state => {
       state.skippedAuth = true;
     },
@@ -34,7 +42,13 @@ export const authSlice = createSlice({
   },
 });
 
-export const {resetAuth, skipAuth, resetCache, setUsernameCache} =
-  authSlice.actions;
+export const {
+  resetAuth,
+  skipAuth,
+  resetCache,
+  setUsernameCache,
+  showOnboarding,
+  completeOnboarding,
+} = authSlice.actions;
 
 export default authSlice.reducer;
