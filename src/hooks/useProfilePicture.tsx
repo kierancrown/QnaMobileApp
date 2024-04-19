@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {PixelRatio} from 'react-native';
@@ -8,7 +8,7 @@ export const useProfilePicture = (userId?: number, size?: number) => {
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const imageSize = parseInt(((size ?? 100) * PixelRatio.get()).toFixed(), 10);
 
-  useEffect(() => {
+  const refreshProfilePicture = useCallback(() => {
     if (!user) {
       setProfilePicture(null);
       return;
@@ -36,5 +36,9 @@ export const useProfilePicture = (userId?: number, size?: number) => {
       });
   }, [imageSize, user, userId]);
 
-  return {profilePicture};
+  useEffect(() => {
+    refreshProfilePicture();
+  }, [userId, size, refreshProfilePicture]);
+
+  return {profilePicture, refreshProfilePicture};
 };

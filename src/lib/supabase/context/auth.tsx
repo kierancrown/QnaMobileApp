@@ -79,7 +79,7 @@ export const AuthContextProvider = (props: any) => {
               .eq('user_id', session?.user?.id ?? '')
               .single();
             console.log({data});
-            if (data?.has_onboarded == null) {
+            if (data?.has_onboarded === false) {
               dispatch(showOnboarding());
             } else {
               // Register for push notifications

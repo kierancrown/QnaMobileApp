@@ -41,6 +41,7 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
   }, []);
 
   const inputStyle: TextStyle = {
+    flex: 1,
     padding: 0,
     margin: 0,
     color: theme.colors[props.color || 'white'],
