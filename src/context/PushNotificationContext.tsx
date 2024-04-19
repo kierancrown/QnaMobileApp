@@ -9,6 +9,7 @@ import {isEmulator} from 'react-native-device-info';
 // Define the context
 interface NotificationContextType {
   getToken: () => Promise<string>;
+  checkPermission: () => Promise<boolean>;
   requestPermission: (sessionId: string) => Promise<boolean>;
   registerOnDatabase: (sessionId: string, token: string) => Promise<void>;
   unRegisterNotifications: () => Promise<boolean>;
@@ -127,6 +128,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     return false;
   };
 
+  const checkPermission = async () => {
+    const enabled = await messaging().hasPermission();
+    return enabled === messaging.AuthorizationStatus.AUTHORIZED;
+  };
+
   const silentTokenRegistration = (
     sessionId: string,
     skipUserCheck = false,
@@ -167,6 +173,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     <NotificationContext.Provider
       value={{
         getToken,
+        checkPermission,
         requestPermission,
         registerOnDatabase,
         unRegisterNotifications,

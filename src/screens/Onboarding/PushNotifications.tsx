@@ -10,11 +10,12 @@ import {useNavigation} from '@react-navigation/native';
 import {OnboardingStackNavigationProp} from 'app/navigation/OnboardingStack';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
+import useMount from 'app/hooks/useMount';
 
 const PushNotifications = () => {
   const {sessionId} = useUser();
   const animation = useRef<LottieView>(null);
-  const {requestPermission} = useNotification();
+  const {requestPermission, checkPermission} = useNotification();
   const {navigate} = useNavigation<OnboardingStackNavigationProp>();
 
   useEffect(() => {
@@ -23,6 +24,12 @@ const PushNotifications = () => {
     }, 2000);
     return () => clearTimeout(timeout);
   }, []);
+
+  useMount(async () => {
+    if (await checkPermission()) {
+      nextStep();
+    }
+  });
 
   const nextStep = () => {
     navigate('ProfileDetails');
@@ -37,6 +44,7 @@ const PushNotifications = () => {
       Alert.alert('Permission Denied', 'You can enable it in settings', [
         {
           text: 'Open Settings',
+          style: 'default',
           onPress: () => {
             Linking.openSettings();
           },
