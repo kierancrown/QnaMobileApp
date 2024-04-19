@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {Session, User} from '@supabase/supabase-js';
 import {supabase} from '../';
 import useMount from 'app/hooks/useMount';
@@ -7,24 +7,53 @@ import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
 import {useNotification} from 'app/context/PushNotificationContext';
-import messaging from '@react-native-firebase/messaging';
+import {Buffer} from 'buffer';
 
 export const AuthContext = createContext<{
   user: User | null;
   session: Session | null;
-  logout: () => void;
+  sessionId?: string;
+  logout: ({
+    allDevices,
+    otherDevices,
+  }: {
+    allDevices?: boolean;
+    otherDevices?: boolean;
+  }) => Promise<boolean>;
 }>({
   user: null,
   session: null,
-  logout: () => {},
+  logout: async () => {
+    return false;
+  },
 });
 
 export const AuthContextProvider = (props: any) => {
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [userSession, setUserSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
-  const {unRegisterNotifications, registerOnDatabase} = useNotification();
+  const {silentTokenRegistration} = useNotification();
+
+  const extractSessionId = (session: Session) => {
+    if (session?.access_token) {
+      try {
+        const sessionTokenParts = session.access_token.split('.');
+        if (sessionTokenParts.length >= 2) {
+          const token = JSON.parse(
+            Buffer.from(sessionTokenParts[1], 'base64').toString('ascii'),
+          );
+          return typeof token.session_id === 'string'
+            ? token.session_id
+            : undefined;
+        }
+      } catch (err) {
+        console.log('Error parsing session token', err);
+        return undefined;
+      }
+    }
+  };
 
   useMount(() => {
     supabase.auth.getSession().then(({data: {session}}) => {
@@ -39,10 +68,14 @@ export const AuthContextProvider = (props: any) => {
 
         if (event === 'SIGNED_IN') {
           setTimeout(async () => {
-            const token = await messaging().getToken();
-            // await on other Supabase function here
-            // this runs right after the callback has finished
-            await registerOnDatabase(token);
+            if (session) {
+              const sId = extractSessionId(session);
+              if (sId) {
+                silentTokenRegistration(sId, true);
+              }
+            } else {
+              console.log('No session found');
+            }
           }, 0);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
@@ -58,12 +91,16 @@ export const AuthContextProvider = (props: any) => {
     };
   });
 
-  const logout = async () => {
-    const success = await unRegisterNotifications();
-    if (!success) {
-      console.log('Failed to unregister notifications');
-    }
-    await supabase.auth.signOut();
+  const logout = async ({allDevices = false, otherDevices = false}) => {
+    // const success = await unRegisterNotifications();
+    // if (!success) {
+    //   console.log('Failed to unregister notifications');
+    // }
+    const {error} = await supabase.auth.signOut({
+      scope: otherDevices ? 'others' : allDevices ? 'global' : 'local',
+    });
+
+    return !error;
   };
 
   // Listen for auth deep links
@@ -77,6 +114,8 @@ export const AuthContextProvider = (props: any) => {
         return;
       }
       const url = new URL(urlString);
+
+      console.log({url: url.toString()});
 
       if (url.searchParams.get('error')) {
         const error = url.searchParams.get('error');
@@ -114,10 +153,20 @@ export const AuthContextProvider = (props: any) => {
     };
   });
 
+  useEffect(() => {
+    if (userSession) {
+      const sId = extractSessionId(userSession);
+      if (sId) {
+        setSessionId(sId);
+      }
+    }
+  }, [userSession]);
+
   const value = {
     userSession,
     user,
     logout,
+    sessionId,
   };
   return <AuthContext.Provider value={value} {...props} />;
 };

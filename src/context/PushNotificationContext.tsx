@@ -8,10 +8,11 @@ import {isEmulator} from 'react-native-device-info';
 
 // Define the context
 interface NotificationContextType {
-  requestPermission: () => Promise<void>;
-  registerOnDatabase: (token: string) => Promise<void>;
+  getToken: () => Promise<string>;
+  requestPermission: (sessionId: string) => Promise<void>;
+  registerOnDatabase: (sessionId: string, token: string) => Promise<void>;
   unRegisterNotifications: () => Promise<boolean>;
-  silentTokenRegistration: () => void;
+  silentTokenRegistration: (sessionId: string, skipUserCheck?: boolean) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -51,7 +52,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     return token;
   };
 
-  const registerOnDatabase = async (token: string) => {
+  const registerOnDatabase = async (sessionId: string, token: string) => {
     if (
       Platform.OS !== 'android' &&
       Platform.OS !== 'ios' &&
@@ -59,10 +60,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     ) {
       return;
     }
+    console.log('Registering token:', sessionId);
+    if (!sessionId) {
+      console.error('Session ID not found');
+      return;
+    }
 
     const {error} = await supabase.from('device_tokens').insert({
       device_token: token,
       type: Platform.OS,
+      session_id: sessionId,
     });
 
     if (error) {
@@ -88,7 +95,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     return true;
   };
 
-  const requestPermission = async () => {
+  const requestPermission = async (sessionId: string) => {
     if (Platform.OS === 'ios' && (await isEmulator())) {
       Alert.alert(
         'Emulator Detected',
@@ -109,24 +116,25 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
-      await messaging().registerDeviceForRemoteMessages();
       const token = await getToken();
-      await registerOnDatabase(token);
+      await registerOnDatabase(sessionId, token);
     }
   };
 
-  const silentTokenRegistration = () => {
-    if (!user) {
+  const silentTokenRegistration = (
+    sessionId: string,
+    skipUserCheck = false,
+  ) => {
+    if (!skipUserCheck && !user) {
       return;
     }
 
     messaging()
       .hasPermission()
       .then(async enabled => {
-        await messaging().registerDeviceForRemoteMessages();
         if (enabled) {
           const token = await getToken();
-          await registerOnDatabase(token);
+          await registerOnDatabase(sessionId, token);
         }
       });
   };
@@ -134,7 +142,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   useEffect(() => {
     const onMessageReceived = async (message: any) => {
       console.log('Message received:', message);
-      await notifee.displayNotification(JSON.parse(message.data));
+      await notifee.displayNotification({
+        title: message.notification.title,
+        body: message.notification.body,
+        android: {
+          channelId: 'default',
+        },
+      });
     };
 
     messaging().onMessage(onMessageReceived);
@@ -149,6 +163,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   return (
     <NotificationContext.Provider
       value={{
+        getToken,
         requestPermission,
         registerOnDatabase,
         unRegisterNotifications,

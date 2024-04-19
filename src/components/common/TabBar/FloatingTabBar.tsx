@@ -220,7 +220,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
           <Center
             width={CTA_SIZE}
             height={CTA_SIZE}
-            // backgroundColor="tabBarIconActive"
+            backgroundColor="tabBarIconActive"
             shadowColor="black"
             shadowOffset={{
               width: 0,

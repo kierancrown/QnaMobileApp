@@ -14,6 +14,7 @@ export type Database = {
           created_at: string
           device_token: string
           id: number
+          session_id: string
           type: Database["public"]["Enums"]["device_type"]
           user_id: string
         }
@@ -21,6 +22,7 @@ export type Database = {
           created_at?: string
           device_token: string
           id?: number
+          session_id: string
           type: Database["public"]["Enums"]["device_type"]
           user_id?: string
         }
@@ -28,12 +30,91 @@ export type Database = {
           created_at?: string
           device_token?: string
           id?: number
+          session_id?: string
           type?: Database["public"]["Enums"]["device_type"]
           user_id?: string
         }
         Relationships: [
           {
+            foreignKeyName: "public_device_tokens_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "public_device_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      login_activity: {
+        Row: {
+          app_version: string
+          id: number
+          ip_address: string | null
+          timestamp: string
+          user_agent: string
+          user_id: string
+        }
+        Insert: {
+          app_version?: string
+          id?: number
+          ip_address?: string | null
+          timestamp?: string
+          user_agent: string
+          user_id?: string
+        }
+        Update: {
+          app_version?: string
+          id?: number
+          ip_address?: string | null
+          timestamp?: string
+          user_agent?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          delivered_at: string | null
+          id: number
+          image_url: string | null
+          read_at: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          delivered_at?: string | null
+          id?: number
+          image_url?: string | null
+          read_at?: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          delivered_at?: string | null
+          id?: number
+          image_url?: string | null
+          read_at?: string | null
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -95,18 +176,21 @@ export type Database = {
           id: number
           question_id: number
           user_id: string
+          user_meta: number | null
         }
         Insert: {
           created_at?: string
           id?: number
           question_id: number
           user_id: string
+          user_meta?: number | null
         }
         Update: {
           created_at?: string
           id?: number
           question_id?: number
           user_id?: string
+          user_meta?: number | null
         }
         Relationships: [
           {
@@ -123,36 +207,37 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_question_upvotes_user_meta_fkey"
+            columns: ["user_meta"]
+            isOneToOne: false
+            referencedRelation: "user_metadata"
+            referencedColumns: ["id"]
+          },
         ]
       }
       questions: {
         Row: {
-          attachments: Json[] | null
           created_at: string
           id: number
           nsfw: boolean
           question: string
-          tags: number[]
           user_id: string
           user_meta: number
         }
         Insert: {
-          attachments?: Json[] | null
           created_at?: string
           id?: number
           nsfw?: boolean
           question: string
-          tags: number[]
           user_id?: string
           user_meta: number
         }
         Update: {
-          attachments?: Json[] | null
           created_at?: string
           id?: number
           nsfw?: boolean
           question?: string
-          tags?: number[]
           user_id?: string
           user_meta?: number
         }
@@ -333,6 +418,11 @@ export type Database = {
     }
     Enums: {
       device_type: "ios" | "android" | "web"
+      notification_type:
+        | "login"
+        | "question_like"
+        | "question_response"
+        | "account_follow"
     }
     CompositeTypes: {
       [_ in never]: never

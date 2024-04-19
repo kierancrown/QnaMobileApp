@@ -20,14 +20,12 @@ import Avatar from 'app/components/common/Avatar';
 import Username from 'app/components/Username';
 import {useNotification} from 'app/context/PushNotificationContext';
 
-import messaging from '@react-native-firebase/messaging';
-
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
 
   const {requestPermission, unRegisterNotifications} = useNotification();
-  const {user, logout} = useUser();
+  const {user, logout, sessionId} = useUser();
   const {username, updateUsername} = useUsername();
 
   const bottomListPadding = useBottomPadding();
@@ -150,30 +148,28 @@ const ProfileScreen: FC = () => {
               flex={1}
               style={{paddingBottom: bottomListPadding}}
               rowGap="mY">
-              <Button title={user ? 'Logout' : 'Login'} onPress={logout} />
+              <Text>{sessionId}</Text>
+              <Button
+                title={user ? 'Logout' : 'Login'}
+                onPress={() => {
+                  logout({}).then();
+                }}
+              />
+              <Button
+                title="Logout other devices"
+                onPress={() => {
+                  logout({otherDevices: true}).then();
+                }}
+              />
               <Button title="Update Username" onPress={updateUserPrompt} />
               <Button title="Change Avatar" onPress={presentImagePicker} />
 
               <Button
                 title="Request push notifications"
-                onPress={requestPermission}
-              />
-
-              <Button
-                title="APNS?"
                 onPress={() => {
-                  messaging()
-                    .getAPNSToken()
-                    .then(token => {
-                      if (!token) {
-                        Alert.alert('Error', 'No token found');
-                        return;
-                      }
-                      Alert.alert('APNS Token', token);
-                    })
-                    .catch(error => {
-                      Alert.alert('Error', error.message);
-                    });
+                  if (sessionId) {
+                    requestPermission(sessionId);
+                  }
                 }}
               />
 
