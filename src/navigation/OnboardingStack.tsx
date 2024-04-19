@@ -18,7 +18,7 @@ const OnboardingStack = () => {
   return (
     <Stack.Navigator
       initialRouteName="PushNotifications"
-      screenOptions={{headerShown: false}}>
+      screenOptions={{headerShown: false, gestureEnabled: false}}>
       <Stack.Screen name="PushNotifications" component={PushNotifications} />
       <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
     </Stack.Navigator>

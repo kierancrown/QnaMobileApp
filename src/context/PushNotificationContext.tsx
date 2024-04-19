@@ -9,7 +9,7 @@ import {isEmulator} from 'react-native-device-info';
 // Define the context
 interface NotificationContextType {
   getToken: () => Promise<string>;
-  requestPermission: (sessionId: string) => Promise<void>;
+  requestPermission: (sessionId: string) => Promise<boolean>;
   registerOnDatabase: (sessionId: string, token: string) => Promise<void>;
   unRegisterNotifications: () => Promise<boolean>;
   silentTokenRegistration: (sessionId: string, skipUserCheck?: boolean) => void;
@@ -101,13 +101,17 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         'Emulator Detected',
         'Push notifications are not supported on the iOS emulator',
       );
-      return;
+      return false;
     }
 
     if (Platform.OS === 'android') {
-      await PermissionsAndroid.request(
+      const status = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
       );
+
+      if (status !== PermissionsAndroid.RESULTS.GRANTED) {
+        return false;
+      }
     }
 
     const authStatus = await messaging().requestPermission();
@@ -118,7 +122,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     if (enabled) {
       const token = await getToken();
       await registerOnDatabase(sessionId, token);
+      return true;
     }
+    return false;
   };
 
   const silentTokenRegistration = (
