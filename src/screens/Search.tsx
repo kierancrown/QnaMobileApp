@@ -1,14 +1,35 @@
-import React, {FC} from 'react';
-import {Flex} from 'ui';
-
-import LargeTitleHeader from 'app/components/common/Header/LargeTitleHeader';
+import {
+  NearGeoLocation,
+  useGeoLocationSearch,
+} from 'app/hooks/useGeoLocationSearch';
+import React, {FC, useState} from 'react';
+import {ScrollView} from 'react-native-gesture-handler';
+import {Button, Flex, HStack, SafeAreaView, Text} from 'ui';
 
 const SearchScreen: FC = () => {
+  const {findNearestLocation} = useGeoLocationSearch();
+  const [res, setRes] = useState<NearGeoLocation[]>([]);
+
+  const f = async () => {
+    const t = await findNearestLocation({lat: 51.4856124, long: -0.2994634});
+    setRes(t);
+  };
+
   return (
-    <Flex>
-      <LargeTitleHeader title="Discover" />
-      {/* Content */}
-    </Flex>
+    <SafeAreaView>
+      <HStack px="m">
+        <Button onPress={f} title="Test Loc" />
+      </HStack>
+      <Flex mt="mY" px="m">
+        <ScrollView>
+          {res.map(r => (
+            <Text key={r.id} variant="headline" my="xxsY">
+              {r.name}
+            </Text>
+          ))}
+        </ScrollView>
+      </Flex>
+    </SafeAreaView>
   );
 };
 
