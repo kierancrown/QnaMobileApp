@@ -1,21 +1,23 @@
-import {QueryData} from '@supabase/supabase-js';
-import {supabase} from '../init';
+export interface QuestionsDetailData {
+  id: number;
+  created_at: string;
+  nsfw: boolean;
+  question: string;
+  user_id: string;
 
-export const questionDetailQuery = supabase.from('questions').select(
-  `
-  *,
-  user_metadata (
-    verified,
-    profile_picture_key,
-    username
-  ),
-  question_metadata (
-    upvote_count,
-    response_count,
-    view_count,
-    visible
-  )
-`,
-);
+  user_metadata: {
+    verified: boolean;
+    profile_picture_key: string | null;
+    username: string | null;
+  };
 
-export type QuestionsDetail = QueryData<typeof questionDetailQuery>;
+  question_metadata: {
+    upvote_count: number;
+    response_count: number;
+    view_count: number;
+    visible: boolean;
+    location?: {
+      name: string;
+    };
+  };
+}

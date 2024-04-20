@@ -1,4 +1,4 @@
-import {Flex, SafeAreaView, Text, VStack} from 'ui';
+import {Button, Center, Flex, HStack, SafeAreaView, Text, VStack} from 'ui';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Avatar, {AvatarRef} from 'app/components/common/Avatar';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -9,28 +9,42 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {decode} from 'base64-arraybuffer';
 import {useDebounceValue} from 'usehooks-ts';
 import Input from 'app/components/common/TextInput';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
+import {useUsername} from 'app/hooks/useUsername';
+import {useOnboarding} from 'app/hooks/useOnboarding';
 
 const ProfileDetails = () => {
   const {user} = useUser();
   const avatarRef = useRef<AvatarRef>(null);
+  const {updateUsername} = useUsername();
+  const {completeOnboarding} = useOnboarding();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [loadingUsername, setLoadingUsername] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('');
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean>();
   const [debouncedUsername] = useDebounceValue(username, 1000);
 
+  useEffect(() => {
+    if (username.trim().length > 2) {
+      setLoadingUsername(true);
+    }
+  }, [username]);
+
   const checkUsernameAvailability = useCallback(async () => {
-    setLoadingUsername(true);
-    const response = axios.post<{
+    if (debouncedUsername.trim().length < 3) {
+      return;
+    }
+
+    const response = await axios.post<{
       available: boolean;
     }>('https://api.askthat.co/functions/v1/username-available', {
-      username: username,
+      username: debouncedUsername,
     });
 
     setLoadingUsername(false);
-    return (await response).data.available;
-  }, [username]);
+    return response.data.available;
+  }, [debouncedUsername]);
 
   useEffect(() => {
     if (!debouncedUsername || debouncedUsername.trim().length < 3) {
@@ -82,45 +96,104 @@ const ProfileDetails = () => {
     );
   };
 
+  const saveUsername = async () => {
+    setLoading(true);
+    try {
+      const success = await updateUsername(username.trim());
+      if (success && user) {
+        await completeOnboarding(user);
+      } else {
+        Alert.alert(
+          'Something went wrong',
+          'We seem to be having trouble connecting. Check your connection and try again later.',
+        );
+      }
+    } catch (error) {
+      const err = error as Error;
+      console.error(err);
+      Alert.alert(
+        'Something went wrong',
+        'We seem to be having trouble connecting. Check your connection and try again later.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView>
-      <Flex px="m" py="lY">
-        <VStack rowGap="xxsY">
-          <Text variant="navbarTitle">Complete your profile</Text>
-          <Text variant="body">
-            Add a profile picture and a username to get started
-          </Text>
-        </VStack>
+      <Flex px="m" alignItems="center">
+        <Flex mt="mY">
+          <Center>
+            <VStack rowGap="sY">
+              <Text variant="navbarTitle" textAlign="center">
+                Complete your profile
+              </Text>
+              <Text variant="body" textAlign="center">
+                Add a profile picture and a username to get started
+              </Text>
+            </VStack>
+          </Center>
+        </Flex>
 
-        <TouchableOpacity onPress={presentImagePicker}>
-          <Avatar ref={avatarRef} size="xxxxl" />
-        </TouchableOpacity>
+        <Flex
+          flex={2}
+          alignItems="center"
+          justifyContent="flex-start"
+          rowGap="l">
+          <TouchableOpacity onPress={presentImagePicker}>
+            <Avatar ref={avatarRef} size="xxxxl" />
+          </TouchableOpacity>
 
-        <Text variant="body" mt="lY">
-          {loadingUsername ? 'Checking username availability...' : ''}
-        </Text>
-
-        <Input
-          value={username}
-          onChangeText={setUsername}
-          placeholder="Enter your username"
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="username-new"
-          rightAdornment={
-            loadingUsername ? (
-              <ActivityIndicator />
-            ) : isUsernameAvailable === false ? (
+          <Input
+            minWidth="100%"
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Enter your username"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="username-new"
+          />
+          <HStack
+            minWidth="100%"
+            mt="mMinus"
+            justifyContent="flex-start"
+            alignItems="center">
+            {username.trim().length < 3 ? (
               <Text variant="body" color="destructiveAction">
-                N
+                Username must be at least 3 characters
+              </Text>
+            ) : loadingUsername ? (
+              <HStack columnGap="xs" alignItems="center">
+                <ActivityIndicator color="white" />
+                <Text>Checking username availability</Text>
+              </HStack>
+            ) : isUsernameAvailable === undefined ||
+              username.trim().length < 3 ? null : isUsernameAvailable ===
+              false ? (
+              <Text variant="body" color="destructiveAction">
+                Username unavailable
               </Text>
             ) : (
               <Text variant="body" color="successfulAction">
-                Y
+                Username available
               </Text>
-            )
-          }
-        />
+            )}
+          </HStack>
+        </Flex>
+
+        <Flex justifyContent="flex-end" pb="mY">
+          <VStack rowGap="mY" alignItems="center">
+            <Button
+              title="Complete Profile"
+              disabled={
+                loading ||
+                !(username.trim().length > 2 && isUsernameAvailable === true)
+              }
+              onPress={saveUsername}
+            />
+          </VStack>
+        </Flex>
       </Flex>
     </SafeAreaView>
   );

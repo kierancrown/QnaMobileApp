@@ -6,12 +6,14 @@ import {Alert, Linking} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {
+  completeOnboarding,
   resetAuth,
   resetCache,
   showOnboarding,
 } from 'app/redux/slices/authSlice';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
+import {useOnboarding} from 'app/hooks/useOnboarding';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -37,6 +39,7 @@ export const AuthContextProvider = (props: any) => {
   const [userSession, setUserSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const dispatch = useDispatch<AppDispatch>();
+  const {hasOnboarded} = useOnboarding();
 
   const {silentTokenRegistration} = useNotification();
 
@@ -72,16 +75,11 @@ export const AuthContextProvider = (props: any) => {
 
         if (event === 'SIGNED_IN') {
           setTimeout(async () => {
-            // Check if onboarding is complete
-            const {data} = await supabase
-              .from('user_metadata')
-              .select('has_onboarded')
-              .eq('user_id', session?.user?.id ?? '')
-              .single();
-            console.log({data});
-            if (data?.has_onboarded === false) {
+            const onboardingCompleted = await hasOnboarded(session?.user);
+            if (!onboardingCompleted) {
               dispatch(showOnboarding());
             } else {
+              dispatch(completeOnboarding());
               // Register for push notifications
               if (session) {
                 const sId = extractSessionId(session);

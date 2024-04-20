@@ -2,7 +2,7 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {useCallback, useMemo, useState} from 'react';
 import useMount from './useMount';
 import {supabase} from 'app/lib/supabase';
-import {QuestionsDetail} from 'app/lib/supabase/queries/questionDetail';
+import {QuestionsDetailData} from 'app/lib/supabase/queries/questionDetail';
 
 interface UseQuestionDetailProps {
   questionId: number;
@@ -12,7 +12,7 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
   const {user} = useUser();
 
   const [hasUpvoted, setHasUpvoted] = useState(false);
-  const [question, setQuestion] = useState<QuestionsDetail[0] | null>(null);
+  const [question, setQuestion] = useState<QuestionsDetailData | null>(null);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -124,25 +124,29 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
       .from('questions')
       .select(
         `
-      *,
-      user_metadata (
-        verified,
-        profile_picture_key,
-        username
-      ),
-      question_metadata (
-        upvote_count,
-        response_count,
-        view_count,
-        visible
-      )
-    `,
+        *,
+        user_metadata (
+          verified,
+          profile_picture_key,
+          username
+        ),
+        question_metadata (
+          upvote_count,
+          response_count,
+          view_count,
+          visible,
+          location (
+            name
+          )
+        )
+      `,
       )
       .eq('id', questionId);
 
     if (e) {
       setError(e.message);
     } else {
+      // @ts-ignore
       setQuestion(data[0] ?? null);
       await fetchUpvotedStatus(data?.[0]?.id);
     }

@@ -30,6 +30,8 @@ import {HomeStackParamList} from 'app/navigation/HomeStack';
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
 import TimeIcon from 'app/assets/icons/TimeFive.svg';
+import LocationIcon from 'app/assets/icons/LocationPin.svg';
+
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
 
 import {
@@ -186,6 +188,19 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     {dayjs(question.created_at).fromNow(true)}
                   </Text>
                 </HStack>
+                <Flex />
+                {question.question_metadata?.location && (
+                  <HStack alignItems="center" columnGap="xxs">
+                    <LocationIcon
+                      fill={theme.colors.cardText}
+                      width={ICON_SIZE}
+                      height={ICON_SIZE}
+                    />
+                    <Text color="cardText" variant="smaller">
+                      {question.question_metadata.location.name}
+                    </Text>
+                  </HStack>
+                )}
               </HStack>
               <ActionBar
                 isLiked={hasUpvoted}
