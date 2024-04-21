@@ -1,4 +1,3 @@
-import {Alert} from 'react-native';
 import React, {FC} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
@@ -14,19 +13,18 @@ import {useUsername} from 'app/hooks/useUsername';
 import EyesIcon from 'app/assets/icons/Eyes.svg';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
-import {launchImageLibrary} from 'react-native-image-picker';
-import {decode} from 'base64-arraybuffer';
 import Avatar from 'app/components/common/Avatar';
 import Username from 'app/components/Username';
 import {useNotification} from 'app/context/PushNotificationContext';
+import {Alert} from 'react-native';
 
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
 
-  const {requestPermission, unRegisterNotifications} = useNotification();
-  const {user, logout, sessionId} = useUser();
-  const {username, updateUsername} = useUsername();
+  const {requestPermission} = useNotification();
+  const {user, logout, sessionId, deleteUser} = useUser();
+  const {username} = useUsername();
 
   const bottomListPadding = useBottomPadding();
 
@@ -38,73 +36,41 @@ const ProfileScreen: FC = () => {
     }
   };
 
-  const updateUserPrompt = () => {
-    if (!user) {
-      Alert.alert('Login Required', 'You must be logged in to update username');
-      return;
-    }
-    Alert.prompt(
-      'Update Username',
-      'Enter your new username',
-      async newUsername => {
-        if (newUsername) {
-          try {
-            const success = await updateUsername(newUsername);
-            if (success) {
-              Alert.alert('Success', 'Username updated');
-            } else {
-              Alert.alert('Error', 'Failed to update username');
-            }
-          } catch (error) {
-            const err = error as Error;
-            Alert.alert('Error', err.message);
-          }
-        }
-      },
-    );
-  };
-
-  const presentImagePicker = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        includeBase64: true,
-        quality: 0.5,
-      },
-      response => {
-        const imageBuffer = response.assets?.[0].base64;
-        if (!imageBuffer) {
-          console.log('No image selected');
-          return;
-        }
-        // TODO: Fix duplicate image error
-        supabase.storage
-          .from('user_profile_pictures')
-          .upload(`public/${user?.id}.jpg`, decode(imageBuffer), {
-            contentType: response.assets?.[0].type ?? 'image/jpg',
-          })
-          .then(({data, error}) => {
-            if (!error && data) {
-              const url = data.path;
-              supabase
-                .from('user_metadata')
-                .upsert(
-                  {
-                    user_id: user?.id,
-                    profile_picture_key: url,
+  const deleteAccountPrompt = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Heads up',
+              'Deleting your account is permanent. All of your questions and responses will be deleted. Are you sure you want to continue?',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: () => {
+                    if (user) {
+                      deleteUser().then();
+                    }
                   },
-                  {onConflict: 'user_id'},
-                )
-                .then(({error: e}) => {
-                  if (e) {
-                    console.error('Error updating profile picture', e);
-                  } else {
-                    Alert.alert('Success', 'Profile picture updated');
-                  }
-                });
-            }
-          });
-      },
+                },
+              ],
+            );
+          },
+        },
+      ],
     );
   };
 
@@ -137,12 +103,7 @@ const ProfileScreen: FC = () => {
         </Center>
       ) : (
         <Flex>
-          <Username
-            variant="header"
-            color="foreground"
-            username={username}
-            isVerified
-          />
+          <Username variant="header" color="foreground" username={username} />
           {user && (
             <Center
               flex={1}
@@ -161,8 +122,12 @@ const ProfileScreen: FC = () => {
                   logout({otherDevices: true}).then();
                 }}
               />
-              <Button title="Update Username" onPress={updateUserPrompt} />
-              <Button title="Change Avatar" onPress={presentImagePicker} />
+
+              <Button
+                title="Delete Account"
+                variant="danger"
+                onPress={deleteAccountPrompt}
+              />
 
               <Button
                 title="Request push notifications"
@@ -171,11 +136,6 @@ const ProfileScreen: FC = () => {
                     requestPermission(sessionId);
                   }
                 }}
-              />
-
-              <Button
-                title="Unregister device token"
-                onPress={unRegisterNotifications}
               />
 
               <Avatar size="xxxxl" />

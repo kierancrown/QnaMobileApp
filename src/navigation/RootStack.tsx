@@ -16,12 +16,28 @@ const RootStack = () => {
   const theme = useTheme<Theme>();
   const {user} = useUser();
 
-  const skipAuth = useSelector(
-    (state: RootState) => state.persistent.auth.skippedAuth,
-  );
-  const showOnboarding = useSelector(
-    (state: RootState) => state.persistent.auth.showOnboarding,
-  );
+  const authData = useSelector((state: RootState) => state.persistent.auth);
+
+  const determineStack = () => {
+    const {deletedAccount, showOnboarding, skippedAuth} = authData;
+
+    if (deletedAccount) {
+      if (skippedAuth) {
+        return <TabStack />;
+      } else {
+        return <AuthStack />;
+      }
+    }
+    if (showOnboarding) {
+      return <OnboardingStack />;
+    } else if (skippedAuth) {
+      return <TabStack />;
+    }
+    if (user) {
+      return <TabStack />;
+    }
+    return <AuthStack />;
+  };
 
   return (
     <>
@@ -36,15 +52,7 @@ const RootStack = () => {
               text: theme.colors.foreground,
             },
           }}>
-          {skipAuth || user ? (
-            showOnboarding ? (
-              <OnboardingStack />
-            ) : (
-              <TabStack />
-            )
-          ) : (
-            <AuthStack />
-          )}
+          {determineStack()}
         </NavigationContainer>
       </SafeAreaProvider>
     </>

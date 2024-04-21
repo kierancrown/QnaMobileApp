@@ -36,9 +36,47 @@ export const useProfilePicture = (userId?: number, size?: number) => {
       });
   }, [imageSize, user, userId]);
 
+  const deleteProfilePicture = async (): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      if (!user) {
+        setProfilePicture(null);
+        resolve(false);
+        return;
+      }
+
+      supabase
+        .from('user_metadata')
+        .select('profile_picture_key')
+        .eq('user_id', userId ?? user.id)
+        .then(({data, error}) => {
+          if (error) {
+            console.error('Error getting profile picture', error);
+            reject(error);
+          }
+          if (data?.length && data.length > 0 && data[0].profile_picture_key) {
+            supabase.storage
+              .from('user_profile_pictures')
+              .remove([data[0].profile_picture_key])
+              .then(({error: innerErr}) => {
+                if (innerErr) {
+                  console.error('Error deleting profile picture', innerErr);
+                  reject(innerErr);
+                }
+              });
+            setProfilePicture(null);
+          } else {
+            console.log('No profile picture found');
+          }
+          resolve(true);
+        });
+
+      resolve(false);
+    });
+  };
+
   useEffect(() => {
     refreshProfilePicture();
   }, [userId, size, refreshProfilePicture]);
 
-  return {profilePicture, refreshProfilePicture};
+  return {profilePicture, refreshProfilePicture, deleteProfilePicture};
 };

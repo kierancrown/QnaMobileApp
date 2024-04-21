@@ -53,6 +53,8 @@ export type Database = {
       };
       geolocations: {
         Row: {
+          country: string;
+          country_code: string;
           display_name: string;
           id: number;
           location: unknown;
@@ -60,6 +62,8 @@ export type Database = {
           population: number;
         };
         Insert: {
+          country: string;
+          country_code: string;
           display_name: string;
           id?: number;
           location: unknown;
@@ -67,6 +71,8 @@ export type Database = {
           population?: number;
         };
         Update: {
+          country?: string;
+          country_code?: string;
           display_name?: string;
           id?: number;
           location?: unknown;
@@ -366,6 +372,24 @@ export type Database = {
           created_at?: string;
           id?: number;
           name?: string;
+        };
+        Relationships: [];
+      };
+      user_deletions: {
+        Row: {
+          created_at: string;
+          id: number;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          user_id?: string;
         };
         Relationships: [];
       };

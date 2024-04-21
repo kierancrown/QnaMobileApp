@@ -70,6 +70,7 @@ const Questions: FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef(null);
+
   useTabPress({
     tabName: 'HomeTab',
     onPress: () => {

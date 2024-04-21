@@ -7,18 +7,22 @@ import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {
   completeOnboarding,
+  deletedAccount,
   resetAuth,
   resetCache,
+  resetDeletedAccount,
   showOnboarding,
 } from 'app/redux/slices/authSlice';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
 import {useOnboarding} from 'app/hooks/useOnboarding';
+import {useProfilePicture} from 'app/hooks/useProfilePicture';
 
 export const AuthContext = createContext<{
   user: User | null;
   session: Session | null;
   sessionId?: string;
+  deleteUser: () => Promise<boolean>;
   logout: ({
     allDevices,
     otherDevices,
@@ -29,6 +33,7 @@ export const AuthContext = createContext<{
 }>({
   user: null,
   session: null,
+  deleteUser: async () => false,
   logout: async () => {
     return false;
   },
@@ -40,6 +45,8 @@ export const AuthContextProvider = (props: any) => {
   const [user, setUser] = useState<User | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const {hasOnboarded} = useOnboarding();
+
+  const {deleteProfilePicture} = useProfilePicture();
 
   const {silentTokenRegistration} = useNotification();
 
@@ -73,7 +80,10 @@ export const AuthContextProvider = (props: any) => {
         setUserSession(session);
         setUser(session?.user ?? null);
 
-        if (event === 'SIGNED_IN') {
+        if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+          console.log('resetting deleted account');
+          dispatch(resetDeletedAccount());
+        } else if (event === 'SIGNED_IN') {
           setTimeout(async () => {
             const onboardingCompleted = await hasOnboarded(session?.user);
             if (!onboardingCompleted) {
@@ -109,6 +119,49 @@ export const AuthContextProvider = (props: any) => {
     });
 
     return !error;
+  };
+
+  const deleteUser = async () => {
+    if (!user) {
+      return false;
+    }
+    console.log('Deleting user');
+    // First delete profile picture
+    try {
+      console.log('Deleting profile picture');
+      const profilePictureDeletionSuccess = await deleteProfilePicture();
+      if (!profilePictureDeletionSuccess) {
+        // TODO: Log this on a backend DB to remove later on
+        console.log('Error deleting profile picture');
+      } else {
+        console.log('Profile picture deleted');
+      }
+    } catch {
+      // TODO: Log this on a backend DB to remove later on
+      console.log('Error deleting profile picture');
+    }
+
+    // Logout from other devices
+    await logout({allDevices: false, otherDevices: true});
+
+    // Then delete user
+    const {error} = await supabase.from('user_deletions').insert({
+      user_id: user.id,
+    });
+
+    if (error) {
+      console.log('Error deleting user', error);
+      Alert.alert('Error deleting user', error.message, [{text: 'OK'}]);
+      return false;
+    }
+
+    Alert.alert('User deleted', 'Your account has been deleted', [
+      {text: 'OK'},
+    ]);
+    setUser(null);
+    setUserSession(null);
+    dispatch(deletedAccount());
+    return true;
   };
 
   // Listen for auth deep links
@@ -174,6 +227,7 @@ export const AuthContextProvider = (props: any) => {
     userSession,
     user,
     logout,
+    deleteUser,
     sessionId,
   };
   return <AuthContext.Provider value={value} {...props} />;
@@ -184,5 +238,6 @@ export const useUser = () => {
   if (context === undefined) {
     throw new Error('useUser must be used within a AuthContextProvider.');
   }
+
   return context;
 };

@@ -4,12 +4,14 @@ export interface AuthState {
   showOnboarding: boolean;
   skippedAuth: boolean;
   username: string | undefined;
+  deletedAccount: boolean;
 }
 
 const initialState: AuthState = {
   showOnboarding: false,
   skippedAuth: false,
   username: undefined,
+  deletedAccount: false,
 };
 
 export const authSlice = createSlice({
@@ -31,6 +33,15 @@ export const authSlice = createSlice({
     resetCache: state => {
       state.username = undefined;
     },
+    deletedAccount: state => {
+      state.username = undefined;
+      state.showOnboarding = false;
+      state.skippedAuth = false;
+      state.deletedAccount = true;
+    },
+    resetDeletedAccount: state => {
+      state.deletedAccount = false;
+    },
     setUsernameCache: (
       state,
       action: {
@@ -49,6 +60,8 @@ export const {
   setUsernameCache,
   showOnboarding,
   completeOnboarding,
+  deletedAccount,
+  resetDeletedAccount,
 } = authSlice.actions;
 
 export default authSlice.reducer;
