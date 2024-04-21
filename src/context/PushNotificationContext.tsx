@@ -1,10 +1,13 @@
-import React, {createContext, useContext, useEffect} from 'react';
+import React, {createContext, useCallback, useContext, useEffect} from 'react';
 import {Platform, PermissionsAndroid, Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+// import notifee from '@notifee/react-native';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from 'app/redux/store';
+import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 
 // Define the context
 interface NotificationContextType {
@@ -40,6 +43,26 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
   const {user} = useUser();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const getUnreadCount = useCallback(async () => {
+    console.log('Getting unread count');
+    if (!user) {
+      return 0;
+    }
+    const {data, error} = await supabase
+      .from('notifications')
+      .select('id')
+      .eq('read', false)
+      .eq('user_id', user?.id);
+
+    if (error) {
+      console.error('Error getting unread count:', error);
+      return 0;
+    }
+
+    return data?.length || 0;
+  }, [user]);
 
   const getToken = async () => {
     if (Platform.OS === 'ios') {
@@ -153,11 +176,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   useEffect(() => {
     const onMessageReceived = async (message: any) => {
+      const unreadCount = await getUnreadCount();
+      dispatch(setUnreadCount(unreadCount));
       console.log('Message received:', message);
-      await notifee.displayNotification({
-        ...message.notification,
-        android: {channelId: 'default'},
-      });
+      // await notifee.displayNotification({
+      //   ...message.notification,
+      //   android: {channelId: 'default'},
+      // });
     };
 
     messaging().onMessage(onMessageReceived);
@@ -167,7 +192,18 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       messaging().onMessage(onMessageReceived);
       messaging().setBackgroundMessageHandler(onMessageReceived);
     };
-  }, []);
+  }, [dispatch, getUnreadCount]);
+
+  useEffect(() => {
+    (async () => {
+      if (user) {
+        const unreadCount = await getUnreadCount();
+        dispatch(setUnreadCount(unreadCount));
+      } else {
+        console.log('User not found');
+      }
+    })();
+  }, [dispatch, getUnreadCount, user]);
 
   return (
     <NotificationContext.Provider

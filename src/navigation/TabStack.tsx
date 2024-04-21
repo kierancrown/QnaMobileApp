@@ -29,6 +29,8 @@ import Color from 'color';
 import AskQuestionSheet from 'app/components/sheets/AskQuestionSheet';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {TabBarProvider} from 'app/context/tabBarContext';
+import {useSelector} from 'react-redux';
+import {RootState} from 'app/redux/store';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -84,6 +86,10 @@ export default function TabStack() {
   const theme = useTheme<Theme>();
   const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
 
+  const unreadNotificationCount = useSelector(
+    (state: RootState) => state.persistent.notifications.unreadCount,
+  );
+
   return (
     <TabBarProvider>
       <Tab.Navigator
@@ -136,6 +142,10 @@ export default function TabStack() {
             name="InobxTab"
             options={{
               tabBarIcon: InboxTabBarIcon,
+              tabBarBadge:
+                unreadNotificationCount > 0
+                  ? unreadNotificationCount
+                  : undefined,
               title: 'Inbox',
             }}
             component={InboxTabStack}

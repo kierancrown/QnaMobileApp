@@ -25,6 +25,7 @@ import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 import PlusIcon from 'app/assets/icons/actions/Plus.svg';
 import ReplyIcon from 'app/assets/icons/actions/Comment.svg';
+import Badge from '../Badge';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -198,15 +199,17 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
                 hitSlop={16}
                 onPress={onPress}
                 onLongPress={onLongPress}>
-                <VStack alignItems="center">
-                  {tabBarIcon
-                    ? tabBarIcon({
-                        focused: isFocused,
-                        color: isFocused ? activeColor : inactiveColor,
-                        size: ICON_SIZE,
-                      })
-                    : null}
-                </VStack>
+                <Badge size="xsmall" hidden={options.tabBarBadge == null}>
+                  <VStack alignItems="center">
+                    {tabBarIcon
+                      ? tabBarIcon({
+                          focused: isFocused,
+                          color: isFocused ? activeColor : inactiveColor,
+                          size: ICON_SIZE,
+                        })
+                      : null}
+                  </VStack>
+                </Badge>
               </Pressable>
             </Fragment>
           );

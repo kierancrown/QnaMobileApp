@@ -11,8 +11,9 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import globalSheetsSlice from './slices/globalSheetsSlice';
 import authSlice from './slices/authSlice';
+import globalSheetsSlice from './slices/globalSheetsSlice';
+import globalNotificationsSlice from './slices/notificationSlice';
 
 const persistConfig = {
   key: 'persisted',
@@ -21,6 +22,7 @@ const persistConfig = {
 
 const reducers = combineReducers({
   auth: authSlice,
+  notifications: globalNotificationsSlice,
 });
 
 const nonPersistedReducers = combineReducers({

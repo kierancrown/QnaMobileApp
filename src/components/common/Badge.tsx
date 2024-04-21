@@ -7,6 +7,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import useMount from 'app/hooks/useMount';
 
 interface Props {
   size?: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | number;
@@ -51,8 +52,9 @@ const Badge = ({
       ? 40
       : 24;
 
+  const [hasMounted, setHasMounted] = useState(false);
   const [actualWidth, setActualWidth] = useState(SIZE);
-  const badgeScale = useSharedValue(1);
+  const badgeScale = useSharedValue(0);
 
   const backgroundStyle: ViewStyle = {
     minWidth: SIZE,
@@ -101,6 +103,10 @@ const Badge = ({
     height: SIZE / 2,
   };
 
+  useMount(() => {
+    setHasMounted(true);
+  });
+
   useEffect(() => {
     if (animateOnMount === true) {
       badgeScale.value = 0;
@@ -110,6 +116,9 @@ const Badge = ({
   }, [animateOnMount]);
 
   useEffect(() => {
+    if (!hasMounted) {
+      return;
+    }
     if (hidden === true) {
       badgeScale.value = withTiming(0, {duration: 250});
     } else {
@@ -120,7 +129,7 @@ const Badge = ({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hidden]);
+  }, [hidden, hasMounted]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

@@ -28,6 +28,9 @@ import {SharedValue} from 'react-native-reanimated';
 import {RefreshControl} from 'react-native-gesture-handler';
 import NotificationItem from 'app/components/NotificationItem';
 import Badge from 'app/components/common/Badge';
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from 'app/redux/store';
+import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 const HeaderTabs = ['All', 'Asked', 'Notifications'] as const;
@@ -115,6 +118,7 @@ const InboxScreen: FC = () => {
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
   const {user} = useUser();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [notifications, setNotifications] = useState<
     {date: string; data: Notification[]}[]
@@ -178,7 +182,11 @@ const InboxScreen: FC = () => {
         if (updateError) {
           console.error(updateError);
           Alert.alert('Error', updateError.message);
+        } else {
+          dispatch(setUnreadCount(0));
         }
+      } else {
+        dispatch(setUnreadCount(0));
       }
     }
     setRefreshing(false);
