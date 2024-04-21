@@ -33,7 +33,7 @@ import {AppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
-const HeaderTabs = ['All', 'Asked', 'Notifications'] as const;
+const HeaderTabs = ['All', 'Requested', 'Notifications'] as const;
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
   <Header

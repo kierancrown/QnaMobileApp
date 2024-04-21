@@ -67,7 +67,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
     <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[animatedStyle]}>
         <VStack
-          rowGap="sY"
+          rowGap="xxsY"
           px="m"
           py="sY"
           my="xxsY"

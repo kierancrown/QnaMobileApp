@@ -8,6 +8,7 @@ import {isEmulator} from 'react-native-device-info';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
+import {getUserId} from 'app/lib/supabase/helpers/userId';
 
 // Define the context
 interface NotificationContextType {
@@ -42,27 +43,29 @@ interface NotificationProviderProps {
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
-  const {user} = useUser();
   const dispatch = useDispatch<AppDispatch>();
+  const {user} = useUser();
 
   const getUnreadCount = useCallback(async () => {
-    console.log('Getting unread count');
-    if (!user) {
+    const userId = await getUserId();
+    if (!userId) {
       return 0;
     }
     const {data, error} = await supabase
       .from('notifications')
       .select('id')
-      .eq('read', false)
-      .eq('user_id', user?.id);
+      .is('read_at', null)
+      .eq('user_id', userId);
 
     if (error) {
       console.error('Error getting unread count:', error);
       return 0;
     }
 
+    console.log('Unread count:', data?.length);
+
     return data?.length || 0;
-  }, [user]);
+  }, []);
 
   const getToken = async () => {
     if (Platform.OS === 'ios') {
@@ -196,14 +199,15 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   useEffect(() => {
     (async () => {
-      if (user) {
+      const userId = await getUserId();
+      if (userId) {
         const unreadCount = await getUnreadCount();
         dispatch(setUnreadCount(unreadCount));
       } else {
         console.log('User not found');
       }
     })();
-  }, [dispatch, getUnreadCount, user]);
+  }, [dispatch, getUnreadCount]);
 
   return (
     <NotificationContext.Provider
