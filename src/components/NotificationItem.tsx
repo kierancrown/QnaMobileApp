@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {Box, HStack, Text, VStack} from './common';
+import {Center, HStack, Text, VStack} from './common';
 import dayjs from 'dayjs';
 import {Database} from 'app/types/supabase';
 import Animated, {
@@ -7,9 +7,14 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {Pressable} from 'react-native';
+import {Pressable, StyleSheet} from 'react-native';
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'app/styles/theme';
+import Avatar from './common/Avatar';
+
+import UserSheildIcon from 'app/assets/icons/SharpShield.svg';
+import Badge from './common/Badge';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface NotificationItemProps {
   onPress: () => void;
@@ -35,6 +40,50 @@ const getTitleFromType = (type: NotificationType) => {
       return 'Somebody responded to your question';
     default:
       return 'New notification';
+  }
+};
+
+const renderIcon = (
+  type: NotificationType,
+  theme: Theme,
+  unread: boolean = false,
+) => {
+  switch (type) {
+    case 'login':
+      return (
+        <Badge
+          size="xsmall"
+          hidden={!unread}
+          color={theme.colors.bookmarkAction}
+          animateOnMount={false}>
+          <Center
+            overflow="hidden"
+            width={theme.iconSizes.xl}
+            height={theme.iconSizes.xl}
+            borderRadius="pill"
+            bg="inputBackground">
+            <LinearGradient
+              colors={['#F09819', '#FF512F']}
+              style={StyleSheet.absoluteFillObject}
+            />
+            <UserSheildIcon
+              fill={theme.colors.foreground}
+              width={theme.iconSizes.intermediate}
+              height={theme.iconSizes.intermediate}
+            />
+          </Center>
+        </Badge>
+      );
+    default:
+      return (
+        <Badge
+          size="xsmall"
+          hidden={!unread}
+          color={theme.colors.bookmarkAction}
+          animateOnMount={false}>
+          <Avatar size="xl" defaultAvatar />
+        </Badge>
+      );
   }
 };
 
@@ -66,30 +115,22 @@ const NotificationItem: FC<NotificationItemProps> = ({
   return (
     <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[animatedStyle]}>
-        <VStack
-          rowGap="xxsY"
-          px="m"
-          py="sY"
-          my="xxsY"
-          backgroundColor="cardBackground">
-          <HStack alignItems="center" columnGap="xs">
-            {read === false && (
-              <Box
-                width={theme.iconSizes.xs}
-                height={theme.iconSizes.xs}
-                borderRadius="pill"
-                bg="bookmarkAction"
-              />
-            )}
-            <Text variant="smaller" fontWeight="400">
-              {getTitleFromType(title)}
-            </Text>
-          </HStack>
-          <HStack columnGap="xs" alignItems="center">
-            <Text variant="questionBody">{body}</Text>
-            <Text variant="username" color="cardText">
-              {dayjs(timestamp).fromNow()}
-            </Text>
+        <VStack px="m" py="sY" my="xxxxxs" backgroundColor="cardBackground">
+          <HStack alignItems="center" columnGap="s">
+            {renderIcon(title, theme, read === false)}
+            <VStack rowGap="xxsY">
+              <HStack alignItems="center" columnGap="xs">
+                <Text variant="smaller" fontWeight="400">
+                  {getTitleFromType(title)}
+                </Text>
+                <Text variant="username" color="cardText">
+                  {dayjs(timestamp).fromNow(true)}
+                </Text>
+              </HStack>
+              <HStack columnGap="xs" alignItems="center">
+                <Text variant="questionBody">{body}</Text>
+              </HStack>
+            </VStack>
           </HStack>
         </VStack>
       </Animated.View>

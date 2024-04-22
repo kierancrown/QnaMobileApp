@@ -8,6 +8,7 @@ import {Image, StyleProp} from 'react-native';
 
 interface AvatarProps {
   userId?: number;
+  defaultAvatar?: boolean;
   size?: keyof Theme['iconSizes'];
 }
 
@@ -21,7 +22,7 @@ const styles: StyleProp<ImageStyle> = {
 };
 
 const Avatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
-  const {userId, size} = props;
+  const {userId, size, defaultAvatar} = props;
   const theme = useTheme<Theme>();
   const {profilePicture, refreshProfilePicture} = useProfilePicture(
     userId,
@@ -41,7 +42,7 @@ const Avatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
       bg="cardBackground"
       width={size ? theme.iconSizes[size] : theme.iconSizes.xl}
       height={size ? theme.iconSizes[size] : theme.iconSizes.xl}>
-      {profilePicture == null ? (
+      {defaultAvatar || profilePicture == null ? (
         <Image
           // @ts-ignore
           style={styles}

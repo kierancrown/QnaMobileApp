@@ -112,7 +112,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
           rowGap="sY"
           px="m"
           py="sY"
-          my="xxsY"
+          my="xxxxxs"
           backgroundColor="cardBackground">
           <Text variant="questionBody">
             {question}
