@@ -36,7 +36,10 @@ export const LargeProfileHeaderComponent = ({
 
   return (
     <LargeHeader headerStyle={headerStyle}>
-      <ScalingView scrollY={scrollY} style={scalingViewStyle}>
+      <ScalingView
+        translationDirection="none"
+        scrollY={scrollY}
+        style={scalingViewStyle}>
         <Center rowGap="mY">
           <Avatar size="xxxxl" />
           <Username

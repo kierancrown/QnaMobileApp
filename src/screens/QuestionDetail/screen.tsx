@@ -20,6 +20,7 @@ import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
 import dayjs from 'dayjs';
 import {
+  NavigationProp,
   RouteProp,
   useFocusEffect,
   useNavigation,
@@ -94,7 +95,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   });
   const theme = useTheme<Theme>();
   const {setFabAction} = useTabBar();
-
+  const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
   const [bookmarked, setBookmarked] = useState(false);
 
   const headerStyle: StyleProp<ViewStyle> = {
@@ -151,6 +152,12 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                   fontWeight="600"
                   username={question.user_metadata?.username ?? 'Anyonymous'}
                   isVerified={question.user_metadata?.verified ?? false}
+                  onPress={() => {
+                    navigate('Profile', {
+                      userId: question.user_id,
+                      displayBackButton: true,
+                    });
+                  }}
                 />
               </HStack>
               <HStack alignItems="center" columnGap="s">

@@ -18,6 +18,8 @@ import Animated, {
 import {Alert, Pressable} from 'react-native';
 import Username from './Username';
 import {supabase} from 'app/lib/supabase';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {HomeStackParamList} from 'app/navigation/HomeStack';
 
 interface QuestionItemProps {
   onPress: () => void;
@@ -53,6 +55,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   const votes = formatNumber(voteCount);
   const answers = formatNumber(answerCount);
   const opacity = useSharedValue(1);
+  const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -141,6 +144,12 @@ const QuestionItem: FC<QuestionItemProps> = ({
                 fontWeight="600"
                 username={username}
                 isVerified={userVerified}
+                onPress={() => {
+                  navigate('Profile', {
+                    userId: username,
+                    displayBackButton: true,
+                  });
+                }}
               />
             </HStack>
             <HStack alignItems="center" columnGap="s">

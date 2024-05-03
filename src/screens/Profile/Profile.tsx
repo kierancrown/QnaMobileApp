@@ -34,7 +34,13 @@ const Profile = () => {
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
           <Center flex={1} my="xxxlY" py="xxxlY">
-            <Text variant="medium" my="xlY" color="cardText">
+            <Text
+              variant="medium"
+              my="xlY"
+              color="cardText"
+              py="xxxlY"
+              mt="xxxlY"
+              mb="xxxlY">
               Nothing to see here
             </Text>
           </Center>

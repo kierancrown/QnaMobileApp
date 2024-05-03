@@ -8,11 +8,13 @@ import ProfileScreen from 'app/screens/Profile';
 export type ProfileStackNavigationProp =
   NativeStackNavigationProp<ProfileStackParamList>;
 
+export type ProfileScreenParams = {
+  displayBackButton?: boolean;
+  userId?: string;
+};
+
 export type ProfileStackParamList = {
-  Profile: {
-    displayBackButton?: boolean;
-    userId?: string;
-  };
+  Profile: ProfileScreenParams;
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
