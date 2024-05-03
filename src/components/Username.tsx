@@ -28,9 +28,11 @@ const Username: FC<UsernameProps> = ({
     ? theme.textVariants[rest.variant].fontSize
     : theme.textVariants.body.fontSize;
 
+  const columnGap: keyof Theme['spacing'] = iconSize >= 24 ? 'xs' : 'xxxs';
+
   return (
     <Pressable disabled={onPress == null} onPress={onPress} hitSlop={8}>
-      <HStack alignItems="center" columnGap="xxxs">
+      <HStack alignItems="center" columnGap={columnGap}>
         <Text
           color={
             noHighlight == null && user?.username === username
