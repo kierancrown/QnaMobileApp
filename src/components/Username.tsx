@@ -9,9 +9,15 @@ import {useUsername} from 'app/hooks/useUsername';
 interface UsernameProps extends TextProps<Theme> {
   username?: string;
   isVerified?: boolean;
+  noHighlight?: boolean;
 }
 
-const Username: FC<UsernameProps> = ({username, isVerified, ...rest}) => {
+const Username: FC<UsernameProps> = ({
+  username,
+  noHighlight,
+  isVerified,
+  ...rest
+}) => {
   const theme = useTheme<Theme>();
   const user = useUsername();
 
@@ -23,7 +29,9 @@ const Username: FC<UsernameProps> = ({username, isVerified, ...rest}) => {
     <HStack alignItems="center" columnGap="xxxs">
       <Text
         color={
-          user?.username === username ? 'brand' : rest.color ?? 'foreground'
+          noHighlight == null && user?.username === username
+            ? 'brand'
+            : rest.color ?? 'foreground'
         }
         {...rest}>
         {username ?? 'Anonymous'}

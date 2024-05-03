@@ -152,12 +152,37 @@ export type Database = {
           },
         ];
       };
+      profile_images: {
+        Row: {
+          created_at: string;
+          id: number;
+          path: string;
+          thumbhash: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          path: string;
+          thumbhash?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          path?: string;
+          thumbhash?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       question_metadata: {
         Row: {
           id: number;
           location: number | null;
           question_id: number;
           response_count: number;
+          tags: string[] | null;
           updated_at: string;
           upvote_count: number;
           user_id: string;
@@ -169,6 +194,7 @@ export type Database = {
           location?: number | null;
           question_id: number;
           response_count?: number;
+          tags?: string[] | null;
           updated_at?: string;
           upvote_count?: number;
           user_id?: string;
@@ -180,6 +206,7 @@ export type Database = {
           location?: number | null;
           question_id?: number;
           response_count?: number;
+          tags?: string[] | null;
           updated_at?: string;
           upvote_count?: number;
           user_id?: string;
@@ -397,7 +424,7 @@ export type Database = {
         Row: {
           has_onboarded: boolean;
           id: number;
-          profile_picture_key: string | null;
+          profile_picture: string | null;
           updated_at: string | null;
           user_id: string;
           username: string | null;
@@ -406,7 +433,7 @@ export type Database = {
         Insert: {
           has_onboarded?: boolean;
           id?: number;
-          profile_picture_key?: string | null;
+          profile_picture?: string | null;
           updated_at?: string | null;
           user_id?: string;
           username?: string | null;
@@ -415,7 +442,7 @@ export type Database = {
         Update: {
           has_onboarded?: boolean;
           id?: number;
-          profile_picture_key?: string | null;
+          profile_picture?: string | null;
           updated_at?: string | null;
           user_id?: string;
           username?: string | null;
@@ -436,6 +463,13 @@ export type Database = {
             referencedRelation: 'usernames';
             referencedColumns: ['username'];
           },
+          {
+            foreignKeyName: 'user_metadata_profile_picture_fkey';
+            columns: ['profile_picture'];
+            isOneToOne: true;
+            referencedRelation: 'profile_images';
+            referencedColumns: ['path'];
+          },
         ];
       };
       usernames: {
@@ -443,21 +477,21 @@ export type Database = {
           active: boolean;
           created_at: string;
           id: number;
-          user_id: string;
+          user_id: string | null;
           username: string;
         };
         Insert: {
           active?: boolean;
           created_at?: string;
           id?: number;
-          user_id?: string;
+          user_id?: string | null;
           username: string;
         };
         Update: {
           active?: boolean;
           created_at?: string;
           id?: number;
-          user_id?: string;
+          user_id?: string | null;
           username?: string;
         };
         Relationships: [

@@ -7,13 +7,24 @@ import {useDispatch, useSelector} from 'react-redux';
 
 export const useUsername = () => {
   const {user} = useUser();
+  const dispatch = useDispatch<AppDispatch>();
+
   const username = useSelector(
     (state: RootState) => state.persistent.auth.username,
   );
-  const dispatch = useDispatch<AppDispatch>();
+  const isVerified = useSelector(
+    (state: RootState) => state.persistent.auth.isVerified,
+  );
 
   const setUsername = useCallback(
-    (value: string | undefined) => {
+    (
+      value:
+        | {
+            username: string;
+            isVerified: boolean;
+          }
+        | undefined,
+    ) => {
       dispatch(setUsernameCache(value));
     },
     [dispatch],
@@ -26,7 +37,7 @@ export const useUsername = () => {
     }
     supabase
       .from('user_metadata')
-      .select('username')
+      .select('username, verified')
       .eq('user_id', user?.id)
       .then(({data, error}) => {
         if (error) {
@@ -34,7 +45,10 @@ export const useUsername = () => {
           return;
         }
         if (data.length && data[0].username) {
-          setUsername(data[0].username);
+          setUsername({
+            username: data[0].username,
+            isVerified: data[0].verified,
+          });
         }
       });
   }, [setUsername, user]);
@@ -55,9 +69,12 @@ export const useUsername = () => {
         throw error;
       }
     }
-    setUsername(data[0].username);
+    setUsername({
+      username: data[0].username,
+      isVerified,
+    });
     return true;
   };
 
-  return {username, updateUsername};
+  return {username, isVerified, updateUsername};
 };

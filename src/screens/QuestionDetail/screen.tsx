@@ -260,7 +260,10 @@ const QuestionDetail: FC = () => {
       *,
       user_metadata (
         verified,
-        profile_picture_key,
+        profile_picture (
+          path,
+          thumbhash
+        ),
         username
       )
     `,

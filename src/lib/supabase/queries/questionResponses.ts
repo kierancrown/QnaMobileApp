@@ -6,7 +6,10 @@ export const questionResponsesQuery = supabase.from('responses').select(
   *,
   user_metadata (
     verified,
-    profile_picture_key,
+    profile_picture (
+      path,
+      thumbhash
+    ),
     username
   )
 `,

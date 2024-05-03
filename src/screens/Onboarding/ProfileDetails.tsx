@@ -1,5 +1,6 @@
 import {Button, Center, Flex, HStack, SafeAreaView, Text, VStack} from 'ui';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Keyboard} from 'react-native';
 import Avatar, {AvatarRef} from 'app/components/common/Avatar';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import axios from 'axios';
@@ -13,6 +14,17 @@ import {ActivityIndicator, Alert} from 'react-native';
 import {useUsername} from 'app/hooks/useUsername';
 import {useOnboarding} from 'app/hooks/useOnboarding';
 
+import ImageResizer from '@bam.tech/react-native-image-resizer';
+import RNFetchBlob from 'rn-fetch-blob';
+import {rgbaToThumbHash, rgbaToDataURL} from 'thumbhash';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+
 const ProfileDetails = () => {
   const {user} = useUser();
   const avatarRef = useRef<AvatarRef>(null);
@@ -24,6 +36,27 @@ const ProfileDetails = () => {
   const [username, setUsername] = useState<string>('');
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean>();
   const [debouncedUsername] = useDebounceValue(username, 1000);
+
+  const keyboardOpen = useSharedValue(0);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        keyboardOpen.value = withTiming(1);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardWillHide',
+      () => {
+        keyboardOpen.value = withTiming(0);
+      },
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, [keyboardOpen]);
 
   useEffect(() => {
     if (username.trim().length > 2) {
@@ -53,6 +86,63 @@ const ProfileDetails = () => {
     checkUsernameAvailability().then(setIsUsernameAvailable);
   }, [checkUsernameAvailability, debouncedUsername]);
 
+  const imageToBase64 = async (uri: string) => {
+    try {
+      // Check if URI starts with file:///
+      if (uri.startsWith('file:///')) {
+        const filePath = uri.replace('file://', '');
+
+        // Read the file and convert it to base64
+        const base64String = await RNFetchBlob.fs.readFile(filePath, 'base64');
+        return base64String;
+      } else {
+        throw new Error('Not a file URI');
+      }
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      return null;
+    }
+  };
+
+  const fileToArrayLikeNumber = async (uri: string) => {
+    try {
+      // Check if URI starts with file:///
+      if (uri.startsWith('file:///')) {
+        const filePath = uri.replace('file://', '');
+
+        // Read the file and convert it to base64
+        const base64String = await RNFetchBlob.fs.readFile(filePath, 'base64');
+
+        // Convert base64 to Uint8Array
+
+        const binaryString = atob(base64String);
+
+        const bytes = new Uint8Array(binaryString.length);
+
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        return bytes;
+      } else {
+        throw new Error('Not a file URI');
+      }
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      return null;
+    }
+  };
+
+  function base64ToArray(base64: string): Uint8Array {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    console.log({bytes});
+    return bytes;
+  }
+
   const presentImagePicker = () => {
     launchImageLibrary(
       {
@@ -61,11 +151,38 @@ const ProfileDetails = () => {
         quality: 0.5,
       },
       response => {
-        const imageBuffer = response.assets?.[0].base64;
-        if (!imageBuffer) {
+        const input = response.assets?.[0];
+        const imageBuffer = input?.base64;
+        if (!imageBuffer || !input) {
           console.log('No image selected');
           return;
         }
+
+        ImageResizer.createResizedImage(
+          input.uri!,
+          100,
+          100,
+          'JPEG',
+          100,
+          0,
+          undefined,
+          false,
+          {
+            mode: 'cover',
+            onlyScaleDown: true,
+          },
+        )
+          .then(res => {
+            fileToArrayLikeNumber(res.uri).then(data => {
+              console.log(data);
+              const t = rgbaToDataURL(res.width, res.height, data!);
+              console.log(t);
+              const thumbhash = rgbaToThumbHash(res.width, res.height, data!);
+              console.log(thumbhash);
+            });
+          })
+          .catch(err => {});
+
         supabase.storage
           .from('user_profile_pictures')
           .upload(`public/${user?.id}.jpg`, decode(imageBuffer), {
@@ -80,6 +197,7 @@ const ProfileDetails = () => {
                   {
                     user_id: user?.id,
                     profile_picture_key: url,
+                    // profile_picture_thumbhash: thumbhash.toString(),
                   },
                   {onConflict: 'user_id'},
                 )
@@ -120,21 +238,41 @@ const ProfileDetails = () => {
     }
   };
 
+  const headerAnimatedStyles = useAnimatedStyle(() => {
+    return {
+      flex: 1,
+      opacity: interpolate(
+        keyboardOpen.value,
+        [0, 1],
+        [1, 0],
+        Extrapolation.CLAMP,
+      ),
+      translateY: interpolate(
+        keyboardOpen.value,
+        [0, 1],
+        [0, -100],
+        Extrapolation.CLAMP,
+      ),
+    };
+  }, []);
+
   return (
     <SafeAreaView>
       <Flex px="m" alignItems="center">
-        <Flex mt="mY">
-          <Center>
-            <VStack rowGap="sY">
-              <Text variant="navbarTitle" textAlign="center">
-                Complete your profile
-              </Text>
-              <Text variant="body" textAlign="center">
-                Add a profile picture and a username to get started
-              </Text>
-            </VStack>
-          </Center>
-        </Flex>
+        <Animated.View style={headerAnimatedStyles}>
+          <Flex mt="mY">
+            <Center>
+              <VStack rowGap="sY">
+                <Text variant="navbarTitle" textAlign="center">
+                  Complete your profile
+                </Text>
+                <Text variant="body" textAlign="center">
+                  Add a profile picture and a username to get started
+                </Text>
+              </VStack>
+            </Center>
+          </Flex>
+        </Animated.View>
 
         <Flex
           flex={2}

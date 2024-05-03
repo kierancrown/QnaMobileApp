@@ -127,7 +127,10 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
         *,
         user_metadata (
           verified,
-          profile_picture_key,
+          profile_picture (
+            path,
+            thumbhash
+          ),
           username
         ),
         question_metadata (

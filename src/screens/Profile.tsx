@@ -17,6 +17,7 @@ import Avatar from 'app/components/common/Avatar';
 import Username from 'app/components/Username';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Alert} from 'react-native';
+import Profile from './Profile/Profile';
 
 const ProfileScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -74,76 +75,35 @@ const ProfileScreen: FC = () => {
     );
   };
 
-  return (
+  return !user ? (
     <SafeAreaView>
-      {!user ? (
-        <Center
-          flex={1}
-          style={{
-            paddingBottom: bottomListPadding,
-            paddingTop: bottomListPadding / 2,
-          }}>
-          <VStack rowGap="sY" px="l">
-            <EyesIcon
-              fill={theme.colors.foreground}
-              width={theme.iconSizes.xxxxl}
-              height={theme.iconSizes.xxxxl}
-            />
-            <Text variant="header" textAlign="left">
-              {"You're currently\nannoymous"}
-            </Text>
-            <Text variant="subheader" color="cardText" textAlign="left">
-              Login to ask questions and get answers
-            </Text>
+      <Center
+        flex={1}
+        style={{
+          paddingBottom: bottomListPadding,
+          paddingTop: bottomListPadding / 2,
+        }}>
+        <VStack rowGap="sY" px="l">
+          <EyesIcon
+            fill={theme.colors.foreground}
+            width={theme.iconSizes.xxxxl}
+            height={theme.iconSizes.xxxxl}
+          />
+          <Text variant="header" textAlign="left">
+            {"You're currently\nannoymous"}
+          </Text>
+          <Text variant="subheader" color="cardText" textAlign="left">
+            Login to ask questions and get answers
+          </Text>
 
-            <HStack>
-              <Button title="Login" mt="lY" onPress={login} />
-            </HStack>
-          </VStack>
-        </Center>
-      ) : (
-        <Flex>
-          <Username variant="header" color="foreground" username={username} />
-          {user && (
-            <Center
-              flex={1}
-              style={{paddingBottom: bottomListPadding}}
-              rowGap="mY">
-              <Text>{sessionId}</Text>
-              <Button
-                title={user ? 'Logout' : 'Login'}
-                onPress={() => {
-                  logout({}).then();
-                }}
-              />
-              <Button
-                title="Logout other devices"
-                onPress={() => {
-                  logout({otherDevices: true}).then();
-                }}
-              />
-
-              <Button
-                title="Delete Account"
-                variant="danger"
-                onPress={deleteAccountPrompt}
-              />
-
-              <Button
-                title="Request push notifications"
-                onPress={() => {
-                  if (sessionId) {
-                    requestPermission(sessionId);
-                  }
-                }}
-              />
-
-              <Avatar size="xxxxl" />
-            </Center>
-          )}
-        </Flex>
-      )}
+          <HStack>
+            <Button title="Login" mt="lY" onPress={login} />
+          </HStack>
+        </VStack>
+      </Center>
     </SafeAreaView>
+  ) : (
+    <Profile />
   );
 };
 

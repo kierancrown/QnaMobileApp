@@ -9,7 +9,10 @@ export type ProfileStackNavigationProp =
   NativeStackNavigationProp<ProfileStackParamList>;
 
 export type ProfileStackParamList = {
-  Profile: undefined;
+  Profile: {
+    displayBackButton?: boolean;
+    userId?: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -19,7 +22,14 @@ const ProfileStack = () => {
     <Stack.Navigator
       initialRouteName="Profile"
       screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        initialParams={{
+          displayBackButton: false,
+          userId: undefined,
+        }}
+      />
     </Stack.Navigator>
   );
 };
