@@ -142,6 +142,7 @@ const Questions: FC = () => {
                 navigate('QuestionDetail', {questionId: item.id});
               }}
               username={item.user_metadata?.username || 'Anonymous'}
+              userId={item.user_id}
               question={item.question}
               answerCount={item.question_metadata?.response_count || 0}
               voteCount={item.question_metadata?.upvote_count || 0}

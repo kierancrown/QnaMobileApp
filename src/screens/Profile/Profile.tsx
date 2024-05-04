@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {FC, useRef} from 'react';
 import {Box, Center, Flex, Text} from 'app/components/common';
 import {FlashListWithHeaders} from '@codeherence/react-native-header';
 import {RefreshControl} from 'react-native-gesture-handler';
@@ -8,8 +8,14 @@ import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
 import HeaderComponent from './components/Header';
 import {LargeProfileHeaderComponent} from './components/LargeHeader';
+import {RouteProp, useRoute} from '@react-navigation/native';
+import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 
-const Profile = () => {
+const Profile: FC = () => {
+  const {
+    params: {userId},
+  } = useRoute<RouteProp<ProfileStackParamList>>();
+
   const theme = useAppTheme();
   const scrollRef = useRef(null);
   const {scrollHandlerWorklet} = useTabBarAnimation({

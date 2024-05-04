@@ -1,5 +1,4 @@
 import React from 'react';
-import {Alert} from 'react-native';
 import {Header} from '@codeherence/react-native-header';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {SharedValue} from 'react-native-reanimated';
@@ -15,34 +14,77 @@ import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
 import {useUser} from 'app/lib/supabase/context/auth';
 import Username from 'app/components/Username';
 
+import {useAppTheme} from 'app/styles/theme';
+
+import LikedIcon from 'app/assets/icons/actions/Heart-Outline.svg';
+import BookmarkedIcon from 'app/assets/icons/actions/Bookmark-Outline.svg';
+import GearIcon from 'app/assets/icons/gear.svg';
+import PopoverMenu, {
+  PopoverMenuItemProps,
+} from 'app/components/common/PopoverMenu';
+
 const BACK_ICON_SIZE = 24;
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {goBack} = useNavigation();
-  const {username, isVerified} = useUsername();
-  const {logout} = useUser();
-
   const {
-    params: {displayBackButton},
+    params: {userId, displayBackButton},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
-
-  const openMenu = () => {
-    Alert.alert('Account Options', 'What would you like to do?', [
-      {text: 'Change Username', onPress: () => {}},
-      {text: 'Change Profile Picture', onPress: () => {}},
-
-      {
-        text: 'Sign Out',
-        style: 'destructive',
-        onPress: () => {
-          (async () => {
-            await logout({allDevices: false, otherDevices: false});
-          })();
+  const {username, isVerified} = useUsername({userId});
+  const {user} = useUser();
+  const {logout} = useUser();
+  const theme = useAppTheme();
+  const isOwnProfile = user && user?.id === userId;
+  const menuItems: (PopoverMenuItemProps | 'divider')[] = isOwnProfile
+    ? [
+        {
+          title: 'Your likes',
+          left: (
+            <LikedIcon
+              fill={theme.colors.cardText}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
         },
-      },
-      {text: 'Cancel', style: 'cancel'},
-    ]);
-  };
+        {
+          title: 'Bookmarked',
+          left: (
+            <BookmarkedIcon
+              fill={theme.colors.cardText}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
+        },
+        'divider',
+        {
+          title: 'App Settings',
+          left: (
+            <GearIcon
+              fill={theme.colors.cardText}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
+        },
+        'divider',
+        {
+          title: 'Sign Out',
+          titleColor: 'destructiveAction',
+          onPress: () => {
+            (async () => {
+              await logout({allDevices: false, otherDevices: false});
+            })();
+          },
+        },
+      ]
+    : [
+        {
+          title: `Block ${username}`,
+          titleColor: 'destructiveAction',
+        },
+      ];
 
   return (
     <Header
@@ -65,7 +107,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       headerCenter={
         <Center py="xxsY">
           <HStack columnGap="xs">
-            <Avatar size="l" />
+            <Avatar userId={userId} size="l" />
             <Username
               username={username ?? 'Profile'}
               isVerified={isVerified}
@@ -76,16 +118,17 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         </Center>
       }
       headerRight={
-        <TouchableOpacity
-          onPress={openMenu}
-          hitSlop={8}
+        <PopoverMenu
           accessibilityLabel="Open Account Options"
           accessibilityRole="button"
-          accessibilityHint="Sign out, change username, change profile picture">
-          <Center py="xxsY" px="xxs">
-            <ElipsisIcon width={BACK_ICON_SIZE} height={BACK_ICON_SIZE} />
-          </Center>
-        </TouchableOpacity>
+          accessibilityHint="Sign out, change username, change profile picture"
+          triggerComponent={
+            <Center py="xxsY" px="xxs">
+              <ElipsisIcon width={BACK_ICON_SIZE} height={BACK_ICON_SIZE} />
+            </Center>
+          }
+          items={menuItems}
+        />
       }
     />
   );

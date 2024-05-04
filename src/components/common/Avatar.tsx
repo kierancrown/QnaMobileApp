@@ -8,7 +8,7 @@ import {ImageStyle, StyleProp} from 'react-native';
 import {FasterImageView} from '@candlefinance/faster-image';
 
 interface AvatarProps {
-  userId?: number;
+  userId?: string;
   defaultAvatar?: boolean;
   size?: keyof Theme['iconSizes'];
 }

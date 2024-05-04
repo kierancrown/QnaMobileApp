@@ -24,6 +24,7 @@ import {HomeStackParamList} from 'app/navigation/HomeStack';
 interface QuestionItemProps {
   onPress: () => void;
   id: number;
+  userId: string;
   username: string;
   question: string;
   answerCount: number;
@@ -41,6 +42,7 @@ const ICON_SIZE = 13;
 const QuestionItem: FC<QuestionItemProps> = ({
   onPress,
   id,
+  userId,
   username,
   question,
   answerCount,
@@ -146,7 +148,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
                 isVerified={userVerified}
                 onPress={() => {
                   navigate('Profile', {
-                    userId: username,
+                    userId,
                     displayBackButton: true,
                   });
                 }}

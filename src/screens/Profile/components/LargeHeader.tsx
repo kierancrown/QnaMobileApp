@@ -22,7 +22,7 @@ export const LargeProfileHeaderComponent = ({
     params: {userId},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
   const theme = useTheme<Theme>();
-  const {username, isVerified} = useUsername();
+  const {username, isVerified} = useUsername({userId});
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
@@ -41,7 +41,7 @@ export const LargeProfileHeaderComponent = ({
         scrollY={scrollY}
         style={scalingViewStyle}>
         <Center rowGap="mY">
-          <Avatar size="xxxxl" />
+          <Avatar userId={userId} size="xxxxl" />
           <Username
             variant="header"
             username={username ?? 'Profile'}
