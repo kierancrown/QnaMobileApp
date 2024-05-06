@@ -1,6 +1,11 @@
 import React, {useMemo} from 'react';
 import {Header} from '@codeherence/react-native-header';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {SharedValue} from 'react-native-reanimated';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
@@ -30,7 +35,8 @@ import BanIcon from 'app/assets/icons/Ban.svg';
 import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
-  const {goBack} = useNavigation();
+  const {goBack, navigate} =
+    useNavigation<NavigationProp<ProfileStackParamList>>();
   const {
     params: {userId, displayBackButton},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
@@ -73,6 +79,10 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
                   height={theme.iconSizes.m}
                 />
               ),
+              closeOnPress: true,
+              onPress: () => {
+                navigate('Settings');
+              },
             },
             'divider',
             {
