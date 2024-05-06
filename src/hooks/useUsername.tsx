@@ -1,20 +1,13 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect} from 'react';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {setUsernameCache} from 'app/redux/slices/authSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
 import {useDispatch, useSelector} from 'react-redux';
 
-interface useUsernameProps {
-  userId?: string;
-}
-
-export const useUsername = (props: useUsernameProps | undefined) => {
-  const userId = props?.userId;
+export const useUsername = () => {
   const {user} = useUser();
   const dispatch = useDispatch<AppDispatch>();
-  const [otherUsername, setOtherUsername] = useState('');
-  const [otherVerified, setOtherVerified] = useState(false);
 
   const username = useSelector(
     (state: RootState) => state.persistent.auth.username,
@@ -33,8 +26,6 @@ export const useUsername = (props: useUsernameProps | undefined) => {
         | undefined,
     ) => {
       if (!user) {
-        setOtherUsername(value?.username ?? '');
-        setOtherVerified(value?.isVerified ?? false);
       } else {
         dispatch(setUsernameCache(value));
       }
@@ -43,14 +34,14 @@ export const useUsername = (props: useUsernameProps | undefined) => {
   );
 
   useEffect(() => {
-    if (!user && !userId) {
+    if (!user) {
       setUsername(undefined);
       return;
     }
     supabase
       .from('user_metadata')
       .select('username, verified')
-      .eq('user_id', user ? user.id : userId!)
+      .eq('user_id', user.id!)
       .then(({data, error}) => {
         if (error) {
           console.error('Error getting username', error);
@@ -63,7 +54,7 @@ export const useUsername = (props: useUsernameProps | undefined) => {
           });
         }
       });
-  }, [setUsername, user, userId]);
+  }, [setUsername, user]);
 
   const updateUsername = async (newUsername: string) => {
     if (!user) {
@@ -89,8 +80,8 @@ export const useUsername = (props: useUsernameProps | undefined) => {
   };
 
   return {
-    username: userId ? otherUsername : username,
-    isVerified: userId ? otherVerified : isVerified,
+    username,
+    isVerified,
     updateUsername,
   };
 };

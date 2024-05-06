@@ -9,9 +9,9 @@ import {StyleProp, ViewStyle} from 'react-native';
 import {SharedValue} from 'react-native-reanimated';
 import Avatar from 'app/components/common/Avatar';
 import Username from 'app/components/Username';
-import {useUsername} from 'app/hooks/useUsername';
 
 import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
+import useProfile from 'app/hooks/useProfile';
 
 export const LargeProfileHeaderComponent = ({
   scrollY,
@@ -22,7 +22,7 @@ export const LargeProfileHeaderComponent = ({
     params: {userId},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
   const theme = useTheme<Theme>();
-  const {username, isVerified} = useUsername({userId});
+  const {username, verified} = useProfile(userId);
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
@@ -45,7 +45,7 @@ export const LargeProfileHeaderComponent = ({
           <Username
             variant="header"
             username={username ?? 'Profile'}
-            isVerified={isVerified}
+            isVerified={verified}
             noHighlight
           />
 

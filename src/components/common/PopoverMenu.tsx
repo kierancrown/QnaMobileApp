@@ -7,7 +7,7 @@ import {
 } from 'react-native-gesture-handler';
 import Popover from 'react-native-popover-view';
 import VStack from './VStack';
-import {Pressable, StyleSheet} from 'react-native';
+import {Platform, Pressable, StyleSheet} from 'react-native';
 import HStack from './HStack';
 import Box from './Box';
 import Text from './Text';
@@ -20,6 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {HapticFeedbackTypes} from 'react-native-haptic-feedback';
 import {useHaptics} from 'app/hooks/useHaptics';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export interface PopoverMenuItemProps {
   title: string;
@@ -68,12 +69,12 @@ const PopoverMenuItem: FC<PopoverMenuItemProps> = item => {
       onPressIn={onPressIn}
       onPressOut={onPressOut}>
       <Animated.View style={animatedStyle}>
-        <HStack px="s" columnGap="xxs">
+        <HStack px="s" columnGap="xs">
           {item.left}
           <Text variant="smallBody" color={item.titleColor ?? 'cardText'}>
             {item.title}
           </Text>
-          <Flex justifyContent="flex-end">{item.right}</Flex>
+          <Flex alignItems="flex-end">{item.right}</Flex>
         </HStack>
       </Animated.View>
     </Pressable>
@@ -88,10 +89,13 @@ const PopoverMenu: FC<PopoverMenuProps> = ({
 }) => {
   const theme = useAppTheme();
   const POPOVER_MIN_WIDTH = minWidth ?? SCREEN_WIDTH / 2.5;
+  const insets = useSafeAreaInsets();
+  const verticalOffset = Platform.OS === 'android' ? -(insets.bottom + 5) : -5;
 
   return (
     <Popover
-      verticalOffset={-5}
+      verticalOffset={verticalOffset}
+      displayAreaInsets={insets}
       arrowSize={{width: 0, height: 0}}
       popoverStyle={{
         backgroundColor: theme.colors.cardBackground,

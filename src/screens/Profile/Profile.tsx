@@ -49,6 +49,15 @@ const Profile: FC = () => {
               mb="xxxlY">
               Nothing to see here
             </Text>
+            <Text
+              variant="medium"
+              my="xlY"
+              color="cardText"
+              py="xxxlY"
+              mt="xxxlY"
+              mb="xxxlY">
+              Nothing to see here
+            </Text>
           </Center>
         }
         contentContainerStyle={{

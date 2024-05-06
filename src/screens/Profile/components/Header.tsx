@@ -1,13 +1,14 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Header} from '@codeherence/react-native-header';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {SharedValue} from 'react-native-reanimated';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
-import {useUsername} from 'app/hooks/useUsername';
 import {Center, HStack} from 'app/components/common';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import Avatar from 'app/components/common/Avatar';
+
+import useProfile from 'app/hooks/useProfile';
 
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
 import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
@@ -16,12 +17,17 @@ import Username from 'app/components/Username';
 
 import {useAppTheme} from 'app/styles/theme';
 
-import LikedIcon from 'app/assets/icons/actions/Heart-Outline.svg';
-import BookmarkedIcon from 'app/assets/icons/actions/Bookmark-Outline.svg';
-import GearIcon from 'app/assets/icons/gear.svg';
 import PopoverMenu, {
   PopoverMenuItemProps,
 } from 'app/components/common/PopoverMenu';
+
+import LikedIcon from 'app/assets/icons/actions/Heart-Outline.svg';
+import BookmarkedIcon from 'app/assets/icons/actions/Bookmark-Outline.svg';
+import GearIcon from 'app/assets/icons/gear.svg';
+import LockIcon from 'app/assets/icons/Lock.svg';
+import FlagIcon from 'app/assets/icons/Flag.svg';
+import BanIcon from 'app/assets/icons/Ban.svg';
+import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
 
 const BACK_ICON_SIZE = 24;
 
@@ -30,16 +36,19 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {
     params: {userId, displayBackButton},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
-  const {username, isVerified} = useUsername({userId});
+  const {username, verified} = useProfile(userId);
   const {user} = useUser();
   const {logout} = useUser();
   const theme = useAppTheme();
-  const isOwnProfile = user && user?.id === userId;
+  const isOwnProfile = useMemo(
+    () => userId == null || user?.id === userId,
+    [user, userId],
+  );
   const menuItems: (PopoverMenuItemProps | 'divider')[] = isOwnProfile
     ? [
         {
           title: 'Your likes',
-          left: (
+          right: (
             <LikedIcon
               fill={theme.colors.cardText}
               width={theme.iconSizes.m}
@@ -49,7 +58,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         },
         {
           title: 'Bookmarked',
-          left: (
+          right: (
             <BookmarkedIcon
               fill={theme.colors.cardText}
               width={theme.iconSizes.m}
@@ -60,7 +69,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         'divider',
         {
           title: 'App Settings',
-          left: (
+          right: (
             <GearIcon
               fill={theme.colors.cardText}
               width={theme.iconSizes.m}
@@ -72,6 +81,13 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         {
           title: 'Sign Out',
           titleColor: 'destructiveAction',
+          right: (
+            <LockIcon
+              color={theme.colors.destructiveAction}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
           onPress: () => {
             (async () => {
               await logout({allDevices: false, otherDevices: false});
@@ -81,8 +97,36 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       ]
     : [
         {
+          title: 'Ask Question',
+          right: (
+            <AskUserIcon
+              fill={theme.colors.cardText}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
+        },
+        'divider',
+        {
+          title: 'Report Profile',
+          right: (
+            <FlagIcon
+              fill={theme.colors.cardText}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
+        },
+        {
           title: `Block ${username}`,
           titleColor: 'destructiveAction',
+          right: (
+            <BanIcon
+              color={theme.colors.destructiveAction}
+              width={theme.iconSizes.m}
+              height={theme.iconSizes.m}
+            />
+          ),
         },
       ];
 
@@ -110,7 +154,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
             <Avatar userId={userId} size="l" />
             <Username
               username={username ?? 'Profile'}
-              isVerified={isVerified}
+              isVerified={verified}
               noHighlight
               variant="medium"
             />
