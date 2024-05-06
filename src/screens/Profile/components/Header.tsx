@@ -124,6 +124,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
                   height={theme.iconSizes.m}
                 />
               ),
+              closeOnPress: true,
             },
           ],
     // eslint-disable-next-line react-hooks/exhaustive-deps

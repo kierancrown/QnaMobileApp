@@ -13,7 +13,7 @@ import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 
 const Profile: FC = () => {
   const {
-    params: {userId},
+    params: {},
   } = useRoute<RouteProp<ProfileStackParamList>>();
 
   const theme = useAppTheme();
@@ -65,7 +65,7 @@ const Profile: FC = () => {
           paddingBottom: bottomListPadding,
         }}
         estimatedItemSize={100}
-        renderItem={({item}) => <Box />}
+        renderItem={({}) => <Box />}
       />
     </Flex>
   );

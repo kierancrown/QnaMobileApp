@@ -28,6 +28,8 @@ interface PopoverMenuItemProps {
   left?: React.ReactNode;
   right?: React.ReactNode;
   onPress?: () => void;
+  closeOnPress?: boolean;
+  onClosePress?: () => void;
 }
 
 export type PopoverMenuItemsProps = (PopoverMenuItemProps | 'divider')[];
@@ -53,6 +55,9 @@ const PopoverMenuItem: FC<PopoverMenuItemProps> = item => {
   const onInternalPress = async () => {
     await triggerHaptic(HapticFeedbackTypes.impactLight);
     item.onPress?.();
+    if (item.closeOnPress) {
+      item.onClosePress?.();
+    }
   };
 
   const onPressIn = () => {
@@ -93,9 +98,12 @@ const PopoverMenu: FC<PopoverMenuProps> = ({
   const POPOVER_MIN_WIDTH = minWidth ?? SCREEN_WIDTH / 2.5;
   const insets = useSafeAreaInsets();
   const verticalOffset = Platform.OS === 'android' ? -(insets.bottom + 5) : -5;
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
 
   return (
     <Popover
+      isVisible={popoverOpen}
+      onRequestClose={() => setPopoverOpen(false)}
       verticalOffset={verticalOffset}
       displayAreaInsets={insets}
       arrowSize={{width: 0, height: 0}}
@@ -104,14 +112,23 @@ const PopoverMenu: FC<PopoverMenuProps> = ({
         borderRadius: theme.borderRadii.m,
       }}
       from={
-        <TouchableOpacity hitSlop={8} {...rest}>
+        <TouchableOpacity
+          hitSlop={8}
+          {...rest}
+          onPress={() => setPopoverOpen(true)}>
           {triggerComponent}
         </TouchableOpacity>
       }>
       <VStack rowGap="sY" py="sY" minWidth={POPOVER_MIN_WIDTH}>
         {items.map((item, index) =>
           item !== 'divider' ? (
-            <PopoverMenuItem key={index} {...item} />
+            <PopoverMenuItem
+              key={index}
+              {...item}
+              onClosePress={() => {
+                setPopoverOpen(false);
+              }}
+            />
           ) : (
             <Box
               key={index}
