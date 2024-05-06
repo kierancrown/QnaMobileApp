@@ -22,7 +22,7 @@ import {HapticFeedbackTypes} from 'react-native-haptic-feedback';
 import {useHaptics} from 'app/hooks/useHaptics';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-export interface PopoverMenuItemProps {
+interface PopoverMenuItemProps {
   title: string;
   titleColor?: keyof Theme['colors'];
   left?: React.ReactNode;
@@ -30,10 +30,12 @@ export interface PopoverMenuItemProps {
   onPress?: () => void;
 }
 
+export type PopoverMenuItemsProps = (PopoverMenuItemProps | 'divider')[];
+
 interface PopoverMenuProps extends TouchableOpacityProps {
   triggerComponent: React.ReactNode;
   minWidth?: number;
-  items: (PopoverMenuItemProps | 'divider')[];
+  items: PopoverMenuItemsProps;
 }
 
 const PopoverMenuItem: FC<PopoverMenuItemProps> = item => {

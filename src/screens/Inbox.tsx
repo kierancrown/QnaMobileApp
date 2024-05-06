@@ -128,7 +128,7 @@ const InboxScreen: FC = () => {
   const scrollRef = useRef(null);
 
   useTabPress({
-    tabName: 'InobxTab',
+    tabName: 'InboxTab',
     onPress: () => {
       if (scrollRef.current) {
         // @ts-ignore

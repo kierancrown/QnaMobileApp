@@ -14,7 +14,11 @@ export type HomeStackNavigationProp =
 export type HomeStackParamList = {
   Auth: undefined;
   Questions: undefined;
-  QuestionDetail: {questionId: number};
+  QuestionDetail: {
+    questionId: number;
+    responseCount?: number;
+    isOwner?: boolean;
+  };
   Profile: ProfileScreenParams;
 };
 

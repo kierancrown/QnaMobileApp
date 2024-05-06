@@ -33,10 +33,7 @@ import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
 import TimeIcon from 'app/assets/icons/TimeFive.svg';
 import LocationIcon from 'app/assets/icons/LocationPin.svg';
 
-import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
-
 import {
-  Header,
   LargeHeader,
   ScalingView,
   FlashListWithHeaders,
@@ -44,7 +41,6 @@ import {
 import {useQuestionDetail} from 'app/hooks/useQuestionDetail';
 import {formatNumber} from 'app/utils/numberFormatter';
 import ActionBar from './components/ActionBar';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {
   FabAction,
@@ -53,37 +49,9 @@ import {
 } from 'app/context/tabBarContext';
 import Username from 'app/components/Username';
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
+import HeaderComponent from './components/Header';
 
 const ICON_SIZE = 13;
-const BACK_ICON_SIZE = 24;
-
-const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
-  const {goBack} = useNavigation();
-
-  return (
-    <Header
-      showNavBar={showNavBar}
-      noBottomBorder
-      headerLeft={
-        <TouchableOpacity
-          onPress={goBack}
-          hitSlop={8}
-          accessibilityLabel="Go back"
-          accessibilityRole="button"
-          accessibilityHint="Go back to previous screen">
-          <Center py="xxsY" px="xxs">
-            <BackIcon width={BACK_ICON_SIZE} height={BACK_ICON_SIZE} />
-          </Center>
-        </TouchableOpacity>
-      }
-      headerCenter={
-        <Center py="xxsY">
-          <Text variant="medium">Question</Text>
-        </Center>
-      }
-    />
-  );
-};
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {

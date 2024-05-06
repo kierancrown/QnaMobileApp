@@ -137,7 +137,7 @@ const theme = createTheme({
     inactiveAction: palette.Grey[900],
     heartAction: palette['french-rose'][600],
     successfulAction: palette.successfulActionDark,
-    destructiveAction: palette.destructiveActionDark,
+    destructiveAction: palette.destructiveActionLight,
     bookmarkAction: palette.cerulean[600],
     // Backgrounds
     mainBackground: palette.black,

@@ -18,7 +18,7 @@ import Username from 'app/components/Username';
 import {useAppTheme} from 'app/styles/theme';
 
 import PopoverMenu, {
-  PopoverMenuItemProps,
+  PopoverMenuItemsProps,
 } from 'app/components/common/PopoverMenu';
 
 import LikedIcon from 'app/assets/icons/actions/Heart-Outline.svg';
@@ -29,8 +29,6 @@ import FlagIcon from 'app/assets/icons/Flag.svg';
 import BanIcon from 'app/assets/icons/Ban.svg';
 import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
 
-const BACK_ICON_SIZE = 24;
-
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {goBack} = useNavigation();
   const {
@@ -40,95 +38,97 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {user} = useUser();
   const {logout} = useUser();
   const theme = useAppTheme();
-  const isOwnProfile = useMemo(
-    () => userId == null || user?.id === userId,
-    [user, userId],
+
+  const menuItems: PopoverMenuItemsProps = useMemo(
+    () =>
+      userId == null || user?.id === userId
+        ? [
+            {
+              title: 'Your likes',
+              right: (
+                <LikedIcon
+                  fill={theme.colors.cardText}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+            },
+            {
+              title: 'Bookmarked',
+              right: (
+                <BookmarkedIcon
+                  fill={theme.colors.cardText}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+            },
+            'divider',
+            {
+              title: 'App Settings',
+              right: (
+                <GearIcon
+                  fill={theme.colors.cardText}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+            },
+            'divider',
+            {
+              title: 'Sign Out',
+              titleColor: 'destructiveAction',
+              right: (
+                <LockIcon
+                  color={theme.colors.destructiveAction}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+              onPress: () => {
+                (async () => {
+                  await logout({allDevices: false, otherDevices: false});
+                })();
+              },
+            },
+          ]
+        : [
+            {
+              title: 'Ask Question',
+              right: (
+                <AskUserIcon
+                  fill={theme.colors.cardText}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+            },
+            'divider',
+            {
+              title: 'Report Profile',
+              right: (
+                <FlagIcon
+                  fill={theme.colors.cardText}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+            },
+            {
+              title: `Block ${username}`,
+              titleColor: 'destructiveAction',
+              right: (
+                <BanIcon
+                  color={theme.colors.destructiveAction}
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              ),
+            },
+          ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userId, user],
   );
-  const menuItems: (PopoverMenuItemProps | 'divider')[] = isOwnProfile
-    ? [
-        {
-          title: 'Your likes',
-          right: (
-            <LikedIcon
-              fill={theme.colors.cardText}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-        },
-        {
-          title: 'Bookmarked',
-          right: (
-            <BookmarkedIcon
-              fill={theme.colors.cardText}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-        },
-        'divider',
-        {
-          title: 'App Settings',
-          right: (
-            <GearIcon
-              fill={theme.colors.cardText}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-        },
-        'divider',
-        {
-          title: 'Sign Out',
-          titleColor: 'destructiveAction',
-          right: (
-            <LockIcon
-              color={theme.colors.destructiveAction}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-          onPress: () => {
-            (async () => {
-              await logout({allDevices: false, otherDevices: false});
-            })();
-          },
-        },
-      ]
-    : [
-        {
-          title: 'Ask Question',
-          right: (
-            <AskUserIcon
-              fill={theme.colors.cardText}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-        },
-        'divider',
-        {
-          title: 'Report Profile',
-          right: (
-            <FlagIcon
-              fill={theme.colors.cardText}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-        },
-        {
-          title: `Block ${username}`,
-          titleColor: 'destructiveAction',
-          right: (
-            <BanIcon
-              color={theme.colors.destructiveAction}
-              width={theme.iconSizes.m}
-              height={theme.iconSizes.m}
-            />
-          ),
-        },
-      ];
 
   return (
     <Header
@@ -143,7 +143,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
             accessibilityRole="button"
             accessibilityHint="Go back to previous screen">
             <Center py="xxsY" px="xxs">
-              <BackIcon width={BACK_ICON_SIZE} height={BACK_ICON_SIZE} />
+              <BackIcon width={theme.iconSizes.l} height={theme.iconSizes.l} />
             </Center>
           </TouchableOpacity>
         )
@@ -168,7 +168,10 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
           accessibilityHint="Sign out, change username, change profile picture"
           triggerComponent={
             <Center py="xxsY" px="xxs">
-              <ElipsisIcon width={BACK_ICON_SIZE} height={BACK_ICON_SIZE} />
+              <ElipsisIcon
+                width={theme.iconSizes.l}
+                height={theme.iconSizes.l}
+              />
             </Center>
           }
           items={menuItems}
