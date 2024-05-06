@@ -1,5 +1,5 @@
 import {Header} from '@codeherence/react-native-header';
-import {SharedValue} from 'react-native-reanimated';
+import {SharedValue, useSharedValue} from 'react-native-reanimated';
 import {Center, Text} from 'app/components/common';
 import React from 'react';
 
@@ -9,13 +9,10 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import {useAppTheme} from 'app/styles/theme';
 
-export const HeaderComponent = ({
-  showNavBar,
-}: {
-  showNavBar: SharedValue<number>;
-}) => {
+export const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
   const {goBack} = useNavigation<NavigationProp<ProfileStackParamList>>();
   const theme = useAppTheme();
+  const showNavBar = useSharedValue(1);
 
   return (
     <Header

@@ -7,6 +7,7 @@ import {useAppTheme} from 'app/styles/theme';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {useTabBar} from 'app/context/tabBarContext';
 import {useFocusEffect} from '@react-navigation/native';
+import SettingsItem from './components/SettingsItem';
 
 const SettingsScren = () => {
   const theme = useAppTheme();
@@ -25,94 +26,14 @@ const SettingsScren = () => {
   return (
     <ScrollViewWithHeaders
       HeaderComponent={HeaderComponent}
-      LargeHeaderComponent={LargeHeaderComponent}
       contentContainerStyle={{
         paddingBottom: bottomListPadding,
       }}>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
-      <Text>Settings</Text>
+      <SettingsItem title="Account" onPress={() => {}} />
+      <SettingsItem title="Notifications" onPress={() => {}} />
+      <SettingsItem title="Privacy & Security" onPress={() => {}} />
+      <SettingsItem title="Help" onPress={() => {}} />
+      <SettingsItem title="About" onPress={() => {}} />
     </ScrollViewWithHeaders>
   );
 };
