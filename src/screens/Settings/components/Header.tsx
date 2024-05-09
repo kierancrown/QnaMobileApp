@@ -5,12 +5,20 @@ import React from 'react';
 
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import {useAppTheme} from 'app/styles/theme';
 
 export const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
   const {goBack} = useNavigation<NavigationProp<ProfileStackParamList>>();
+  const {
+    params: {headerTitle},
+  } = useRoute<RouteProp<ProfileStackParamList, 'Settings'>>();
   const theme = useAppTheme();
   const showNavBar = useSharedValue(1);
 
@@ -32,7 +40,7 @@ export const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
       }
       headerCenter={
         <Center py="xxsY">
-          <Text variant="medium">Settings</Text>
+          <Text variant="medium">{headerTitle}</Text>
         </Center>
       }
     />

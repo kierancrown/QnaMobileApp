@@ -5,6 +5,9 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import ProfileScreen from 'app/screens/Profile';
 import SettingsScren from 'app/screens/Settings/Screen';
+import SettingsAboutScreen from 'app/screens/Settings/About/Screen';
+import SettingsHelpScreen from 'app/screens/Settings/Help/Screen';
+import SettingsDebugScreen from 'app/screens/Settings/Debug/Screen';
 
 export type ProfileStackNavigationProp =
   NativeStackNavigationProp<ProfileStackParamList>;
@@ -14,11 +17,16 @@ export type ProfileScreenParams = {
   userId?: string;
 };
 
-export type SettingsScreenParams = undefined;
+export type SettingsScreenParams = {
+  headerTitle: string;
+};
 
 export type ProfileStackParamList = {
   Profile: ProfileScreenParams;
   Settings: SettingsScreenParams;
+  SettingsHelp: SettingsScreenParams;
+  SettingsAbout: SettingsScreenParams;
+  SettingsDebug: SettingsScreenParams;
 };
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -36,7 +44,26 @@ const ProfileStack = () => {
           userId: undefined,
         }}
       />
-      <Stack.Screen name="Settings" component={SettingsScren} />
+      <Stack.Screen
+        name="Settings"
+        initialParams={{headerTitle: 'Settings'}}
+        component={SettingsScren}
+      />
+      <Stack.Screen
+        name="SettingsHelp"
+        initialParams={{headerTitle: 'Help'}}
+        component={SettingsHelpScreen}
+      />
+      <Stack.Screen
+        name="SettingsAbout"
+        initialParams={{headerTitle: 'About'}}
+        component={SettingsAboutScreen}
+      />
+      <Stack.Screen
+        name="SettingsDebug"
+        initialParams={{headerTitle: 'Debug'}}
+        component={SettingsDebugScreen}
+      />
     </Stack.Navigator>
   );
 };

@@ -158,3 +158,14 @@ export const useTabPress = ({tabName, onPress}: UseTabPressProps) => {
     };
   });
 };
+
+export const useHiddenTabBar = () => {
+  const {setHidden} = useTabBar();
+
+  useFocusEffect(() => {
+    setHidden(true);
+    return () => {
+      setHidden(false);
+    };
+  });
+};

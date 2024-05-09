@@ -2,7 +2,7 @@ import React, {FC} from 'react';
 import {Text, HStack, Center} from 'ui';
 import {Pressable} from 'react-native';
 import ChevronRightIcon from 'app/assets/icons/arrows/chevron-right.svg';
-import {useAppTheme} from 'app/styles/theme';
+import {Theme, useAppTheme} from 'app/styles/theme';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -12,11 +12,17 @@ import Animated, {
 
 interface SettingsItemProps {
   title: string;
+  titleColor?: keyof Theme['colors'];
   onPress: () => void;
   icon?: React.ReactNode;
 }
 
-const SettingsItem: FC<SettingsItemProps> = ({title, onPress, icon}) => {
+const SettingsItem: FC<SettingsItemProps> = ({
+  title,
+  titleColor,
+  onPress,
+  icon,
+}) => {
   const theme = useAppTheme();
   const bgAnimation = useSharedValue(0);
 
@@ -52,8 +58,12 @@ const SettingsItem: FC<SettingsItemProps> = ({title, onPress, icon}) => {
           alignItems="center"
           paddingVertical="mY"
           marginHorizontal="s">
-          {icon}
-          <Text variant="body">{title}</Text>
+          <HStack alignItems="center" columnGap="xs">
+            {icon}
+            <Text variant="body" color={titleColor}>
+              {title}
+            </Text>
+          </HStack>
           <Center>
             <ChevronRightIcon
               width={theme.iconSizes.m}
