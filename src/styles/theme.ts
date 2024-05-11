@@ -167,7 +167,8 @@ const theme = createTheme({
     // Outline
     outline: palette.dividerLight,
     // Skeleton
-    skeleton: palette.skeletonDark,
+    skeletonBackground: palette.cardBackgroundDark,
+    skeleton: '#52525b',
     // Common
     white: palette.white,
     black: palette.black,
@@ -230,6 +231,22 @@ const theme = createTheme({
     logo: s(120),
   },
   textVariants: {
+    markdownH1: {
+      fontFamily: fonts.black,
+      fontSize: mvs(34),
+    },
+    markdownH2: {
+      fontFamily: fonts.bold,
+      fontSize: mvs(26),
+    },
+    markdownH3: {
+      fontFamily: fonts.bold,
+      fontSize: mvs(20),
+    },
+    markdownBullet: {
+      fontFamily: fonts.semiBold,
+      fontSize: mvs(16),
+    },
     extraLargeHeader: {
       fontWeight: '900',
       fontSize: mvs(56),
@@ -321,6 +338,7 @@ const theme = createTheme({
     defaults: {
       fontFamily: fonts.regular,
       color: 'foreground',
+      fontSize: mvs(16),
     },
   },
 });

@@ -33,7 +33,7 @@ const SettingsDebugScreen = () => {
       <SectionHeader title="Notifications" />
       <SettingsItem title="Resend FCM Token" onPress={() => {}} />
       <Text variant="smallBody" color="cardText" paddingHorizontal="s">
-        {fcmToken}
+        {fcmToken || 'Loading FCM token...'}
       </Text>
     </ScrollViewWithHeaders>
   );

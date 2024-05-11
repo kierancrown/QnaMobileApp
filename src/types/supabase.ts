@@ -176,6 +176,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      public_docs: {
+        Row: {
+          content: string;
+          id: number;
+          name: string;
+          updated_at: string;
+        };
+        Insert: {
+          content?: string;
+          id?: number;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          content?: string;
+          id?: number;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       question_metadata: {
         Row: {
           id: number;

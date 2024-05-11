@@ -6661,6 +6661,11 @@ react-native-popover-view@^5.1.8:
     deprecated-react-native-prop-types "^2.3.0"
     prop-types "^15.8.1"
 
+react-native-reanimated-skeleton@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated-skeleton/-/react-native-reanimated-skeleton-1.5.1.tgz#6167a402e541d01e056a5477ce2c4e7dcc2df191"
+  integrity sha512-PO7/hWBDlV8w3l6EJmzzwWwdlXVTrBFuF8QcUu4ZUOMQQGD5YKfBsYnUNkPAfjvYx3ZJfvPORe72QbArI3OGSw==
+
 react-native-reanimated@3.9.0-rc.1:
   version "3.9.0-rc.1"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.9.0-rc.1.tgz#af50c901ae5500b3a1d811f7ffd676af2907782b"

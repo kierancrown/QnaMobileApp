@@ -28,7 +28,6 @@ const SettingsItem: FC<SettingsItemProps> = ({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      borderRadius: theme.borderRadii.m,
       backgroundColor: interpolateColor(
         bgAnimation.value,
         [0, 1],
@@ -57,7 +56,7 @@ const SettingsItem: FC<SettingsItemProps> = ({
           columnGap="s"
           alignItems="center"
           paddingVertical="mY"
-          marginHorizontal="s">
+          paddingHorizontal="s">
           <HStack alignItems="center" columnGap="xs">
             {icon}
             <Text variant="body" color={titleColor}>
