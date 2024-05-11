@@ -29,8 +29,6 @@ export const generateSkeletonTextLines = ({
     )}%` as DimensionValue;
     const height = fontSize + 6;
 
-    console.log('width', width);
-
     lines.push({
       key: `line${i + 1}`,
       width,

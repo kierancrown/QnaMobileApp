@@ -1,12 +1,11 @@
 import {
-  ActivityIndicator,
   Alert,
   Pressable,
   RefreshControl,
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {FC, useCallback, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -50,6 +49,7 @@ import {
 import Username from 'app/components/Username';
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import HeaderComponent from './components/Header';
+import Skeleton from 'react-native-reanimated-skeleton';
 
 const ICON_SIZE = 13;
 
@@ -57,7 +57,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {
     params: {questionId},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
-
+  // const loading = true;
   const {loading, question, hasUpvoted, upvoteQuestion} = useQuestionDetail({
     questionId,
   });
@@ -65,6 +65,10 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {setFabAction} = useTabBar();
   const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
   const [bookmarked, setBookmarked] = useState(false);
+
+  useEffect(() => {
+    console.log({hasUpvoted, question, loading, upvoteQuestion});
+  }, [loading, question, hasUpvoted, upvoteQuestion]);
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
@@ -87,15 +91,22 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   return (
     <LargeHeader headerStyle={headerStyle}>
       <ScalingView scrollY={scrollY} style={scalingViewStyle}>
-        {loading ? (
-          <Center flex={1}>
-            <ActivityIndicator size="large" />
-          </Center>
-        ) : question ? (
-          <VStack rowGap="sY" px="m">
+        <VStack rowGap="sY" px="m">
+          <Skeleton
+            isLoading={loading}
+            containerStyle={{}}
+            boneColor={theme.colors.skeletonBackground}
+            highlightColor={theme.colors.skeleton}
+            layout={[
+              {
+                key: 'line1',
+                height: theme.textVariants.medium.lineHeight,
+                width: '88%',
+              },
+            ]}>
             <Text variant="medium">
-              {question.question}
-              {question.nsfw && (
+              {question?.question}
+              {question?.nsfw && (
                 <HStack alignItems="center">
                   <Box px="xxs" />
                   <Center
@@ -110,7 +121,21 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                 </HStack>
               )}
             </Text>
-            <VStack rowGap="xsY">
+          </Skeleton>
+          <VStack rowGap="xsY">
+            <Skeleton
+              isLoading={loading}
+              containerStyle={{}}
+              boneColor={theme.colors.skeletonBackground}
+              highlightColor={theme.colors.skeleton}
+              layout={[
+                {
+                  key: 'line1',
+                  height:
+                    theme.textVariants.username.fontSize + theme.spacing.xxsY,
+                  width: '44%',
+                },
+              ]}>
               <HStack alignItems="center">
                 <Text variant="username" fontWeight="400">
                   Asked by{' '}
@@ -118,16 +143,30 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                 <Username
                   variant="username"
                   fontWeight="600"
-                  username={question.user_metadata?.username ?? 'Anyonymous'}
-                  isVerified={question.user_metadata?.verified ?? false}
+                  username={question?.user_metadata?.username ?? 'Anyonymous'}
+                  isVerified={question?.user_metadata?.verified ?? false}
                   onPress={() => {
                     navigate('Profile', {
-                      userId: question.user_id,
+                      userId: question!.user_id,
                       displayBackButton: true,
                     });
                   }}
                 />
               </HStack>
+            </Skeleton>
+            <Skeleton
+              isLoading={loading}
+              containerStyle={{}}
+              boneColor={theme.colors.skeletonBackground}
+              highlightColor={theme.colors.skeleton}
+              layout={[
+                {
+                  key: 'line1',
+                  height:
+                    theme.textVariants.username.fontSize + theme.spacing.xxsY,
+                  width: '42%',
+                },
+              ]}>
               <HStack alignItems="center" columnGap="s">
                 <HStack alignItems="center" columnGap="xxs">
                   <HeartOutlineIcon
@@ -137,7 +176,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                   />
                   <Text color="cardText" variant="smaller">
                     {formatNumber(
-                      question.question_metadata?.upvote_count || 0,
+                      question?.question_metadata?.upvote_count || 0,
                     )}
                   </Text>
                 </HStack>
@@ -149,7 +188,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                   />
                   <Text color="cardText" variant="smaller">
                     {formatNumber(
-                      question.question_metadata?.response_count || 0,
+                      question?.question_metadata?.response_count || 0,
                     )}
                   </Text>
                 </HStack>
@@ -160,11 +199,11 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     height={ICON_SIZE}
                   />
                   <Text color="cardText" variant="smaller">
-                    {dayjs(question.created_at).fromNow(true)}
+                    {dayjs(question?.created_at).fromNow(true)}
                   </Text>
                 </HStack>
                 <Flex />
-                {question.question_metadata?.location && (
+                {question?.question_metadata?.location && (
                   <HStack alignItems="center" columnGap="xxs">
                     <LocationIcon
                       fill={theme.colors.cardText}
@@ -177,25 +216,19 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                   </HStack>
                 )}
               </HStack>
-              <ActionBar
-                isLiked={hasUpvoted}
-                isBookmarked={bookmarked}
-                onLike={async () => {
-                  await upvoteQuestion();
-                }}
-                onBookmark={() => {
-                  setBookmarked(!bookmarked);
-                }}
-              />
-            </VStack>
+            </Skeleton>
+            <ActionBar
+              isLiked={hasUpvoted}
+              isBookmarked={bookmarked}
+              onLike={async () => {
+                await upvoteQuestion();
+              }}
+              onBookmark={() => {
+                setBookmarked(!bookmarked);
+              }}
+            />
           </VStack>
-        ) : (
-          <Center flex={1}>
-            <Text variant="medium" color="destructiveAction">
-              Question not found
-            </Text>
-          </Center>
-        )}
+        </VStack>
       </ScalingView>
     </LargeHeader>
   );
@@ -223,7 +256,8 @@ const QuestionDetail: FC = () => {
 
   const [responses, setResponses] = useState<Responses>([]);
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [responsesLoading, setResponsesLoading] = useState(true);
 
   const refreshResponses = async () => {
@@ -250,7 +284,7 @@ const QuestionDetail: FC = () => {
     } else {
       setResponses(data || []);
     }
-    setLoading(false);
+    // setLoading(false);
   };
 
   useMount(refreshResponses);
@@ -327,7 +361,10 @@ const QuestionDetail: FC = () => {
         ref={scrollRef}
         keyExtractor={item => item.id.toString()}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={refreshResponses} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refreshResponses}
+          />
         }
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
