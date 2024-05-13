@@ -35,7 +35,7 @@ import {RootState} from 'app/redux/store';
 export type TabStackParamList = {
   HomeTab: undefined;
   SearchTab: undefined;
-  InobxTab: undefined;
+  InboxTab: undefined;
   ProfileTab: undefined;
 };
 

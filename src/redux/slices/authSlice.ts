@@ -4,6 +4,7 @@ export interface AuthState {
   showOnboarding: boolean;
   skippedAuth: boolean;
   username: string | undefined;
+  isVerified: boolean;
   deletedAccount: boolean;
 }
 
@@ -11,6 +12,7 @@ const initialState: AuthState = {
   showOnboarding: false,
   skippedAuth: false,
   username: undefined,
+  isVerified: false,
   deletedAccount: false,
 };
 
@@ -45,10 +47,16 @@ export const authSlice = createSlice({
     setUsernameCache: (
       state,
       action: {
-        payload: string | undefined;
+        payload:
+          | {
+              username: string;
+              isVerified: boolean;
+            }
+          | undefined;
       },
     ) => {
-      state.username = action.payload;
+      state.username = action.payload?.username;
+      state.isVerified = action.payload?.isVerified ?? false;
     },
   },
 });

@@ -16,6 +16,7 @@ import {
   StyleProp,
   StyleSheet,
   ViewStyle,
+  RefreshControl,
 } from 'react-native';
 import useMount from 'app/hooks/useMount';
 import {
@@ -25,7 +26,6 @@ import {
   ScalingView,
 } from '@codeherence/react-native-header';
 import {SharedValue} from 'react-native-reanimated';
-import {RefreshControl} from 'react-native-gesture-handler';
 import NotificationItem from 'app/components/NotificationItem';
 import Badge from 'app/components/common/Badge';
 import {useDispatch} from 'react-redux';
@@ -128,7 +128,7 @@ const InboxScreen: FC = () => {
   const scrollRef = useRef(null);
 
   useTabPress({
-    tabName: 'InobxTab',
+    tabName: 'InboxTab',
     onPress: () => {
       if (scrollRef.current) {
         // @ts-ignore
@@ -270,7 +270,7 @@ const InboxScreen: FC = () => {
           keyExtractor={item => item.id.toString()}
           refreshControl={
             <RefreshControl
-              refreshing={false}
+              refreshing={refreshing}
               onRefresh={refreshNotifications}
             />
           }

@@ -52,7 +52,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
 
-  const {scrollDirection, fabEventEmitter, fabAction} = useTabBar();
+  const {scrollDirection, fabEventEmitter, fabAction, hidden} = useTabBar();
   const fabChange = useSharedValue(fabAction);
 
   const internalCtaPress = () => {
@@ -63,7 +63,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   };
 
   const animatedStyle = useAnimatedStyle(() => {
-    const hideTabBar = scrollDirection === 'down';
+    const hideTabBar = hidden === true || scrollDirection === 'down';
     return {
       transform: [
         {
@@ -73,7 +73,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
         },
       ],
     };
-  }, [scrollDirection]);
+  }, [scrollDirection, hidden]);
 
   const ctaStyles: StyleProp<ViewStyle> = {
     position: 'absolute',

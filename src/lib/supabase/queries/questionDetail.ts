@@ -7,7 +7,10 @@ export interface QuestionsDetailData {
 
   user_metadata: {
     verified: boolean;
-    profile_picture_key: string | null;
+    profile_picture: {
+      path: string | null;
+      thumbhash: string | null;
+    } | null;
     username: string | null;
   };
 

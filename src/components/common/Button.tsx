@@ -22,6 +22,8 @@ export interface ButtonProps extends BoxProps<Theme> {
   loading?: boolean;
   disabled?: boolean;
   testID?: string;
+  leftNode?: React.ReactNode;
+  rightNode?: React.ReactNode;
 }
 
 const Button = ({
@@ -33,6 +35,8 @@ const Button = ({
   onPress,
   loading,
   disabled,
+  leftNode,
+  rightNode,
   ...rest
 }: ButtonProps) => {
   const opacity = useSharedValue(1);
@@ -100,11 +104,13 @@ const Button = ({
                 color={variant === 'text' ? 'brand' : 'white'}
               />
             ) : null}
+            {leftNode}
             <Text
               variant="headline"
               color={variant === 'text' ? 'brand' : 'white'}>
               {title}
             </Text>
+            {rightNode}
           </HStack>
         </Box>
       </Animated.View>

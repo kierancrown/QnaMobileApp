@@ -17,9 +17,9 @@ interface TabBarContextData {
   scrollDirection: 'up' | 'down';
   hideThreshold: number;
   fabAction: FabAction;
-
+  hidden: boolean;
+  setHidden: (value: boolean) => void;
   fabEventEmitter: EventEmitter;
-
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
   setContentSize: (value: number) => void;
@@ -37,6 +37,8 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
   const scrollY = useSharedValue(0);
   const [scrollContentSize, setContentSize] = useState<number>(0);
   const [fabAction, setFabAction] = useState<FabAction>(FabAction.ADD);
+
+  const [hidden, setHidden] = useState<boolean>(false);
 
   const [hideThreshold, setHideThreshold] = useState<number>(40);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
@@ -82,6 +84,8 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
         setContentSize,
         setScrollY,
         setFabAction,
+        hidden,
+        setHidden,
       }}>
       {children}
     </TabBarContext.Provider>
@@ -151,6 +155,17 @@ export const useTabPress = ({tabName, onPress}: UseTabPressProps) => {
 
     return () => {
       listener.remove();
+    };
+  });
+};
+
+export const useHiddenTabBar = () => {
+  const {setHidden} = useTabBar();
+
+  useFocusEffect(() => {
+    setHidden(true);
+    return () => {
+      setHidden(false);
     };
   });
 };

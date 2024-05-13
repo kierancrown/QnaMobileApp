@@ -1,11 +1,16 @@
-import {ActivityIndicator, Alert, StyleProp, ViewStyle} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import React, {FC, useRef, useState} from 'react';
 import {Center, Flex, Text} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import useMount from 'app/hooks/useMount';
-import {RefreshControl} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {HomeStackNavigationProp} from 'app/navigation/HomeStack';
 import {
@@ -139,9 +144,14 @@ const Questions: FC = () => {
             <QuestionItem
               onPress={() => {
                 triggerHaptic(HapticFeedbackTypes.selection).then();
-                navigate('QuestionDetail', {questionId: item.id});
+                navigate('QuestionDetail', {
+                  questionId: item.id,
+                  responseCount: item.question_metadata?.response_count || 0,
+                  isOwner: item.user_id === user?.id,
+                });
               }}
               username={item.user_metadata?.username || 'Anonymous'}
+              userId={item.user_id}
               question={item.question}
               answerCount={item.question_metadata?.response_count || 0}
               voteCount={item.question_metadata?.upvote_count || 0}

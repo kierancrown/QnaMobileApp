@@ -1,13 +1,15 @@
 import React, {forwardRef, useImperativeHandle} from 'react';
 import {Box} from './';
-import FastImage, {ImageStyle} from 'react-native-fast-image';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useProfilePicture} from 'app/hooks/useProfilePicture';
-import {Image, StyleProp} from 'react-native';
+import {ImageStyle, StyleProp} from 'react-native';
+
+import {FasterImageView} from '@candlefinance/faster-image';
 
 interface AvatarProps {
-  userId?: number;
+  userId?: string;
+  defaultAvatar?: boolean;
   size?: keyof Theme['iconSizes'];
 }
 
@@ -20,13 +22,14 @@ const styles: StyleProp<ImageStyle> = {
   height: '100%',
 };
 
+const DEFAULT_AVATAR =
+  'https://api.askthat.co/storage/v1/object/public/user_profile_pictures/default.jpg';
+
 const Avatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
-  const {userId, size} = props;
+  const {userId, size, defaultAvatar} = props;
   const theme = useTheme<Theme>();
-  const {profilePicture, refreshProfilePicture} = useProfilePicture(
-    userId,
-    theme.iconSizes[size ?? 'xl'],
-  );
+  const {profilePicture, profilePictureThumbhash, refreshProfilePicture} =
+    useProfilePicture(userId, theme.iconSizes[size ?? 'xl']);
 
   useImperativeHandle(ref, () => ({
     refresh: () => {
@@ -41,23 +44,22 @@ const Avatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
       bg="cardBackground"
       width={size ? theme.iconSizes[size] : theme.iconSizes.xl}
       height={size ? theme.iconSizes[size] : theme.iconSizes.xl}>
-      {profilePicture == null ? (
-        <Image
-          // @ts-ignore
-          style={styles}
-          source={require('app/assets/images/avatar.jpg')}
-        />
-      ) : (
-        <FastImage
-          style={styles}
-          resizeMode="cover"
-          fallback
-          source={{
-            uri: profilePicture,
-            cache: FastImage.cacheControl.web,
-          }}
-        />
-      )}
+      <FasterImageView
+        style={styles}
+        onError={event => console.warn(event.nativeEvent.error)}
+        source={{
+          transitionDuration: 0.3,
+          cachePolicy: 'discWithCacheControl',
+          resizeMode: 'cover',
+          blurhash: profilePictureThumbhash,
+          progressiveLoadingEnabled: true,
+          showActivityIndicator: true,
+          failureImage: DEFAULT_AVATAR,
+          url: defaultAvatar
+            ? DEFAULT_AVATAR
+            : profilePicture ?? DEFAULT_AVATAR,
+        }}
+      />
     </Box>
   );
 });

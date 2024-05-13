@@ -18,10 +18,13 @@ import Animated, {
 import {Alert, Pressable} from 'react-native';
 import Username from './Username';
 import {supabase} from 'app/lib/supabase';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {HomeStackParamList} from 'app/navigation/HomeStack';
 
 interface QuestionItemProps {
   onPress: () => void;
   id: number;
+  userId: string;
   username: string;
   question: string;
   answerCount: number;
@@ -39,6 +42,7 @@ const ICON_SIZE = 13;
 const QuestionItem: FC<QuestionItemProps> = ({
   onPress,
   id,
+  userId,
   username,
   question,
   answerCount,
@@ -53,6 +57,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   const votes = formatNumber(voteCount);
   const answers = formatNumber(answerCount);
   const opacity = useSharedValue(1);
+  const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -112,7 +117,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
           rowGap="sY"
           px="m"
           py="sY"
-          my="xxsY"
+          my="xxxxxs"
           backgroundColor="cardBackground">
           <Text variant="questionBody">
             {question}
@@ -141,6 +146,12 @@ const QuestionItem: FC<QuestionItemProps> = ({
                 fontWeight="600"
                 username={username}
                 isVerified={userVerified}
+                onPress={() => {
+                  navigate('Profile', {
+                    userId,
+                    displayBackButton: true,
+                  });
+                }}
               />
             </HStack>
             <HStack alignItems="center" columnGap="s">

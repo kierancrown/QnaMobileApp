@@ -51,6 +51,7 @@ const SplashScreen = ({onDismiss}: SplashScreenProps) => {
         <View style={styles.animation}>
           <Lottie
             source={LottieAnimation}
+            speed={1.5}
             autoPlay
             loop={false}
             resizeMode="cover"

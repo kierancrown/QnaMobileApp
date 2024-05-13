@@ -137,7 +137,7 @@ const theme = createTheme({
     inactiveAction: palette.Grey[900],
     heartAction: palette['french-rose'][600],
     successfulAction: palette.successfulActionDark,
-    destructiveAction: palette.destructiveActionDark,
+    destructiveAction: palette.destructiveActionLight,
     bookmarkAction: palette.cerulean[600],
     // Backgrounds
     mainBackground: palette.black,
@@ -167,7 +167,8 @@ const theme = createTheme({
     // Outline
     outline: palette.dividerLight,
     // Skeleton
-    skeleton: palette.skeletonDark,
+    skeletonBackground: palette.cardBackgroundDark,
+    skeleton: '#52525b',
     // Common
     white: palette.white,
     black: palette.black,
@@ -183,6 +184,8 @@ const theme = createTheme({
     xlMinus: s(-32),
     xxlMinus: s(-48),
     none: 0,
+    xxxxxs: s(0.5),
+    xxxxs: s(1),
     xxxs: s(2),
     xxxsY: vs(2),
     xxs: s(4),
@@ -218,6 +221,7 @@ const theme = createTheme({
     xs: s(8),
     s: s(12),
     m: s(16),
+    intermediate: s(20),
     l: s(24),
     xl: s(32),
     ll: s(36),
@@ -227,6 +231,22 @@ const theme = createTheme({
     logo: s(120),
   },
   textVariants: {
+    markdownH1: {
+      fontFamily: fonts.black,
+      fontSize: mvs(34),
+    },
+    markdownH2: {
+      fontFamily: fonts.bold,
+      fontSize: mvs(26),
+    },
+    markdownH3: {
+      fontFamily: fonts.bold,
+      fontSize: mvs(20),
+    },
+    markdownBullet: {
+      fontFamily: fonts.semiBold,
+      fontSize: mvs(16),
+    },
     extraLargeHeader: {
       fontWeight: '900',
       fontSize: mvs(56),
@@ -318,6 +338,7 @@ const theme = createTheme({
     defaults: {
       fontFamily: fonts.regular,
       color: 'foreground',
+      fontSize: mvs(16),
     },
   },
 });
