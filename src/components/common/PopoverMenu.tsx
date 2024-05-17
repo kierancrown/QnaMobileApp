@@ -5,7 +5,10 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native-gesture-handler';
-import Popover from 'react-native-popover-view';
+import Popover, {
+  PopoverMode,
+  PopoverPlacement,
+} from 'react-native-popover-view';
 import VStack from './VStack';
 import {Platform, Pressable, StyleSheet} from 'react-native';
 import HStack from './HStack';
@@ -38,6 +41,8 @@ interface PopoverMenuProps extends TouchableOpacityProps {
   triggerComponent: React.ReactNode;
   minWidth?: number;
   items: PopoverMenuItemsProps;
+  mode?: PopoverMode;
+  placement?: PopoverPlacement;
 }
 
 const PopoverMenuItem: FC<PopoverMenuItemProps> = item => {
@@ -92,6 +97,8 @@ const PopoverMenu: FC<PopoverMenuProps> = ({
   triggerComponent,
   items,
   minWidth,
+  mode = PopoverMode.RN_MODAL,
+  placement = PopoverPlacement.AUTO,
   ...rest
 }) => {
   const theme = useAppTheme();
@@ -103,6 +110,8 @@ const PopoverMenu: FC<PopoverMenuProps> = ({
   return (
     <Popover
       isVisible={popoverOpen}
+      mode={mode}
+      placement={placement}
       onRequestClose={() => setPopoverOpen(false)}
       verticalOffset={verticalOffset}
       displayAreaInsets={insets}

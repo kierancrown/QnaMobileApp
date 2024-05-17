@@ -157,6 +157,9 @@ const theme = createTheme({
     // Input
     inputBackground: palette.inputBackgroundDark,
     inputPlaceholder: palette.inputPlaceholderDark,
+    lowCharLimit: '#d97706',
+    reallyLowCharLimit: '#ea580c',
+    minusCharLimit: '#dc2626',
     // Segment control
     segmentBackground: palette.segmentBackgroundDark,
     segmentItemBackground: palette.segmentItemBackgroundDark,

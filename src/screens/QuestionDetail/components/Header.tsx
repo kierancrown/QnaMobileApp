@@ -1,6 +1,6 @@
 import {Header} from '@codeherence/react-native-header';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
-import {Center, Text} from 'app/components/common';
+import {Center, HStack, Text} from 'app/components/common';
 import {useAppTheme} from 'app/styles/theme';
 import React, {useMemo} from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -8,6 +8,7 @@ import {SharedValue} from 'react-native-reanimated';
 
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
 import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
+import SortIcon from 'app/assets/icons/actions/Sort.svg';
 
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 import {formatNumber} from 'app/utils/numberFormatter';
@@ -95,20 +96,35 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         </Center>
       }
       headerRight={
-        <PopoverMenu
-          accessibilityLabel="Open Question Options"
-          accessibilityRole="button"
-          accessibilityHint="Report or hide this question"
-          triggerComponent={
-            <Center py="xxsY" px="xxs">
-              <ElipsisIcon
-                width={theme.iconSizes.l}
-                height={theme.iconSizes.l}
-              />
-            </Center>
-          }
-          items={menuItems}
-        />
+        <HStack alignItems="center" columnGap="xs">
+          <PopoverMenu
+            accessibilityLabel="Sort answers by"
+            accessibilityRole="button"
+            triggerComponent={
+              <Center py="xxsY" px="xxs">
+                <SortIcon
+                  width={theme.iconSizes.l}
+                  height={theme.iconSizes.l}
+                />
+              </Center>
+            }
+            items={menuItems}
+          />
+          <PopoverMenu
+            accessibilityLabel="Open Question Options"
+            accessibilityRole="button"
+            accessibilityHint="Report or hide this question"
+            triggerComponent={
+              <Center py="xxsY" px="xxs">
+                <ElipsisIcon
+                  width={theme.iconSizes.l}
+                  height={theme.iconSizes.l}
+                />
+              </Center>
+            }
+            items={menuItems}
+          />
+        </HStack>
       }
     />
   );

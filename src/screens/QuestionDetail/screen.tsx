@@ -50,6 +50,7 @@ import Username from 'app/components/Username';
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import HeaderComponent from './components/Header';
 import Skeleton from 'react-native-reanimated-skeleton';
+import {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 
 const ICON_SIZE = 13;
 
@@ -234,6 +235,10 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   );
 };
 
+const ESTIMATED_PAGE_SIZE = ((SCREEN_HEIGHT * 2) / 100).toFixed(0);
+
+console.log({ESTIMATED_PAGE_SIZE});
+
 const QuestionDetail: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme<Theme>();
@@ -278,7 +283,8 @@ const QuestionDetail: FC = () => {
     `,
       )
       .eq('question_id', questionId)
-      .order('created_at', {ascending: false});
+      .order('created_at', {ascending: false})
+      .range(0, ESTIMATED_PAGE_SIZE);
     if (error) {
       Alert.alert('Error', error.message);
     } else {
@@ -288,6 +294,35 @@ const QuestionDetail: FC = () => {
   };
 
   useMount(refreshResponses);
+
+  const fetchNextPage = async () => {
+    const {data, error} = await supabase
+      .from('responses')
+      .select(
+        `
+    *,
+    user_metadata (
+      verified,
+      profile_picture (
+        path,
+        thumbhash
+      ),
+      username
+    )
+  `,
+      )
+      .eq('question_id', questionId)
+      .order('created_at', {ascending: false})
+      .range(responses.length, responses.length + ESTIMATED_PAGE_SIZE);
+
+    if (error) {
+      Alert.alert('Error', error.message);
+    }
+
+    if (data) {
+      setResponses([...responses, ...data]);
+    }
+  };
 
   const showAnswer = useCallback(() => {
     if (!user) {
@@ -382,6 +417,7 @@ const QuestionDetail: FC = () => {
           paddingBottom: bottomListPadding,
         }}
         estimatedItemSize={100}
+        onEndReached={fetchNextPage}
         renderItem={({item}) => (
           <Pressable
             onLongPress={() => {
