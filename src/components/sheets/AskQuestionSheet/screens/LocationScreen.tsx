@@ -3,17 +3,17 @@ import {
   useFocusEffect,
   useNavigation,
 } from '@react-navigation/native';
-import {Center, Flex, HStack, Text, VStack} from 'app/components/common';
+import {Box, Center, Flex, HStack, Text, VStack} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
 import {
   setActionButton,
   setSelectedLocation,
 } from 'app/redux/slices/askSheetSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {ActivityIndicator, TextInput} from 'react-native';
+import {ActivityIndicator, StyleProp, TextInput, ViewStyle} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
@@ -22,6 +22,8 @@ import useMount from 'app/hooks/useMount';
 import {FlashList} from '@shopify/flash-list';
 import SelectionItem from 'app/components/common/SelectionItem';
 import {AskQuestionStackParamList} from '..';
+import {useAppTheme} from 'app/styles/theme';
+import LinearGradient from 'react-native-linear-gradient';
 
 const LocationsScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,6 +35,15 @@ const LocationsScreen: FC = () => {
   const [results, setResults] = useState<NearGeoLocation[]>([]);
   const {goBack} = useNavigation<NavigationProp<AskQuestionStackParamList>>();
   const searchInput = useRef<TextInput>(null);
+  const theme = useAppTheme();
+
+  const listHeaderGradientStyles: StyleProp<ViewStyle> = useMemo(
+    () => ({
+      width: '100%',
+      height: theme.spacing.xlY,
+    }),
+    [theme],
+  );
 
   useFocusEffect(() => {
     dispatch(setActionButton('back'));
@@ -47,7 +58,14 @@ const LocationsScreen: FC = () => {
             lat: info.coords.latitude,
             long: info.coords.longitude,
           });
-          setResults(data);
+          if (
+            selectedLocation &&
+            !data.find(d => d.id === selectedLocation?.id)
+          ) {
+            setResults([selectedLocation, ...data]);
+          } else {
+            setResults(data);
+          }
         })();
       });
     } catch (error) {
@@ -77,16 +95,27 @@ const LocationsScreen: FC = () => {
   }, [searchTerm]);
 
   return (
-    <VStack flex={1} py="mY">
-      <VStack px="m">
+    <VStack flex={1}>
+      <VStack px="s" pt="mY">
         <Input
           placeholder="Search for a location"
           ref={searchInput}
           value={searchTerm}
           onChangeText={setSearchTerm}
+          returnKeyType="search"
+          insideBottomSheet
         />
       </VStack>
-      <Flex pt="mY">
+
+      <Flex>
+        <Box position="absolute" top={0} left={0} right={0} zIndex={10}>
+          <LinearGradient
+            colors={[theme.colors.mainBackground, theme.colors.none]}
+            start={{x: 0, y: 0}}
+            end={{x: 0, y: 1}}
+            style={listHeaderGradientStyles}
+          />
+        </Box>
         {results.length === 0 ? (
           <Center flex={1}>
             <HStack alignItems="center" columnGap="xs">
@@ -99,6 +128,9 @@ const LocationsScreen: FC = () => {
             data={results}
             keyExtractor={item => item.id.toString()}
             keyboardShouldPersistTaps="always"
+            contentContainerStyle={{
+              paddingVertical: theme.spacing.mY,
+            }}
             estimatedItemSize={66}
             renderItem={({item}) => (
               <SelectionItem

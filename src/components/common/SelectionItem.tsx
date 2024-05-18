@@ -26,12 +26,12 @@ const SelectionItem: FC<SelectionItemProps> = ({
   selected,
 }) => {
   const theme = useAppTheme();
-  const bgAnimation = useSharedValue(0);
+  const bgAnimation = useSharedValue(selected ? 1 : 0);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
       backgroundColor: interpolateColor(
-        selected ? withTiming(1) : bgAnimation.value,
+        bgAnimation.value,
         [0, 1],
         [theme.colors.none, theme.colors.cardBackground],
       ),
@@ -39,12 +39,18 @@ const SelectionItem: FC<SelectionItemProps> = ({
   }, [selected]);
 
   const onPressIn = () => {
+    if (selected) {
+      return;
+    }
     bgAnimation.value = withTiming(1, {
       duration: 66,
     });
   };
 
   const onPressOut = () => {
+    if (selected) {
+      return;
+    }
     bgAnimation.value = withTiming(0, {
       duration: 66,
     });
@@ -63,13 +69,13 @@ const SelectionItem: FC<SelectionItemProps> = ({
           alignItems="center"
           paddingVertical={subtitle ? 'xsY' : 'mY'}
           paddingHorizontal="s">
-          <HStack alignItems="center" columnGap="xs">
+          <HStack alignItems="center" columnGap="xs" flex={1}>
             <VStack rowGap="xxsY">
-              <Text variant="body" color={titleColor}>
+              <Text variant="body" numberOfLines={1} color={titleColor}>
                 {title}
               </Text>
               {subtitle && (
-                <Text variant="smallBody" color="cardText">
+                <Text variant="smallBody" numberOfLines={1} color="cardText">
                   {subtitle}
                 </Text>
               )}

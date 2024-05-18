@@ -222,6 +222,13 @@ const AskSheetContent: FC = () => {
                   <BottomSheetTextInput
                     blurOnSubmit={false}
                     multiline
+                    onKeyPress={({nativeEvent}) => {
+                      if (nativeEvent.key === 'Backspace') {
+                        if (questionDetail.length === 0) {
+                          focusInput();
+                        }
+                      }
+                    }}
                     placeholder="Add extra info here... (optional)"
                     keyboardType="default"
                     editable={!isLoading}
