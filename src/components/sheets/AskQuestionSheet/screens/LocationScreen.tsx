@@ -1,29 +1,31 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {Center, HStack, Text, VStack} from 'app/components/common';
+import {Center, Flex, HStack, Text, VStack} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
 import {setActionButton} from 'app/redux/slices/askSheetSlice';
 import {AppDispatch} from 'app/redux/store';
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Alert} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
 } from 'app/hooks/useGeoLocationSearch';
 import useMount from 'app/hooks/useMount';
+import {FlashList} from '@shopify/flash-list';
+import SettingsItem from 'app/screens/Settings/components/SettingsItem';
 
 const LocationsScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const {findNearestLocation} = useGeoLocationSearch();
+  const {findNearestLocation, searchLocations} = useGeoLocationSearch();
   const [results, setResults] = useState<NearGeoLocation[]>([]);
 
   useFocusEffect(() => {
     dispatch(setActionButton('back'));
   });
 
-  useMount(() => {
+  const getCurrent = () => {
     try {
       Geolocation.getCurrentPosition(info => {
         (async () => {
@@ -38,16 +40,32 @@ const LocationsScreen: FC = () => {
     } catch (error) {
       console.log(error);
     }
-  });
+  };
+
+  useMount(getCurrent);
+
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      (async () => {
+        const data = await searchLocations(searchTerm);
+        setResults(data);
+      })();
+    } else {
+      getCurrent();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
 
   return (
     <VStack flex={1} py="mY">
-      <VStack flex={1} px="m">
+      <VStack px="m">
         <Input
           placeholder="Search for a location"
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
+      </VStack>
+      <Flex pt='mY'>
         {results.length === 0 ? (
           <Center flex={1}>
             <HStack alignItems="center" columnGap="xs">
@@ -56,15 +74,21 @@ const LocationsScreen: FC = () => {
             </HStack>
           </Center>
         ) : (
-          <VStack flex={1}>
-            {results.map(r => (
-              <Text key={r.id} variant="headline" my="xxsY">
-                {r.name}
-              </Text>
-            ))}
-          </VStack>
+          <FlashList
+            data={results}
+            keyExtractor={item => item.id.toString()}
+            estimatedItemSize={66}
+            renderItem={({item}) => (
+              <SettingsItem
+                title={item.name}
+                onPress={() => {
+                  Alert.alert('hi');
+                }}
+              />
+            )}
+          />
         )}
-      </VStack>
+      </Flex>
     </VStack>
   );
 };

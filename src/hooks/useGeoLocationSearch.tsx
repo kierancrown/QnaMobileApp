@@ -28,5 +28,19 @@ export const useGeoLocationSearch = () => {
     return data ?? [];
   };
 
-  return {findNearestLocation};
+  const searchLocations = async (searchTerm: string) => {
+    const {data: locations, error: err} = await supabase
+      .from('geolocations')
+      .select('*')
+      .ilike('name', `%${searchTerm}%`)
+      .limit(10);
+
+    if (err) {
+      throw err;
+    }
+
+    return locations ?? [];
+  };
+
+  return {findNearestLocation, searchLocations};
 };
