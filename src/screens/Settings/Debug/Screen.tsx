@@ -9,6 +9,7 @@ import SectionHeader from '../components/SectionHeader';
 import {Text} from 'app/components/common';
 import {useNotification} from 'app/context/PushNotificationContext';
 import useMount from 'app/hooks/useMount';
+// import {clearCache} from '@candlefinance/faster-image';
 
 const SettingsDebugScreen = () => {
   const theme = useAppTheme();
@@ -23,6 +24,10 @@ const SettingsDebugScreen = () => {
     })();
   });
 
+  const clearCacheHandler = () => {
+    // clearCache();
+  };
+
   return (
     <ScrollViewWithHeaders
       HeaderComponent={HeaderComponent}
@@ -32,9 +37,19 @@ const SettingsDebugScreen = () => {
       }}>
       <SectionHeader title="Notifications" />
       <SettingsItem title="Resend FCM Token" onPress={() => {}} />
-      <Text variant="smallBody" color="cardText" paddingHorizontal="s">
+      <Text
+        variant="smaller"
+        color="cardText"
+        paddingHorizontal="s"
+        marginBottom="mY">
         {fcmToken || 'Loading FCM token...'}
       </Text>
+      <SectionHeader title="Cache" />
+      <SettingsItem
+        title="Clear Cache"
+        titleColor="destructiveAction"
+        onPress={clearCacheHandler}
+      />
     </ScrollViewWithHeaders>
   );
 };
