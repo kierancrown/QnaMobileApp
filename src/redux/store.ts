@@ -14,6 +14,7 @@ import {
 import authSlice from './slices/authSlice';
 import globalSheetsSlice from './slices/globalSheetsSlice';
 import globalNotificationsSlice from './slices/notificationSlice';
+import askSheetSlice from './slices/askSheetSlice';
 
 const persistConfig = {
   key: 'persisted',
@@ -27,6 +28,7 @@ const reducers = combineReducers({
 
 const nonPersistedReducers = combineReducers({
   sheets: globalSheetsSlice,
+  askSheet: askSheetSlice,
 });
 
 const rootReducer = combineReducers({

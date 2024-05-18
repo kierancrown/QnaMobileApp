@@ -139,7 +139,7 @@ export default function TabStack() {
             component={SearchTabStack}
           />
           <Tab.Screen
-            name="InobxTab"
+            name="InboxTab"
             options={{
               tabBarIcon: InboxTabBarIcon,
               tabBarBadge:

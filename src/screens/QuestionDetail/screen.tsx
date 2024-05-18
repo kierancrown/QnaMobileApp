@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   Pressable,
   RefreshControl,
@@ -235,9 +236,10 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   );
 };
 
-const ESTIMATED_PAGE_SIZE = ((SCREEN_HEIGHT * 2) / 100).toFixed(0);
-
-console.log({ESTIMATED_PAGE_SIZE});
+const ESTIMATED_PAGE_SIZE = parseInt(
+  ((SCREEN_HEIGHT * 2) / 100).toFixed(0),
+  10,
+);
 
 const QuestionDetail: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -260,9 +262,11 @@ const QuestionDetail: FC = () => {
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
 
   const [responses, setResponses] = useState<Responses>([]);
+  const [loadingMoreResponses, setLoadingMoreResponses] = useState(false);
+  const [noMoreResponses, setNoMoreResponses] = useState(false);
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   // const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing] = useState(false);
   const [responsesLoading, setResponsesLoading] = useState(true);
 
   const refreshResponses = async () => {
@@ -296,6 +300,8 @@ const QuestionDetail: FC = () => {
   useMount(refreshResponses);
 
   const fetchNextPage = async () => {
+    setLoadingMoreResponses(true);
+    const prevCount = responses.length;
     const {data, error} = await supabase
       .from('responses')
       .select(
@@ -315,12 +321,25 @@ const QuestionDetail: FC = () => {
       .order('created_at', {ascending: false})
       .range(responses.length, responses.length + ESTIMATED_PAGE_SIZE);
 
+    setLoadingMoreResponses(false);
+
     if (error) {
       Alert.alert('Error', error.message);
+      return;
     }
 
     if (data) {
-      setResponses([...responses, ...data]);
+      const mergedData = [...responses, ...data];
+      if (mergedData.length <= prevCount) {
+        setNoMoreResponses(true);
+      } else {
+        if (noMoreResponses === true) {
+          setNoMoreResponses(false);
+        }
+        setResponses(mergedData);
+      }
+    } else {
+      setNoMoreResponses(true);
     }
   };
 
@@ -412,11 +431,31 @@ const QuestionDetail: FC = () => {
         }
         refreshing={responsesLoading}
         onRefresh={refreshResponses}
+        ListFooterComponent={
+          loadingMoreResponses ? (
+            <HStack my="xlY" justifyContent="center" columnGap="xs">
+              <ActivityIndicator size="small" />
+              <Text variant="medium" color="cardText">
+                Loading more responses...
+              </Text>
+            </HStack>
+          ) : noMoreResponses ? (
+            <VStack my="xlY" alignItems="center">
+              <Text variant="medium" color="cardText">
+                Insert cool statement here
+              </Text>
+              <Text variant="smallBody" color="cardText">
+                You've reached the end cheif
+              </Text>
+            </VStack>
+          ) : null
+        }
         contentContainerStyle={{
           paddingTop: theme.spacing.sY,
           paddingBottom: bottomListPadding,
         }}
         estimatedItemSize={100}
+        onEndReachedThreshold={0.5}
         onEndReached={fetchNextPage}
         renderItem={({item}) => (
           <Pressable

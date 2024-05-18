@@ -67,7 +67,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We need permission to access your camera</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>We need your location to post questions in your area</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to post questions in your area</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need permission to access your microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>

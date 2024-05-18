@@ -1,6 +1,6 @@
-import React, {FC, useCallback, useMemo, useRef, useState} from 'react';
+import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
-import Screen from './Content';
+import Screen from './screens/AskScreen';
 import {Alert, Keyboard, Pressable, StyleSheet} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Animated, {
@@ -8,17 +8,74 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import CustomBackground from '../../common/Sheets/Background';
 import CustomBackdrop from './Backdrop';
-import {Button, Center, Flex, HStack, Icon} from 'app/components/common';
+import {Button, Center, Flex, HStack, Icon, Text} from 'app/components/common';
 import {useAppTheme} from 'app/styles/theme';
+
 import CloseIcon from 'app/assets/icons/actions/Close.svg';
+import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
+
+import {
+  NavigationContainer,
+  DefaultTheme,
+  createNavigationContainerRef,
+} from '@react-navigation/native';
+import {
+  createStackNavigator,
+  StackNavigationOptions,
+  TransitionPresets,
+} from '@react-navigation/stack';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from 'app/redux/store';
+import {setSheetState} from 'app/redux/slices/askSheetSlice';
+import LocationsScreen from './screens/LocationScreen';
 
 interface AskQuestionSheetProps {
   open?: boolean;
   onClose?: () => void;
 }
+
+export type AskQuestionStackParamList = {
+  AskScreen: undefined;
+  LocationScreen: undefined;
+};
+
+export const navigationRef = createNavigationContainerRef();
+const Stack = createStackNavigator<AskQuestionStackParamList>();
+
+const Navigator: FC = () => {
+  const theme = useAppTheme();
+
+  const screenOptions = useMemo<StackNavigationOptions>(
+    () => ({
+      ...TransitionPresets.SlideFromRightIOS,
+      headerShown: false,
+      safeAreaInsets: {top: 0},
+    }),
+    [],
+  );
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      independent={true}
+      theme={{
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: theme.colors.mainBackground,
+        },
+      }}>
+      <Stack.Navigator screenOptions={screenOptions}>
+        <Stack.Screen name="AskScreen" component={Screen} />
+        <Stack.Screen name="LocationScreen" component={LocationsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   open = false,
@@ -27,9 +84,10 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const topSafeAreaInset = useSafeAreaInsets().top;
-
-  const [loading, setLoading] = useState(false);
-  const [canSubmit, setCanSubmit] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const {isLoading, canSubmit, actionButton} = useSelector(
+    (state: RootState) => state.nonPersistent.askSheet,
+  );
 
   const theme = useAppTheme();
   const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
@@ -53,7 +111,11 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   );
 
   const onDismiss = () => {
-    sheetRef.current?.close();
+    if (actionButton === 'close') {
+      sheetRef.current?.close();
+    } else {
+      navigationRef.current?.goBack();
+    }
   };
 
   const buttonsContainerAnimatedStyle = useAnimatedStyle(() => ({
@@ -75,6 +137,18 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     ),
   }));
 
+  const askButtonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(actionButton === 'close' ? 1 : 0, {
+        duration: 200,
+      }),
+    };
+  }, [actionButton]);
+
+  useEffect(() => {
+    dispatch(setSheetState(open ? 'open' : 'closed'));
+  }, [dispatch, open]);
+
   return (
     <>
       <Animated.View
@@ -86,22 +160,28 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         <HStack alignItems="center" height={BUTTON_CONTAINER_HEIGHT} px="m">
           <Pressable hitSlop={16} onPress={onDismiss}>
             <Center>
-              <Icon icon={<CloseIcon />} color="foreground" size="l" />
+              {actionButton === 'close' ? (
+                <Icon icon={<CloseIcon />} color="foreground" size="l" />
+              ) : (
+                <Icon icon={<BackIcon />} color="foreground" size="l" />
+              )}
             </Center>
           </Pressable>
           <Flex />
-          <Button
-            title="Ask"
-            disabled={!canSubmit}
-            py="none"
-            height={BUTTON_CONTAINER_HEIGHT}
-            justifyContent="center"
-            borderRadius="pill"
-            px="l"
-            onPress={() => {
-              Alert.alert('hi');
-            }}
-          />
+          <Animated.View style={askButtonAnimatedStyle}>
+            <Button
+              title="Ask"
+              disabled={!canSubmit}
+              py="none"
+              height={BUTTON_CONTAINER_HEIGHT}
+              justifyContent="center"
+              borderRadius="pill"
+              px="l"
+              onPress={() => {
+                Alert.alert('hi');
+              }}
+            />
+          </Animated.View>
         </HStack>
       </Animated.View>
       <BottomSheet
@@ -110,7 +190,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         ref={sheetRef}
         animateOnMount={false}
         animatedIndex={animatedPosition}
-        enablePanDownToClose={!loading}
+        enablePanDownToClose={!isLoading}
         keyboardBehavior="extend"
         maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
         onChange={handleSheetChanges}
@@ -122,13 +202,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
             Keyboard.dismiss();
           }
         }}>
-        <Screen
-          open={open}
-          onLoading={setLoading}
-          animatedIndex={animatedPosition}
-          onDismiss={onDismiss}
-          onCanSubmit={setCanSubmit}
-        />
+        <Navigator />
       </BottomSheet>
     </>
   );
