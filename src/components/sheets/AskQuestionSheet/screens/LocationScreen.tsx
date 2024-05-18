@@ -1,25 +1,37 @@
-import {useFocusEffect} from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {Center, Flex, HStack, Text, VStack} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
-import {setActionButton} from 'app/redux/slices/askSheetSlice';
-import {AppDispatch} from 'app/redux/store';
+import {
+  setActionButton,
+  setSelectedLocation,
+} from 'app/redux/slices/askSheetSlice';
+import {AppDispatch, RootState} from 'app/redux/store';
 import React, {FC, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {ActivityIndicator, Alert} from 'react-native';
+import {ActivityIndicator} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
 } from 'app/hooks/useGeoLocationSearch';
 import useMount from 'app/hooks/useMount';
 import {FlashList} from '@shopify/flash-list';
-import SettingsItem from 'app/screens/Settings/components/SettingsItem';
+import SelectionItem from 'app/components/common/SelectionItem';
+import {AskQuestionStackParamList} from '..';
 
 const LocationsScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const selectedLocation = useSelector(
+    (state: RootState) => state.nonPersistent.askSheet.selectedLocation,
+  );
   const [searchTerm, setSearchTerm] = useState<string>('');
   const {findNearestLocation, searchLocations} = useGeoLocationSearch();
   const [results, setResults] = useState<NearGeoLocation[]>([]);
+  const {goBack} = useNavigation<NavigationProp<AskQuestionStackParamList>>();
 
   useFocusEffect(() => {
     dispatch(setActionButton('back'));
@@ -48,6 +60,7 @@ const LocationsScreen: FC = () => {
     if (searchTerm.length > 2) {
       (async () => {
         const data = await searchLocations(searchTerm);
+        // @ts-ignore
         setResults(data);
       })();
     } else {
@@ -65,7 +78,7 @@ const LocationsScreen: FC = () => {
           onChangeText={setSearchTerm}
         />
       </VStack>
-      <Flex pt='mY'>
+      <Flex pt="mY">
         {results.length === 0 ? (
           <Center flex={1}>
             <HStack alignItems="center" columnGap="xs">
@@ -79,10 +92,12 @@ const LocationsScreen: FC = () => {
             keyExtractor={item => item.id.toString()}
             estimatedItemSize={66}
             renderItem={({item}) => (
-              <SettingsItem
+              <SelectionItem
                 title={item.name}
-                onPress={() => {
-                  Alert.alert('hi');
+                selected={selectedLocation?.id === item.id}
+                onSelected={() => {
+                  dispatch(setSelectedLocation(item));
+                  goBack();
                 }}
               />
             )}

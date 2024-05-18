@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import CustomBackground from '../../common/Sheets/Background';
 import CustomBackdrop from './Backdrop';
-import {Button, Center, Flex, HStack, Icon, Text} from 'app/components/common';
+import {Button, Center, Flex, HStack, Icon} from 'app/components/common';
 import {useAppTheme} from 'app/styles/theme';
 
 import CloseIcon from 'app/assets/icons/actions/Close.svg';

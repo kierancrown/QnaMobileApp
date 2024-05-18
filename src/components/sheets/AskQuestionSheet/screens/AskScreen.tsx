@@ -79,7 +79,7 @@ const AskSheetContent: FC = () => {
   const {navigate} = useNavigation<NavigationProp<AskQuestionStackParamList>>();
   const {keyboardOpen} = useKeyboardStatus();
   const dispatch = useDispatch<AppDispatch>();
-  const {isLoading, sheetState} = useSelector(
+  const {isLoading, sheetState, selectedLocation} = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,
   );
 
@@ -342,9 +342,11 @@ const AskSheetContent: FC = () => {
                   height={ACTION_ICON_SIZE}
                   fill={theme.colors.inputPlaceholder}
                 />
-                <Text variant="smallBody" color="inputPlaceholder">
-                  {''}
-                </Text>
+                {selectedLocation && (
+                  <Text variant="smallBody" color="inputPlaceholder">
+                    {selectedLocation.name}
+                  </Text>
+                )}
               </HStack>
             </TouchableOpacity>
             <Flex />

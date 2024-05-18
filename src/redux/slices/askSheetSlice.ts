@@ -1,4 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {NearGeoLocation} from 'app/hooks/useGeoLocationSearch';
 import {SharedValue} from 'react-native-reanimated';
 
 export interface AskSheetState {
@@ -7,6 +8,7 @@ export interface AskSheetState {
   canSubmit: boolean;
   sheetState: 'closing' | 'closed' | 'open' | 'submitting';
   actionButton: 'close' | 'back';
+  selectedLocation?: NearGeoLocation;
 }
 
 const initialState: AskSheetState = {
@@ -32,6 +34,12 @@ export const askSheetSlice = createSlice({
     setSheetState: (state, action: {payload: AskSheetState['sheetState']}) => {
       state.sheetState = action.payload;
     },
+    setSelectedLocation: (
+      state,
+      action: {payload: AskSheetState['selectedLocation']},
+    ) => {
+      state.selectedLocation = action.payload;
+    },
     setActionButton: (
       state,
       action: {payload: AskSheetState['actionButton']},
@@ -47,6 +55,7 @@ export const {
   setCanSubmit,
   setSheetState,
   setActionButton,
+  setSelectedLocation,
 } = askSheetSlice.actions;
 
 export default askSheetSlice.reducer;
