@@ -1,5 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {PollOptionType} from 'app/components/sheets/AskQuestionSheet/components/Poll';
 import {NearGeoLocation} from 'app/hooks/useGeoLocationSearch';
+import {Asset} from 'react-native-image-picker';
 import {SharedValue} from 'react-native-reanimated';
 
 export interface AskSheetState {
@@ -9,6 +11,11 @@ export interface AskSheetState {
   sheetState: 'closing' | 'closed' | 'open' | 'submitting';
   actionButton: 'close' | 'back';
   selectedLocation?: NearGeoLocation;
+
+  question: string;
+  questionDetail: string;
+  questionMedia: Asset[];
+  questionPoll: PollOptionType[];
 }
 
 const initialState: AskSheetState = {
@@ -16,6 +23,10 @@ const initialState: AskSheetState = {
   canSubmit: false,
   sheetState: 'closed',
   actionButton: 'close',
+  question: '',
+  questionDetail: '',
+  questionMedia: [],
+  questionPoll: [],
 };
 
 export const askSheetSlice = createSlice({
@@ -46,6 +57,19 @@ export const askSheetSlice = createSlice({
     ) => {
       state.actionButton = action.payload;
     },
+    setQuestion: (state, action: {payload: string}) => {
+      state.question = action.payload;
+    },
+    setQuestionDetail: (state, action: {payload: string}) => {
+      state.questionDetail = action.payload;
+    },
+    setQuestionMedia: (state, action: {payload: Asset[]}) => {
+      state.questionMedia = action.payload;
+    },
+    setQuestionPoll: (state, action: {payload: PollOptionType[]}) => {
+      state.questionPoll = action.payload;
+    },
+    resetSheet: () => initialState,
   },
 });
 
@@ -56,6 +80,11 @@ export const {
   setSheetState,
   setActionButton,
   setSelectedLocation,
+  setQuestion,
+  setQuestionDetail,
+  setQuestionMedia,
+  setQuestionPoll,
+  resetSheet,
 } = askSheetSlice.actions;
 
 export default askSheetSlice.reducer;

@@ -1,6 +1,11 @@
 import {SCREEN_WIDTH} from '@gorhom/bottom-sheet';
 import {Theme, useAppTheme} from 'app/styles/theme';
-import React, {FC} from 'react';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useCallback,
+} from 'react';
 import {
   TouchableOpacity,
   TouchableOpacityProps,
@@ -45,7 +50,11 @@ interface PopoverMenuProps extends TouchableOpacityProps {
   placement?: PopoverPlacement;
 }
 
-const PopoverMenuItem: FC<PopoverMenuItemProps> = item => {
+export interface PopoverRef {
+  closePopover: () => void;
+}
+
+const PopoverMenuItem: React.FC<PopoverMenuItemProps> = item => {
   const {triggerHaptic} = useHaptics();
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
@@ -93,64 +102,76 @@ const PopoverMenuItem: FC<PopoverMenuItemProps> = item => {
   );
 };
 
-const PopoverMenu: FC<PopoverMenuProps> = ({
-  triggerComponent,
-  items,
-  minWidth,
-  mode = PopoverMode.RN_MODAL,
-  placement = PopoverPlacement.AUTO,
-  ...rest
-}) => {
-  const theme = useAppTheme();
-  const POPOVER_MIN_WIDTH = minWidth ?? SCREEN_WIDTH / 2.5;
-  const insets = useSafeAreaInsets();
-  const verticalOffset = Platform.OS === 'android' ? -(insets.bottom + 5) : -5;
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
+const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
+  (
+    {
+      triggerComponent,
+      items,
+      minWidth,
+      mode = PopoverMode.RN_MODAL,
+      placement = PopoverPlacement.AUTO,
+      ...rest
+    },
+    ref,
+  ) => {
+    const theme = useAppTheme();
+    const POPOVER_MIN_WIDTH = minWidth ?? SCREEN_WIDTH / 2.5;
+    const insets = useSafeAreaInsets();
+    const verticalOffset =
+      Platform.OS === 'android' ? -(insets.bottom + 5) : -5;
+    const [popoverOpen, setPopoverOpen] = useState(false);
 
-  return (
-    <Popover
-      isVisible={popoverOpen}
-      mode={mode}
-      placement={placement}
-      onRequestClose={() => setPopoverOpen(false)}
-      verticalOffset={verticalOffset}
-      displayAreaInsets={insets}
-      arrowSize={{width: 0, height: 0}}
-      popoverStyle={{
-        backgroundColor: theme.colors.cardBackground,
-        borderRadius: theme.borderRadii.m,
-      }}
-      from={
-        <TouchableOpacity
-          hitSlop={8}
-          {...rest}
-          onPress={() => setPopoverOpen(true)}>
-          {triggerComponent}
-        </TouchableOpacity>
-      }>
-      <VStack rowGap="sY" py="sY" minWidth={POPOVER_MIN_WIDTH}>
-        {items.map((item, index) =>
-          item !== 'divider' ? (
-            <PopoverMenuItem
-              key={index}
-              {...item}
-              onClosePress={() => {
-                setPopoverOpen(false);
-              }}
-            />
-          ) : (
-            <Box
-              key={index}
-              height={StyleSheet.hairlineWidth}
-              backgroundColor="cardText"
-              opacity={0.5}
-              width="100%"
-            />
-          ),
-        )}
-      </VStack>
-    </Popover>
-  );
-};
+    const closePopover = useCallback(() => {
+      setPopoverOpen(false);
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+      closePopover,
+    }));
+
+    return (
+      <Popover
+        isVisible={popoverOpen}
+        mode={mode}
+        placement={placement}
+        onRequestClose={closePopover}
+        verticalOffset={verticalOffset}
+        displayAreaInsets={insets}
+        arrowSize={{width: 0, height: 0}}
+        popoverStyle={{
+          backgroundColor: theme.colors.cardBackground,
+          borderRadius: theme.borderRadii.m,
+        }}
+        from={
+          <TouchableOpacity
+            hitSlop={8}
+            {...rest}
+            onPress={() => setPopoverOpen(true)}>
+            {triggerComponent}
+          </TouchableOpacity>
+        }>
+        <VStack rowGap="sY" py="sY" minWidth={POPOVER_MIN_WIDTH}>
+          {items.map((item, index) =>
+            item !== 'divider' ? (
+              <PopoverMenuItem
+                key={index}
+                {...item}
+                onClosePress={closePopover}
+              />
+            ) : (
+              <Box
+                key={index}
+                height={StyleSheet.hairlineWidth}
+                backgroundColor="cardText"
+                opacity={0.5}
+                width="100%"
+              />
+            ),
+          )}
+        </VStack>
+      </Popover>
+    );
+  },
+);
 
 export default PopoverMenu;

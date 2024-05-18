@@ -31,12 +31,12 @@ import {
   launchCamera,
 } from 'react-native-image-picker';
 import PhotoPreview from '../components/PhotoPreview';
-import PollContainer, {PollOptionType} from '../components/Poll';
+import PollContainer from '../components/Poll';
 import Badge from 'app/components/common/Badge';
 import {percentHeight} from 'app/utils/size';
 import useKeyboardStatus from 'app/hooks/useKeyboardStatus';
 import {ms} from 'react-native-size-matters';
-import PopoverMenu from 'app/components/common/PopoverMenu';
+import PopoverMenu, {PopoverRef} from 'app/components/common/PopoverMenu';
 import {
   NavigationProp,
   useFocusEffect,
@@ -45,29 +45,40 @@ import {
 import {AskQuestionStackParamList} from '..';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from 'app/redux/store';
-import {setActionButton, setCanSubmit} from 'app/redux/slices/askSheetSlice';
+import {
+  setActionButton,
+  setCanSubmit,
+  setQuestion,
+  setQuestionDetail,
+  setQuestionMedia,
+  setQuestionPoll,
+} from 'app/redux/slices/askSheetSlice';
 
 const charLimit = 120;
 const extraInfoLimit = 1000;
 const ACTION_ICON_SIZE = ms(20);
 
 const AskSheetContent: FC = () => {
-  const [question, setQuestion] = useState('');
-  const [extraInfo, setExtraInfo] = useState('');
-  const [photos, setPhotos] = useState<Asset[]>([]);
-  const [pollOptions, setPollOptions] = useState<PollOptionType[]>([]);
-  const [showPoll, setShowPoll] = useState(false);
+  const {
+    isLoading,
+    sheetState,
+    selectedLocation,
+    question,
+    questionDetail,
+    questionMedia,
+    questionPoll,
+  } = useSelector((state: RootState) => state.nonPersistent.askSheet);
 
+  const [showPoll, setShowPoll] = useState(false);
   const [selectedInput, setSelectedInput] = useState<'question' | 'extraInfo'>(
     'question',
   );
-
   const charsRemaining = useMemo(
     () =>
       selectedInput === 'question'
         ? charLimit - question.length
-        : extraInfoLimit - extraInfo.length,
-    [question, selectedInput, extraInfo],
+        : extraInfoLimit - questionDetail.length,
+    [question, selectedInput, questionDetail],
   );
 
   // @ts-ignore
@@ -79,9 +90,7 @@ const AskSheetContent: FC = () => {
   const {navigate} = useNavigation<NavigationProp<AskQuestionStackParamList>>();
   const {keyboardOpen} = useKeyboardStatus();
   const dispatch = useDispatch<AppDispatch>();
-  const {isLoading, sheetState, selectedLocation} = useSelector(
-    (state: RootState) => state.nonPersistent.askSheet,
-  );
+  const mediaPopover = useRef<PopoverRef>(null);
 
   useEffect(() => {
     dispatch(setCanSubmit(question.trim().length > 0 && !isLoading));
@@ -106,8 +115,9 @@ const AskSheetContent: FC = () => {
   });
 
   const openPhotoLibrary = () => {
-    if (photos.length >= 5) {
+    if (questionMedia.length >= 5) {
       Alert.alert('Maximum photos reached', 'You can only add 5 photos');
+      mediaPopover.current?.closePopover();
       return;
     }
     launchImageLibrary(
@@ -115,17 +125,21 @@ const AskSheetContent: FC = () => {
         mediaType: 'photo',
         includeBase64: true,
         quality: 0.5,
-        selectionLimit: 5 - photos.length,
+        selectionLimit: 5 - questionMedia.length,
       },
       response => {
-        setPhotos([...photos, ...(response.assets ?? [])]);
+        dispatch(
+          setQuestionMedia([...questionMedia, ...(response.assets ?? [])]),
+        );
+        mediaPopover.current?.closePopover();
       },
     );
   };
 
   const openCamera = () => {
-    if (photos.length >= 5) {
+    if (questionMedia.length >= 5) {
       Alert.alert('Maximum photos reached', 'You can only add 5 photos');
+      mediaPopover.current?.closePopover();
       return;
     }
     launchCamera(
@@ -136,8 +150,11 @@ const AskSheetContent: FC = () => {
       },
       response => {
         if (response.assets) {
-          setPhotos([...photos, response.assets[0]]);
+          dispatch(
+            setQuestionMedia([...questionMedia, response.assets[0] as Asset]),
+          );
         }
+        mediaPopover.current?.closePopover();
       },
     );
   };
@@ -192,7 +209,9 @@ const AskSheetContent: FC = () => {
                       },
                     ]}
                     cursorColor={theme.colors.foreground}
-                    onChangeText={setQuestion}
+                    onChangeText={text => {
+                      dispatch(setQuestion(text));
+                    }}
                     value={question}
                   />
                 </Box>
@@ -217,23 +236,27 @@ const AskSheetContent: FC = () => {
                       },
                     ]}
                     cursorColor={theme.colors.foreground}
-                    onChangeText={setExtraInfo}
-                    value={extraInfo}
+                    onChangeText={text => {
+                      dispatch(setQuestionDetail(text));
+                    }}
+                    value={questionDetail}
                   />
                 </Box>
               </Pressable>
 
               {showPoll ? (
                 <PollContainer
-                  options={pollOptions}
-                  setOptions={setPollOptions}
+                  options={questionPoll}
+                  setOptions={options => {
+                    dispatch(setQuestionPoll(options));
+                  }}
                   onRemovePoll={() => {
                     setShowPoll(false);
-                    setPollOptions([]);
+                    dispatch(setQuestionPoll([]));
                   }}
                 />
               ) : (
-                photos.length > 0 && (
+                questionMedia.length > 0 && (
                   <Box height={percentHeight(20)}>
                     <NativeViewGestureHandler disallowInterruption={true}>
                       <ScrollView
@@ -244,9 +267,13 @@ const AskSheetContent: FC = () => {
                           paddingHorizontal: theme.spacing.m,
                         }}>
                         <PhotoPreview
-                          photos={photos}
+                          photos={questionMedia}
                           removePhoto={(index: number) => {
-                            setPhotos(photos.filter((_, i) => i !== index));
+                            dispatch(
+                              setQuestionMedia(
+                                questionMedia.filter((_, i) => i !== index),
+                              ),
+                            );
                           }}
                         />
                       </ScrollView>
@@ -262,10 +289,11 @@ const AskSheetContent: FC = () => {
         <SafeAreaView edges={!keyboardOpen ? ['bottom'] : []}>
           <HStack py="sY" px="s" alignItems="center" columnGap="m">
             <Badge
-              text={photos.length.toString()}
-              hidden={photos.length < 1}
+              text={questionMedia.length.toString()}
+              hidden={questionMedia.length < 1}
               size={'small'}>
               <PopoverMenu
+                ref={mediaPopover}
                 onLongPress={openPhotoLibrary}
                 triggerComponent={
                   <PhotosIcon
@@ -302,17 +330,17 @@ const AskSheetContent: FC = () => {
             </Badge>
 
             <Badge
-              text={pollOptions.length.toString()}
-              hidden={pollOptions.length < 1}
+              text={questionPoll.length.toString()}
+              hidden={questionPoll.length < 1}
               size={'small'}>
               <TouchableOpacity
                 hitSlop={8}
                 onPress={() => {
                   if (showPoll === false) {
-                    if (pollOptions.length <= 0) {
-                      setPollOptions([{name: 'Yes'}, {name: 'No'}]);
+                    if (questionPoll.length <= 0) {
+                      dispatch(setQuestionPoll([{name: 'Yes'}, {name: 'No'}]));
                     } else {
-                      setPollOptions([]);
+                      dispatch(setQuestionPoll([]));
                     }
                   }
                   setShowPoll(!showPoll);

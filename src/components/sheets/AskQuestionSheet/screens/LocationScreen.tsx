@@ -10,10 +10,10 @@ import {
   setSelectedLocation,
 } from 'app/redux/slices/askSheetSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, TextInput} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
@@ -32,6 +32,7 @@ const LocationsScreen: FC = () => {
   const {findNearestLocation, searchLocations} = useGeoLocationSearch();
   const [results, setResults] = useState<NearGeoLocation[]>([]);
   const {goBack} = useNavigation<NavigationProp<AskQuestionStackParamList>>();
+  const searchInput = useRef<TextInput>(null);
 
   useFocusEffect(() => {
     dispatch(setActionButton('back'));
@@ -56,6 +57,12 @@ const LocationsScreen: FC = () => {
 
   useMount(getCurrent);
 
+  useFocusEffect(() => {
+    if (searchInput.current) {
+      searchInput.current.focus();
+    }
+  });
+
   useEffect(() => {
     if (searchTerm.length > 2) {
       (async () => {
@@ -74,6 +81,7 @@ const LocationsScreen: FC = () => {
       <VStack px="m">
         <Input
           placeholder="Search for a location"
+          ref={searchInput}
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
@@ -90,10 +98,15 @@ const LocationsScreen: FC = () => {
           <FlashList
             data={results}
             keyExtractor={item => item.id.toString()}
+            keyboardShouldPersistTaps="always"
             estimatedItemSize={66}
             renderItem={({item}) => (
               <SelectionItem
                 title={item.name}
+                subtitle={
+                  // Remove the first part including the first comma
+                  item.display_name.split(',').slice(1).join(',')
+                }
                 selected={selectedLocation?.id === item.id}
                 onSelected={() => {
                   dispatch(setSelectedLocation(item));

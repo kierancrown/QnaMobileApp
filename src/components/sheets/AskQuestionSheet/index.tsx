@@ -1,7 +1,13 @@
 import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import Screen from './screens/AskScreen';
-import {Alert, Keyboard, Pressable, StyleSheet} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Animated, {
   Extrapolation,
@@ -30,7 +36,11 @@ import {
 } from '@react-navigation/stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from 'app/redux/store';
-import {setSheetState} from 'app/redux/slices/askSheetSlice';
+import {
+  resetSheet,
+  setLoading,
+  setSheetState,
+} from 'app/redux/slices/askSheetSlice';
 import LocationsScreen from './screens/LocationScreen';
 
 interface AskQuestionSheetProps {
@@ -111,6 +121,27 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   );
 
   const onDismiss = () => {
+    if (isLoading) {
+      Alert.alert(
+        'Cancel posting',
+        'Are you sure you want to cancel posting this question? You will lose this data.',
+        [
+          {
+            text: 'Yes',
+            style: 'destructive',
+            onPress: () => {
+              dispatch(resetSheet());
+              onClose?.();
+            },
+          },
+          {
+            text: 'No',
+            style: 'cancel',
+          },
+        ],
+      );
+      return;
+    }
     if (actionButton === 'close') {
       sheetRef.current?.close();
     } else {
@@ -149,6 +180,14 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     dispatch(setSheetState(open ? 'open' : 'closed'));
   }, [dispatch, open]);
 
+  const submit = async () => {
+    dispatch(setLoading(true));
+    setTimeout(() => {
+      dispatch(resetSheet());
+      onDismiss();
+    }, 2000);
+  };
+
   return (
     <>
       <Animated.View
@@ -160,7 +199,9 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         <HStack alignItems="center" height={BUTTON_CONTAINER_HEIGHT} px="m">
           <Pressable hitSlop={16} onPress={onDismiss}>
             <Center>
-              {actionButton === 'close' ? (
+              {isLoading ? (
+                <ActivityIndicator size="small" />
+              ) : actionButton === 'close' ? (
                 <Icon icon={<CloseIcon />} color="foreground" size="l" />
               ) : (
                 <Icon icon={<BackIcon />} color="foreground" size="l" />
@@ -170,16 +211,14 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
           <Flex />
           <Animated.View style={askButtonAnimatedStyle}>
             <Button
-              title="Ask"
+              title={isLoading ? 'Asking' : 'Ask'}
               disabled={!canSubmit}
               py="none"
               height={BUTTON_CONTAINER_HEIGHT}
               justifyContent="center"
               borderRadius="pill"
               px="l"
-              onPress={() => {
-                Alert.alert('hi');
-              }}
+              onPress={submit}
             />
           </Animated.View>
         </HStack>

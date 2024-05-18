@@ -541,6 +541,7 @@ export type Database = {
           lat: number;
           long: number;
           dist_meters: number;
+          display_name: string;
         }[];
       };
     };

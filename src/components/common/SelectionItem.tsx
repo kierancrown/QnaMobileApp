@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {Text, HStack, Center} from 'ui';
+import {Text, HStack, Center, VStack} from 'ui';
 import {Pressable} from 'react-native';
 import CheckIcon from 'app/assets/icons/check.svg';
 import {Theme, useAppTheme} from 'app/styles/theme';
@@ -12,6 +12,7 @@ import Animated, {
 
 interface SelectionItemProps {
   title: string;
+  subtitle?: string;
   titleColor?: keyof Theme['colors'];
   onSelected?: () => void;
   selected?: boolean;
@@ -19,6 +20,7 @@ interface SelectionItemProps {
 
 const SelectionItem: FC<SelectionItemProps> = ({
   title,
+  subtitle,
   titleColor,
   onSelected,
   selected,
@@ -59,12 +61,19 @@ const SelectionItem: FC<SelectionItemProps> = ({
           justifyContent="space-between"
           columnGap="s"
           alignItems="center"
-          paddingVertical="mY"
+          paddingVertical={subtitle ? 'xsY' : 'mY'}
           paddingHorizontal="s">
           <HStack alignItems="center" columnGap="xs">
-            <Text variant="body" color={titleColor}>
-              {title}
-            </Text>
+            <VStack rowGap="xxsY">
+              <Text variant="body" color={titleColor}>
+                {title}
+              </Text>
+              {subtitle && (
+                <Text variant="smallBody" color="cardText">
+                  {subtitle}
+                </Text>
+              )}
+            </VStack>
           </HStack>
           <Center>
             {selected && (

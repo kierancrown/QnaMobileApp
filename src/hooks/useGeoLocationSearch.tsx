@@ -6,6 +6,7 @@ export interface NearGeoLocation {
   lat: number;
   long: number;
   dist_meters: number;
+  display_name: string;
 }
 
 export const useGeoLocationSearch = () => {
@@ -28,7 +29,9 @@ export const useGeoLocationSearch = () => {
     return data ?? [];
   };
 
-  const searchLocations = async (searchTerm: string) => {
+  const searchLocations = async (
+    searchTerm: string,
+  ): Promise<NearGeoLocation[]> => {
     const {data: locations, error: err} = await supabase
       .from('geolocations')
       .select('*')
@@ -39,7 +42,16 @@ export const useGeoLocationSearch = () => {
       throw err;
     }
 
-    return locations ?? [];
+    return (
+      locations.map(location => ({
+        id: location.id,
+        name: location.name,
+        lat: 0,
+        long: 0,
+        dist_meters: 0,
+        display_name: location.display_name,
+      })) ?? []
+    );
   };
 
   return {findNearestLocation, searchLocations};
