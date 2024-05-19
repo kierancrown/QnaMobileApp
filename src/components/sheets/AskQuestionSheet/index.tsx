@@ -100,7 +100,6 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     isLoading,
     canSubmit,
     actionButton,
-    preventSwipeDown,
     question,
     questionDetail,
     questionMedia,
@@ -281,7 +280,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         ref={sheetRef}
         animateOnMount={false}
         animatedIndex={animatedPosition}
-        enablePanDownToClose={!isLoading && !preventSwipeDown}
+        enablePanDownToClose={!isLoading && actionButton === 'close'}
         keyboardBehavior="extend"
         maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
         onChange={handleSheetChanges}

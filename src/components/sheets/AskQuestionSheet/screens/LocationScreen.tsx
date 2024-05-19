@@ -7,7 +7,6 @@ import {Box, Center, Flex, HStack, Text, VStack} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
 import {
   setActionButton,
-  setPreventSwipeDown,
   setSelectedLocation,
 } from 'app/redux/slices/askSheetSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
@@ -77,14 +76,9 @@ const LocationsScreen: FC = () => {
   useMount(getCurrent);
 
   useFocusEffect(() => {
-    dispatch(setPreventSwipeDown(true));
     if (searchInput.current) {
       searchInput.current.focus();
     }
-
-    return () => {
-      dispatch(setPreventSwipeDown(false));
-    };
   });
 
   useEffect(() => {

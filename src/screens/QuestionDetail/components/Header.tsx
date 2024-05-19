@@ -19,6 +19,10 @@ import PopoverMenu, {
 import HideIcon from 'app/assets/icons/actions/Hide.svg';
 import ReportIcon from 'app/assets/icons/actions/ReportAlt.svg';
 import TrashIcon from 'app/assets/icons/actions/Trash.svg';
+import MostLikedIcon from 'app/assets/icons/actions/sortBy/heart.svg';
+import NewestIcon from 'app/assets/icons/actions/sortBy/Clock.svg';
+import OldestIcon from 'app/assets/icons/actions/sortBy/ClockOld.svg';
+import RandomIcon from 'app/assets/icons/actions/sortBy/shuffle.svg';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {
@@ -70,6 +74,49 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
     [isOwner],
   );
 
+  const sortByMenuItems: PopoverMenuItemsProps = [
+    {
+      title: 'Most Liked',
+      left: (
+        <MostLikedIcon
+          color={theme.colors.cardText}
+          width={theme.iconSizes.m}
+          height={theme.iconSizes.m}
+        />
+      ),
+    },
+    {
+      title: 'Newest',
+      left: (
+        <NewestIcon
+          color={theme.colors.cardText}
+          width={theme.iconSizes.m}
+          height={theme.iconSizes.m}
+        />
+      ),
+    },
+    {
+      title: 'Oldest',
+      left: (
+        <OldestIcon
+          color={theme.colors.cardText}
+          width={theme.iconSizes.m}
+          height={theme.iconSizes.m}
+        />
+      ),
+    },
+    {
+      title: 'Random',
+      left: (
+        <RandomIcon
+          color={theme.colors.cardText}
+          width={theme.iconSizes.m}
+          height={theme.iconSizes.m}
+        />
+      ),
+    },
+  ];
+
   return (
     <Header
       showNavBar={showNavBar}
@@ -108,7 +155,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
                 />
               </Center>
             }
-            items={menuItems}
+            items={sortByMenuItems}
           />
           <PopoverMenu
             accessibilityLabel="Open Question Options"
