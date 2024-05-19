@@ -35,7 +35,6 @@ import PollContainer from '../components/Poll';
 import Badge from 'app/components/common/Badge';
 import {percentHeight} from 'app/utils/size';
 import useKeyboardStatus from 'app/hooks/useKeyboardStatus';
-import {ms} from 'react-native-size-matters';
 import PopoverMenu, {PopoverRef} from 'app/components/common/PopoverMenu';
 import {
   NavigationProp,
@@ -56,7 +55,6 @@ import {
 
 const charLimit = 120;
 const extraInfoLimit = 1000;
-const ACTION_ICON_SIZE = ms(20);
 
 const AskSheetContent: FC = () => {
   const {
@@ -313,8 +311,8 @@ const AskSheetContent: FC = () => {
                 onLongPress={openPhotoLibrary}
                 triggerComponent={
                   <PhotosIcon
-                    width={ACTION_ICON_SIZE}
-                    height={ACTION_ICON_SIZE}
+                    width={theme.iconSizes.intermediate}
+                    height={theme.iconSizes.intermediate}
                     fill={theme.colors.inputPlaceholder}
                   />
                 }
@@ -323,8 +321,8 @@ const AskSheetContent: FC = () => {
                     title: 'Take a photo',
                     left: (
                       <CameraIcon
-                        width={ACTION_ICON_SIZE}
-                        height={ACTION_ICON_SIZE}
+                        width={theme.iconSizes.intermediate}
+                        height={theme.iconSizes.intermediate}
                         fill={theme.colors.inputPlaceholder}
                       />
                     ),
@@ -334,8 +332,8 @@ const AskSheetContent: FC = () => {
                     title: 'Choose from library',
                     left: (
                       <PhotosIcon
-                        width={ACTION_ICON_SIZE}
-                        height={ACTION_ICON_SIZE}
+                        width={theme.iconSizes.intermediate}
+                        height={theme.iconSizes.intermediate}
                         fill={theme.colors.inputPlaceholder}
                       />
                     ),
@@ -363,14 +361,14 @@ const AskSheetContent: FC = () => {
                 }}>
                 {showPoll ? (
                   <PollFilledIcon
-                    width={ACTION_ICON_SIZE}
-                    height={ACTION_ICON_SIZE}
+                    width={theme.iconSizes.intermediate}
+                    height={theme.iconSizes.intermediate}
                     fill={theme.colors.inputPlaceholder}
                   />
                 ) : (
                   <PollIcon
-                    width={ACTION_ICON_SIZE}
-                    height={ACTION_ICON_SIZE}
+                    width={theme.iconSizes.intermediate}
+                    height={theme.iconSizes.intermediate}
                     fill={theme.colors.inputPlaceholder}
                   />
                 )}
@@ -382,8 +380,8 @@ const AskSheetContent: FC = () => {
                 columnGap="xxxs"
                 marginLeft="xxxsMinus">
                 <LocationIcon
-                  width={ACTION_ICON_SIZE}
-                  height={ACTION_ICON_SIZE}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                   fill={theme.colors.inputPlaceholder}
                 />
                 {selectedLocation && (

@@ -90,9 +90,9 @@ const PopoverMenuItem: React.FC<PopoverMenuItemProps> = item => {
       onPressIn={onPressIn}
       onPressOut={onPressOut}>
       <Animated.View style={animatedStyle}>
-        <HStack px="s" columnGap="xs">
+        <HStack px="s" columnGap="xs" alignItems="center">
           {item.left}
-          <Text variant="smallBody" color={item.titleColor ?? 'cardText'}>
+          <Text variant="body" color={item.titleColor ?? 'cardText'}>
             {item.title}
           </Text>
           <Flex alignItems="flex-end">{item.right}</Flex>

@@ -28,7 +28,7 @@ type SettingsDocViewerScreenParams = {
 
 export type ProfileStackParamList = {
   Profile: ProfileScreenParams;
-  Settings: SettingsScreenParams;
+  Settings: SettingsScreenParams | undefined;
   SettingsHelp: SettingsScreenParams;
   SettingsAbout: SettingsScreenParams;
   SettingsDocumentViewer: SettingsScreenParams & SettingsDocViewerScreenParams;

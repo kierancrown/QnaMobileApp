@@ -41,8 +41,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
               right: (
                 <TrashIcon
                   color={theme.colors.destructiveAction}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
@@ -53,8 +53,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
               right: (
                 <HideIcon
                   fill={theme.colors.cardText}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
@@ -64,8 +64,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
               right: (
                 <ReportIcon
                   color={theme.colors.destructiveAction}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
@@ -80,8 +80,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       left: (
         <MostLikedIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.m}
-          height={theme.iconSizes.m}
+          width={theme.iconSizes.intermediate}
+          height={theme.iconSizes.intermediate}
         />
       ),
     },
@@ -90,8 +90,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       left: (
         <NewestIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.m}
-          height={theme.iconSizes.m}
+          width={theme.iconSizes.intermediate}
+          height={theme.iconSizes.intermediate}
         />
       ),
     },
@@ -100,8 +100,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       left: (
         <OldestIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.m}
-          height={theme.iconSizes.m}
+          width={theme.iconSizes.intermediate}
+          height={theme.iconSizes.intermediate}
         />
       ),
     },
@@ -110,8 +110,8 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       left: (
         <RandomIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.m}
-          height={theme.iconSizes.m}
+          width={theme.iconSizes.intermediate}
+          height={theme.iconSizes.intermediate}
         />
       ),
     },

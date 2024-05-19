@@ -51,32 +51,32 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         ? [
             {
               title: 'Your likes',
-              right: (
+              left: (
                 <LikedIcon
                   fill={theme.colors.cardText}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
             {
               title: 'Bookmarked',
-              right: (
+              left: (
                 <BookmarkedIcon
                   fill={theme.colors.cardText}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
             'divider',
             {
               title: 'App Settings',
-              right: (
+              left: (
                 <GearIcon
                   fill={theme.colors.cardText}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
               closeOnPress: true,
@@ -88,11 +88,11 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
             {
               title: 'Sign Out',
               titleColor: 'destructiveAction',
-              right: (
+              left: (
                 <LockIcon
                   color={theme.colors.destructiveAction}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
               onPress: () => {
@@ -105,33 +105,33 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
         : [
             {
               title: 'Ask Question',
-              right: (
+              left: (
                 <AskUserIcon
                   fill={theme.colors.cardText}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
             'divider',
             {
               title: 'Report Profile',
-              right: (
+              left: (
                 <FlagIcon
                   fill={theme.colors.cardText}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
             },
             {
               title: `Block ${username}`,
               titleColor: 'destructiveAction',
-              right: (
+              left: (
                 <BanIcon
                   color={theme.colors.destructiveAction}
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
                 />
               ),
               closeOnPress: true,
