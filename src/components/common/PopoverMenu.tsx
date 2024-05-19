@@ -130,46 +130,52 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
     }));
 
     return (
-      <Popover
-        isVisible={popoverOpen}
-        mode={mode}
-        placement={placement}
-        onRequestClose={closePopover}
-        verticalOffset={verticalOffset}
-        displayAreaInsets={insets}
-        arrowSize={{width: 0, height: 0}}
-        popoverStyle={{
-          backgroundColor: theme.colors.cardBackground,
-          borderRadius: theme.borderRadii.m,
-        }}
-        from={
-          <TouchableOpacity
-            hitSlop={8}
-            {...rest}
-            onPress={() => setPopoverOpen(true)}>
-            {triggerComponent}
-          </TouchableOpacity>
-        }>
-        <VStack rowGap="sY" py="sY" minWidth={POPOVER_MIN_WIDTH}>
-          {items.map((item, index) =>
-            item !== 'divider' ? (
-              <PopoverMenuItem
-                key={index}
-                {...item}
-                onClosePress={closePopover}
-              />
-            ) : (
-              <Box
-                key={index}
-                height={StyleSheet.hairlineWidth}
-                backgroundColor="cardText"
-                opacity={0.5}
-                width="100%"
-              />
-            ),
-          )}
-        </VStack>
-      </Popover>
+      <Box
+        onStartShouldSetResponder={() => true}
+        onTouchEnd={e => {
+          e.stopPropagation();
+        }}>
+        <Popover
+          isVisible={popoverOpen}
+          mode={mode}
+          placement={placement}
+          onRequestClose={closePopover}
+          verticalOffset={verticalOffset}
+          displayAreaInsets={insets}
+          arrowSize={{width: 0, height: 0}}
+          popoverStyle={{
+            backgroundColor: theme.colors.cardBackground,
+            borderRadius: theme.borderRadii.m,
+          }}
+          from={
+            <TouchableOpacity
+              hitSlop={8}
+              {...rest}
+              onPress={() => setPopoverOpen(true)}>
+              {triggerComponent}
+            </TouchableOpacity>
+          }>
+          <VStack rowGap="sY" py="sY" minWidth={POPOVER_MIN_WIDTH}>
+            {items.map((item, index) =>
+              item !== 'divider' ? (
+                <PopoverMenuItem
+                  key={index}
+                  {...item}
+                  onClosePress={closePopover}
+                />
+              ) : (
+                <Box
+                  key={index}
+                  height={StyleSheet.hairlineWidth}
+                  backgroundColor="cardText"
+                  opacity={0.5}
+                  width="100%"
+                />
+              ),
+            )}
+          </VStack>
+        </Popover>
+      </Box>
     );
   },
 );

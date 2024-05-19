@@ -1,8 +1,8 @@
 import {Header} from '@codeherence/react-native-header';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {Center, HStack, Text} from 'app/components/common';
-import {useAppTheme} from 'app/styles/theme';
-import React, {useMemo} from 'react';
+import {Theme, useAppTheme} from 'app/styles/theme';
+import React from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {SharedValue} from 'react-native-reanimated';
 
@@ -24,55 +24,54 @@ import NewestIcon from 'app/assets/icons/actions/sortBy/Clock.svg';
 import OldestIcon from 'app/assets/icons/actions/sortBy/ClockOld.svg';
 import RandomIcon from 'app/assets/icons/actions/sortBy/shuffle.svg';
 
+export const menuItems = (
+  isOwner: boolean,
+  theme: Theme,
+): PopoverMenuItemsProps =>
+  isOwner
+    ? ([
+        {
+          title: 'Delete',
+          titleColor: 'destructiveAction',
+          right: (
+            <TrashIcon
+              color={theme.colors.destructiveAction}
+              width={theme.iconSizes.intermediate}
+              height={theme.iconSizes.intermediate}
+            />
+          ),
+        },
+      ] as PopoverMenuItemsProps)
+    : ([
+        {
+          title: 'Hide',
+          right: (
+            <HideIcon
+              fill={theme.colors.cardText}
+              width={theme.iconSizes.intermediate}
+              height={theme.iconSizes.intermediate}
+            />
+          ),
+        },
+        {
+          title: 'Report',
+          titleColor: 'destructiveAction',
+          right: (
+            <ReportIcon
+              color={theme.colors.destructiveAction}
+              width={theme.iconSizes.intermediate}
+              height={theme.iconSizes.intermediate}
+            />
+          ),
+        },
+      ] as PopoverMenuItemsProps);
+
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {
     params: {responseCount, isOwner},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
   const {goBack} = useNavigation();
   const theme = useAppTheme();
-
-  const menuItems: PopoverMenuItemsProps = useMemo(
-    () =>
-      isOwner
-        ? ([
-            {
-              title: 'Delete',
-              titleColor: 'destructiveAction',
-              right: (
-                <TrashIcon
-                  color={theme.colors.destructiveAction}
-                  width={theme.iconSizes.intermediate}
-                  height={theme.iconSizes.intermediate}
-                />
-              ),
-            },
-          ] as PopoverMenuItemsProps)
-        : ([
-            {
-              title: 'Hide',
-              right: (
-                <HideIcon
-                  fill={theme.colors.cardText}
-                  width={theme.iconSizes.intermediate}
-                  height={theme.iconSizes.intermediate}
-                />
-              ),
-            },
-            {
-              title: 'Report',
-              titleColor: 'destructiveAction',
-              right: (
-                <ReportIcon
-                  color={theme.colors.destructiveAction}
-                  width={theme.iconSizes.intermediate}
-                  height={theme.iconSizes.intermediate}
-                />
-              ),
-            },
-          ] as PopoverMenuItemsProps),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isOwner],
-  );
 
   const sortByMenuItems: PopoverMenuItemsProps = [
     {
@@ -169,7 +168,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
                 />
               </Center>
             }
-            items={menuItems}
+            items={menuItems(isOwner ?? false, theme)}
           />
         </HStack>
       }

@@ -20,6 +20,10 @@ import Username from './Username';
 import {supabase} from 'app/lib/supabase';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
+import PopoverMenu from './common/PopoverMenu';
+
+import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
+import {menuItems} from 'app/screens/QuestionDetail/components/Header';
 
 interface QuestionItemProps {
   onPress: () => void;
@@ -119,23 +123,37 @@ const QuestionItem: FC<QuestionItemProps> = ({
           py="sY"
           my="xxxxxs"
           backgroundColor="cardBackground">
-          <Text variant="questionBody">
-            {question}
-            {nsfw && (
-              <HStack alignItems="center">
-                <Box px="xxs" />
-                <Center
-                  backgroundColor="destructiveAction"
-                  borderRadius="s"
-                  px="xxs"
-                  py="xxxs">
-                  <Text variant="tag" color="foreground">
-                    NSFW
-                  </Text>
-                </Center>
-              </HStack>
-            )}
-          </Text>
+          <HStack alignItems="flex-start" justifyContent="space-between">
+            <Text variant="questionBody">
+              {question}
+              {nsfw && (
+                <HStack alignItems="center">
+                  <Box px="xxs" />
+                  <Center
+                    backgroundColor="destructiveAction"
+                    borderRadius="s"
+                    px="xxs"
+                    py="xxxs">
+                    <Text variant="tag" color="foreground">
+                      NSFW
+                    </Text>
+                  </Center>
+                </HStack>
+              )}
+            </Text>
+            <PopoverMenu
+              accessibilityLabel="Open Question Options"
+              accessibilityRole="button"
+              accessibilityHint="Report or hide this question"
+              triggerComponent={
+                <ElipsisIcon
+                  width={theme.iconSizes.m}
+                  height={theme.iconSizes.m}
+                />
+              }
+              items={menuItems(isOwner ?? false, theme)}
+            />
+          </HStack>
           <VStack rowGap="xsY">
             <HStack alignItems="center">
               <Text variant="username" fontWeight="400">
