@@ -42,6 +42,7 @@ import {
   setSheetState,
 } from 'app/redux/slices/askSheetSlice';
 import LocationsScreen from './screens/LocationScreen';
+import useAndroidBack from 'app/hooks/useAndroidBack';
 
 interface AskQuestionSheetProps {
   open?: boolean;
@@ -95,12 +96,19 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const animatedPosition = useSharedValue(0);
   const topSafeAreaInset = useSafeAreaInsets().top;
   const dispatch = useDispatch<AppDispatch>();
-  const {isLoading, canSubmit, actionButton} = useSelector(
-    (state: RootState) => state.nonPersistent.askSheet,
-  );
-
+  const {
+    isLoading,
+    canSubmit,
+    actionButton,
+    preventSwipeDown,
+    question,
+    questionDetail,
+    questionMedia,
+    questionPoll,
+  } = useSelector((state: RootState) => state.nonPersistent.askSheet);
   const theme = useAppTheme();
   const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
+
   const snapPoints = useMemo(
     () => [
       SCREEN_HEIGHT -
@@ -111,16 +119,16 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     [topSafeAreaInset, theme, BUTTON_CONTAINER_HEIGHT],
   );
 
-  const handleSheetChanges = useCallback(
-    (index: number) => {
-      if (index === -1) {
-        onClose?.();
-      }
-    },
-    [onClose],
+  const isEmpty = useMemo(
+    () =>
+      !question.length &&
+      !questionDetail.length &&
+      !questionMedia.length &&
+      !questionPoll.length,
+    [question, questionDetail, questionMedia, questionPoll],
   );
 
-  const onDismiss = () => {
+  const beforeClose = useCallback(() => {
     if (isLoading) {
       Alert.alert(
         'Cancel posting',
@@ -131,7 +139,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
             style: 'destructive',
             onPress: () => {
               dispatch(resetSheet());
-              onClose?.();
+              sheetRef.current?.close();
             },
           },
           {
@@ -140,14 +148,58 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
           },
         ],
       );
-      return;
+      sheetRef.current?.snapToIndex(0);
+      return false;
     }
+
+    if (!isEmpty) {
+      Alert.alert(
+        'Discard changes',
+        'Are you sure you want to discard changes? You will lose this data.',
+        [
+          {
+            text: 'Yes',
+            style: 'destructive',
+            onPress: () => {
+              dispatch(resetSheet());
+              sheetRef.current?.close();
+            },
+          },
+          {
+            text: 'No',
+            style: 'cancel',
+          },
+        ],
+      );
+      sheetRef.current?.snapToIndex(0);
+      return false;
+    }
+
+    return true;
+  }, [isLoading, isEmpty, dispatch]);
+
+  const onDismiss = useCallback(() => {
+    console.log('onDismiss');
     if (actionButton === 'close') {
-      sheetRef.current?.close();
+      console.log('beforeClose', beforeClose());
+      if (beforeClose() === true) {
+        sheetRef.current?.close();
+      }
     } else {
       navigationRef.current?.goBack();
     }
-  };
+  }, [actionButton, beforeClose]);
+
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      if (index === -1) {
+        onClose?.();
+      }
+    },
+    [onClose],
+  );
+
+  useAndroidBack(onDismiss);
 
   const buttonsContainerAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -229,7 +281,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         ref={sheetRef}
         animateOnMount={false}
         animatedIndex={animatedPosition}
-        enablePanDownToClose={!isLoading}
+        enablePanDownToClose={!isLoading && !preventSwipeDown}
         keyboardBehavior="extend"
         maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
         onChange={handleSheetChanges}
@@ -238,6 +290,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         backgroundComponent={CustomBackground}
         onAnimate={(fromIndex, toIndex) => {
           if (fromIndex === 0 && toIndex === -1) {
+            beforeClose();
             Keyboard.dismiss();
           }
         }}>

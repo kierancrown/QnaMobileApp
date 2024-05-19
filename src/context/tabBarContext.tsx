@@ -118,6 +118,10 @@ export const useTabBarAnimation = ({scrollToTop}: UseTabBarAnimationProps) => {
         scrollToTop?.();
         return true;
       }
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true;
+      }
       return false;
     };
 

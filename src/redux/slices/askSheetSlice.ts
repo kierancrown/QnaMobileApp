@@ -11,6 +11,7 @@ export interface AskSheetState {
   sheetState: 'closing' | 'closed' | 'open' | 'submitting';
   actionButton: 'close' | 'back';
   selectedLocation?: NearGeoLocation;
+  preventSwipeDown?: boolean;
 
   question: string;
   questionDetail: string;
@@ -21,6 +22,7 @@ export interface AskSheetState {
 const initialState: AskSheetState = {
   isLoading: false,
   canSubmit: false,
+  preventSwipeDown: false,
   sheetState: 'closed',
   actionButton: 'close',
   question: '',
@@ -69,6 +71,9 @@ export const askSheetSlice = createSlice({
     setQuestionPoll: (state, action: {payload: PollOptionType[]}) => {
       state.questionPoll = action.payload;
     },
+    setPreventSwipeDown: (state, action: {payload: boolean}) => {
+      state.preventSwipeDown = action.payload;
+    },
     resetSheet: () => initialState,
   },
 });
@@ -84,6 +89,7 @@ export const {
   setQuestionDetail,
   setQuestionMedia,
   setQuestionPoll,
+  setPreventSwipeDown,
   resetSheet,
 } = askSheetSlice.actions;
 

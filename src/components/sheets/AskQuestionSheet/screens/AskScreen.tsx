@@ -3,7 +3,7 @@ import Text from 'app/components/common/Text';
 import VStack from 'app/components/common/VStack';
 import {useAppTheme} from 'app/styles/theme';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Alert, Linking} from 'react-native';
+import {Pressable, StyleSheet, Alert, Linking, Platform} from 'react-native';
 import {
   NativeViewGestureHandler,
   ScrollView,
@@ -160,7 +160,16 @@ const AskSheetContent: FC = () => {
   };
 
   const locationPicker = () => {
-    request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE).then(result => {
+    if (Platform.OS !== 'ios' && Platform.OS !== 'android') {
+      return;
+    }
+
+    request(
+      Platform.select({
+        ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+        android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      }) ?? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+    ).then(result => {
       if (result === 'granted') {
         navigate('LocationScreen');
       } else {

@@ -7,6 +7,7 @@ import {Box, Center, Flex, HStack, Text, VStack} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
 import {
   setActionButton,
+  setPreventSwipeDown,
   setSelectedLocation,
 } from 'app/redux/slices/askSheetSlice';
 import {AppDispatch, RootState} from 'app/redux/store';
@@ -19,11 +20,11 @@ import {
   useGeoLocationSearch,
 } from 'app/hooks/useGeoLocationSearch';
 import useMount from 'app/hooks/useMount';
-import {FlashList} from '@shopify/flash-list';
 import SelectionItem from 'app/components/common/SelectionItem';
 import {AskQuestionStackParamList} from '..';
 import {useAppTheme} from 'app/styles/theme';
 import LinearGradient from 'react-native-linear-gradient';
+import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 
 const LocationsScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -76,9 +77,14 @@ const LocationsScreen: FC = () => {
   useMount(getCurrent);
 
   useFocusEffect(() => {
+    dispatch(setPreventSwipeDown(true));
     if (searchInput.current) {
       searchInput.current.focus();
     }
+
+    return () => {
+      dispatch(setPreventSwipeDown(false));
+    };
   });
 
   useEffect(() => {
@@ -124,14 +130,13 @@ const LocationsScreen: FC = () => {
             </HStack>
           </Center>
         ) : (
-          <FlashList
+          <BottomSheetFlatList
             data={results}
             keyExtractor={item => item.id.toString()}
             keyboardShouldPersistTaps="always"
             contentContainerStyle={{
               paddingVertical: theme.spacing.mY,
             }}
-            estimatedItemSize={66}
             renderItem={({item}) => (
               <SelectionItem
                 title={item.name}
