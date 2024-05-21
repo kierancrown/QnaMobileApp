@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Linking} from 'react-native';
 import {HStack, Text, VStack} from './common';
 import {mvs} from 'react-native-size-matters';
@@ -8,7 +8,7 @@ interface MarkdownProps {
 }
 
 const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
-  const parseMarkdown = (text: string) => {
+  const parseMarkdown = useMemo(() => {
     const lines = text.split('\n');
     return lines.map((line, index) => {
       if (line.startsWith('# ')) {
@@ -62,9 +62,9 @@ const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
         );
       }
     });
-  };
+  }, [text]);
 
-  return <VStack paddingHorizontal="s">{parseMarkdown(text)}</VStack>;
+  return <VStack paddingHorizontal="s">{parseMarkdown}</VStack>;
 };
 
 export default MarkdownParser;

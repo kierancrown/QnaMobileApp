@@ -72,7 +72,11 @@ const SettingsScren = () => {
             height={theme.iconSizes.intermediate}
           />
         }
-        onPress={() => {}}
+        onPress={() => {
+          navigate('SettingsPrivacySecurity', {
+            headerTitle: 'Privacy',
+          });
+        }}
       />
       <SettingsItem
         title="Help"

@@ -11,8 +11,8 @@ const SectionHeader: FC<SectionHeaderProps> = ({title}) => {
       justifyContent="space-between"
       alignItems="center"
       paddingHorizontal="s"
-      paddingVertical="sY">
-      <Text variant="body" color="cardText">
+      paddingVertical="xsY">
+      <Text variant="medium" color="cardText">
         {title}
       </Text>
     </HStack>

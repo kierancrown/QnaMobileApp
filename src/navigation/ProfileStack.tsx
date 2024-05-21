@@ -10,6 +10,7 @@ import SettingsHelpScreen from 'app/screens/Settings/Help/Screen';
 import SettingsDebugScreen from 'app/screens/Settings/Debug/Screen';
 import SettingsAboutDocumentViewScreen from 'app/screens/Settings/About/PublicDocViewer/Screen';
 import SettingsNotificationScreen from 'app/screens/Settings/Notifications/Screen';
+import SettingsPrivacyScreen from 'app/screens/Settings/Privacy/Screen';
 
 export type ProfileStackNavigationProp =
   NativeStackNavigationProp<ProfileStackParamList>;
@@ -31,6 +32,7 @@ export type ProfileStackParamList = {
   Profile: ProfileScreenParams;
   Settings: SettingsScreenParams | undefined;
   SettingsNotifications: SettingsScreenParams;
+  SettingsPrivacySecurity: SettingsScreenParams;
   SettingsHelp: SettingsScreenParams;
   SettingsAbout: SettingsScreenParams;
   SettingsDocumentViewer: SettingsScreenParams & SettingsDocViewerScreenParams;
@@ -61,6 +63,11 @@ const ProfileStack = () => {
         name="SettingsNotifications"
         initialParams={{headerTitle: 'Notifications'}}
         component={SettingsNotificationScreen}
+      />
+      <Stack.Screen
+        name="SettingsPrivacySecurity"
+        initialParams={{headerTitle: 'Privacy & Security'}}
+        component={SettingsPrivacyScreen}
       />
       <Stack.Screen
         name="SettingsHelp"

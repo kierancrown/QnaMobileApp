@@ -1,6 +1,6 @@
 import {Header} from '@codeherence/react-native-header';
 import {SharedValue, useSharedValue} from 'react-native-reanimated';
-import {Center, Text} from 'app/components/common';
+import {Box, Center, Text} from 'app/components/common';
 import React from 'react';
 
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
@@ -16,9 +16,8 @@ import {useAppTheme} from 'app/styles/theme';
 
 export const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
   const {goBack} = useNavigation<NavigationProp<ProfileStackParamList>>();
-  const {
-    params: {headerTitle},
-  } = useRoute<RouteProp<ProfileStackParamList, 'Settings'>>();
+  const {params} = useRoute<RouteProp<ProfileStackParamList, 'Settings'>>();
+  const headerTitle = params?.headerTitle || 'Settings';
   const theme = useAppTheme();
   const showNavBar = useSharedValue(1);
 
@@ -42,6 +41,14 @@ export const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
         <Center py="xxsY">
           <Text variant="medium">{headerTitle}</Text>
         </Center>
+      }
+      headerRight={
+        <Box
+          py="xxsY"
+          px="xxs"
+          width={theme.iconSizes.l}
+          height={theme.iconSizes.l}
+        />
       }
     />
   );
