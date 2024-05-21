@@ -45,7 +45,10 @@ const SettingsScren = () => {
       <SettingsItem
         title="Account"
         icon={
-          <AccountIcon width={theme.iconSizes.m} height={theme.iconSizes.m} />
+          <AccountIcon
+            width={theme.iconSizes.intermediate}
+            height={theme.iconSizes.intermediate}
+          />
         }
         onPress={() => {}}
       />
@@ -53,22 +56,32 @@ const SettingsScren = () => {
         title="Notifications"
         icon={
           <NotificationsIcon
-            width={theme.iconSizes.m}
-            height={theme.iconSizes.m}
+            width={theme.iconSizes.intermediate}
+            height={theme.iconSizes.intermediate}
+          />
+        }
+        onPress={() => {
+          navigate('SettingsNotifications', {headerTitle: 'Notifications'});
+        }}
+      />
+      <SettingsItem
+        title="Privacy & Security"
+        icon={
+          <PrivacyIcon
+            width={theme.iconSizes.intermediate}
+            height={theme.iconSizes.intermediate}
           />
         }
         onPress={() => {}}
       />
       <SettingsItem
-        title="Privacy & Security"
-        icon={
-          <PrivacyIcon width={theme.iconSizes.m} height={theme.iconSizes.m} />
-        }
-        onPress={() => {}}
-      />
-      <SettingsItem
         title="Help"
-        icon={<HelpIcon width={theme.iconSizes.m} height={theme.iconSizes.m} />}
+        icon={
+          <HelpIcon
+            width={theme.iconSizes.intermediate}
+            height={theme.iconSizes.intermediate}
+          />
+        }
         onPress={() => {
           navigate('SettingsHelp', {headerTitle: 'Help'});
         }}
@@ -76,7 +89,10 @@ const SettingsScren = () => {
       <SettingsItem
         title="About"
         icon={
-          <AboutIcon width={theme.iconSizes.m} height={theme.iconSizes.m} />
+          <AboutIcon
+            width={theme.iconSizes.intermediate}
+            height={theme.iconSizes.intermediate}
+          />
         }
         onPress={() => {
           navigate('SettingsAbout', {headerTitle: 'About'});
@@ -90,8 +106,8 @@ const SettingsScren = () => {
             titleColor="destructiveAction"
             icon={
               <DebugIcon
-                width={theme.iconSizes.m}
-                height={theme.iconSizes.m}
+                width={theme.iconSizes.intermediate}
+                height={theme.iconSizes.intermediate}
                 color={theme.colors.destructiveAction}
               />
             }

@@ -33,7 +33,7 @@ export const menuItems = (
         {
           title: 'Delete',
           titleColor: 'destructiveAction',
-          right: (
+          left: (
             <TrashIcon
               color={theme.colors.destructiveAction}
               width={theme.iconSizes.intermediate}
@@ -45,7 +45,7 @@ export const menuItems = (
     : ([
         {
           title: 'Hide',
-          right: (
+          left: (
             <HideIcon
               fill={theme.colors.cardText}
               width={theme.iconSizes.intermediate}
@@ -56,7 +56,7 @@ export const menuItems = (
         {
           title: 'Report',
           titleColor: 'destructiveAction',
-          right: (
+          left: (
             <ReportIcon
               color={theme.colors.destructiveAction}
               width={theme.iconSizes.intermediate}
