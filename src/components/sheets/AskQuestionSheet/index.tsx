@@ -108,6 +108,11 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const theme = useAppTheme();
   const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
 
+  const enablePanDown = useMemo(
+    () => !isLoading && actionButton === 'close',
+    [isLoading, actionButton],
+  );
+
   const snapPoints = useMemo(
     () => [
       SCREEN_HEIGHT -
@@ -280,7 +285,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         ref={sheetRef}
         animateOnMount={false}
         animatedIndex={animatedPosition}
-        enablePanDownToClose={!isLoading && actionButton === 'close'}
+        enablePanDownToClose={enablePanDown}
         keyboardBehavior="extend"
         maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
         onChange={handleSheetChanges}

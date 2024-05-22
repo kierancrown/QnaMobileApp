@@ -75,12 +75,6 @@ const LocationsScreen: FC = () => {
 
   useMount(getCurrent);
 
-  useFocusEffect(() => {
-    if (searchInput.current) {
-      searchInput.current.focus();
-    }
-  });
-
   useEffect(() => {
     if (searchTerm.length > 2) {
       (async () => {
