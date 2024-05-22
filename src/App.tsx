@@ -21,23 +21,23 @@ import theme from './styles/theme';
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
 
-dayjs.updateLocale('en', {
-  relativeTime: {
-    future: 'in %s',
-    past: '%s ago',
-    s: 'just now',
-    m: '1m',
-    mm: '%dm',
-    h: '1h',
-    hh: '%dh',
-    d: '1d',
-    dd: '%dd',
-    M: '1mo',
-    MM: '%dmo',
-    y: '1yr',
-    yy: '%dyr',
-  },
-});
+// dayjs.updateLocale('en', {
+//   relativeTime: {
+//     future: 'in %s',
+//     past: '%s ago',
+//     s: 'just now',
+//     m: '1m',
+//     mm: '%dm',
+//     h: '1h',
+//     hh: '%dh',
+//     d: '1d',
+//     dd: '%dd',
+//     M: '1mo',
+//     MM: '%dmo',
+//     y: '1yr',
+//     yy: '%dyr',
+//   },
+// });
 
 const gestureStyle = {flex: 1, backgroundColor: theme.colors.black};
 

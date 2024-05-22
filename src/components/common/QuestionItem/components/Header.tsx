@@ -50,7 +50,7 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
             items={menuItems(isOwner ?? false, theme)}
           />
         </HStack>
-        <Text variant="headline" color="cardText">
+        <Text variant="smaller" color="cardText">
           {dayjs(timestamp).fromNow(false)}
         </Text>
       </VStack>
