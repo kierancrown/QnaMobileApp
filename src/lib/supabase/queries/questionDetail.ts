@@ -4,6 +4,7 @@ export interface QuestionsDetailData {
   nsfw: boolean;
   question: string;
   user_id: string;
+  body: string | null;
 
   user_metadata: {
     verified: boolean;

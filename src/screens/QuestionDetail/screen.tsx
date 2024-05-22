@@ -19,19 +19,14 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
 import dayjs from 'dayjs';
-import {
-  NavigationProp,
-  RouteProp,
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import {RouteProp, useFocusEffect, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
-import TimeIcon from 'app/assets/icons/TimeFive.svg';
 import LocationIcon from 'app/assets/icons/LocationPin.svg';
+
+import Header from 'app/components/common/QuestionItem/components/Header';
 
 import {
   LargeHeader,
@@ -47,26 +42,22 @@ import {
   useTabBar,
   useTabBarAnimation,
 } from 'app/context/tabBarContext';
-import Username from 'app/components/Username';
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import HeaderComponent from './components/Header';
 import Skeleton from 'react-native-reanimated-skeleton';
-import {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
-
-const ICON_SIZE = 13;
+import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@gorhom/bottom-sheet';
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {
     params: {questionId},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
-  // const loading = true;
   const {loading, question, hasUpvoted, upvoteQuestion} = useQuestionDetail({
     questionId,
   });
   const theme = useTheme<Theme>();
   const {setFabAction} = useTabBar();
-  const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
   const [bookmarked, setBookmarked] = useState(false);
+  const ICON_SIZE = theme.iconSizes.m;
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
@@ -90,84 +81,89 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     <LargeHeader headerStyle={headerStyle}>
       <ScalingView scrollY={scrollY} style={scalingViewStyle}>
         <VStack rowGap="sY" px="m">
-          {/* Topics */}
-          <HStack columnGap="xxs">
-            {question?.question_metadata?.topics &&
-              question?.question_metadata?.topics.map(topic => (
-                <Box
-                  key={topic}
-                  backgroundColor="cardBackground"
-                  borderRadius="s"
-                  px="xs"
-                  py="xxs">
-                  <Text variant="tag" color="foreground">
-                    {topic}
-                  </Text>
-                </Box>
-              ))}
-          </HStack>
-          <Skeleton
-            isLoading={loading}
-            containerStyle={{}}
-            boneColor={theme.colors.skeletonBackground}
-            highlightColor={theme.colors.skeleton}
-            layout={[
-              {
-                key: 'line1',
-                height: theme.textVariants.medium.lineHeight,
-                width: '88%',
-              },
-            ]}>
-            <Text variant="medium">
-              {question?.question}
-              {question?.nsfw && (
-                <HStack alignItems="center">
-                  <Box px="xxs" />
-                  <Center
-                    backgroundColor="destructiveAction"
-                    borderRadius="s"
-                    px="xxs"
-                    py="xxxs">
-                    <Text variant="tag" color="foreground">
-                      NSFW
-                    </Text>
-                  </Center>
-                </HStack>
-              )}
-            </Text>
-          </Skeleton>
-          <VStack rowGap="xsY">
-            <Skeleton
-              isLoading={loading}
-              containerStyle={{}}
-              boneColor={theme.colors.skeletonBackground}
-              highlightColor={theme.colors.skeleton}
-              layout={[
-                {
-                  key: 'line1',
-                  height:
-                    theme.textVariants.username.fontSize + theme.spacing.xxsY,
-                  width: '44%',
-                },
-              ]}>
-              <HStack alignItems="center">
-                <Text variant="username" fontWeight="400">
-                  Asked by{' '}
+          <VStack rowGap="sY">
+            {question?.user_id && question.created_at && (
+              <Header
+                userId={question.user_id}
+                timestamp={question.created_at}
+                hideActions
+              />
+            )}
+            <VStack rowGap="xxsY">
+              <Skeleton
+                containerStyle={{
+                  padding: theme.spacing.none,
+                }}
+                isLoading={loading}
+                boneColor={theme.colors.skeletonBackground}
+                highlightColor={theme.colors.skeleton}
+                layout={[
+                  {
+                    width: SCREEN_WIDTH * 0.77,
+                    height: theme.textVariants.medium.lineHeight,
+                    borderRadius: theme.borderRadii.s,
+                    marginBottom: theme.spacing.xsY,
+                  },
+                ]}>
+                <Text variant="medium">
+                  {question?.question}
+                  {question?.nsfw && (
+                    <HStack alignItems="center">
+                      <Box px="xxs" />
+                      <Center
+                        backgroundColor="destructiveAction"
+                        borderRadius="s"
+                        px="xxs"
+                        py="xxxs">
+                        <Text variant="tag" color="foreground">
+                          NSFW
+                        </Text>
+                      </Center>
+                    </HStack>
+                  )}
                 </Text>
-                <Username
-                  variant="username"
-                  fontWeight="600"
-                  username={question?.user_metadata?.username ?? 'Anyonymous'}
-                  isVerified={question?.user_metadata?.verified ?? false}
-                  onPress={() => {
-                    navigate('Profile', {
-                      userId: question!.user_id,
-                      displayBackButton: true,
-                    });
+              </Skeleton>
+
+              {question?.body && (
+                <Skeleton
+                  containerStyle={{
+                    padding: theme.spacing.none,
                   }}
-                />
-              </HStack>
-            </Skeleton>
+                  isLoading={loading}
+                  boneColor={theme.colors.skeletonBackground}
+                  highlightColor={theme.colors.skeleton}
+                  layout={[
+                    {
+                      width: SCREEN_WIDTH * 0.93 - theme.spacing.m * 2,
+                      height: theme.textVariants.smallBody.fontSize,
+                      borderRadius: theme.borderRadii.s,
+                      marginBottom: theme.spacing.xxsY,
+                    },
+                    {
+                      width: SCREEN_WIDTH * 0.97 - theme.spacing.m * 2,
+                      height: theme.textVariants.smallBody.fontSize,
+                      borderRadius: theme.borderRadii.s,
+                      marginBottom: theme.spacing.xxsY,
+                    },
+                    {
+                      width: SCREEN_WIDTH * 0.88 - theme.spacing.m * 2,
+                      height: theme.textVariants.smallBody.fontSize,
+                      borderRadius: theme.borderRadii.s,
+                      marginBottom: theme.spacing.xxsY,
+                    },
+                    {
+                      width: SCREEN_WIDTH * 0.99 - theme.spacing.m * 2,
+                      height: theme.textVariants.smallBody.fontSize,
+                      borderRadius: theme.borderRadii.s,
+                      marginBottom: theme.spacing.xxsY,
+                    },
+                  ]}>
+                  <Text variant="smallBody">{question.body}</Text>
+                </Skeleton>
+              )}
+            </VStack>
+          </VStack>
+          <VStack rowGap="sY">
             <Skeleton
               isLoading={loading}
               containerStyle={{}}
@@ -188,7 +184,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     width={ICON_SIZE}
                     height={ICON_SIZE}
                   />
-                  <Text color="cardText" variant="smaller">
+                  <Text color="cardText" variant="small">
                     {formatNumber(
                       question?.question_metadata?.upvote_count || 0,
                     )}
@@ -200,20 +196,10 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     width={ICON_SIZE}
                     height={ICON_SIZE}
                   />
-                  <Text color="cardText" variant="smaller">
+                  <Text color="cardText" variant="small">
                     {formatNumber(
                       question?.question_metadata?.response_count || 0,
                     )}
-                  </Text>
-                </HStack>
-                <HStack alignItems="center" columnGap="xxs">
-                  <TimeIcon
-                    fill={theme.colors.cardText}
-                    width={ICON_SIZE}
-                    height={ICON_SIZE}
-                  />
-                  <Text color="cardText" variant="smaller">
-                    {dayjs(question?.created_at).fromNow(true)}
                   </Text>
                 </HStack>
                 <Flex />
@@ -224,7 +210,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                       width={ICON_SIZE}
                       height={ICON_SIZE}
                     />
-                    <Text color="cardText" variant="smaller">
+                    <Text color="cardText" variant="small">
                       {question.question_metadata.location.name}
                     </Text>
                   </HStack>
