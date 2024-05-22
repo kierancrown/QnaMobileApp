@@ -1,10 +1,10 @@
-import React, {FC, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {Center, Flex, HStack, Text, VStack} from 'ui';
 import {Database} from 'app/types/supabase';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
-import {Theme} from 'app/styles/theme';
+import {Theme, useAppTheme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import dayjs from 'dayjs';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
@@ -25,27 +25,62 @@ import {
   LargeHeader,
   ScalingView,
 } from '@codeherence/react-native-header';
-import {SharedValue} from 'react-native-reanimated';
+import Animated, {
+  SharedValue,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import NotificationItem from 'app/components/NotificationItem';
 import Badge from 'app/components/common/Badge';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
+import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
+import PopoverMenu from 'app/components/common/PopoverMenu';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 const HeaderTabs = ['All', 'Requested', 'Notifications'] as const;
 
-const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
-  <Header
-    showNavBar={showNavBar}
-    noBottomBorder
-    headerCenter={
-      <Center py="xxsY">
-        <Text variant="medium">Inbox - All</Text>
-      </Center>
-    }
-  />
-);
+const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
+  const theme = useAppTheme();
+
+  return (
+    <Header
+      showNavBar={showNavBar}
+      noBottomBorder
+      headerCenter={
+        <Center py="xxsY">
+          <Text variant="medium">Inbox - All</Text>
+        </Center>
+      }
+      headerRight={
+        <HStack alignItems="center" columnGap="xs">
+          <PopoverMenu
+            accessibilityLabel="Open Inbox Options"
+            accessibilityRole="button"
+            accessibilityHint="Mark all as read"
+            triggerComponent={
+              <Center py="xxsY" px="xxs">
+                <ElipsisIcon
+                  width={theme.iconSizes.l}
+                  height={theme.iconSizes.l}
+                />
+              </Center>
+            }
+            items={[
+              {
+                title: 'Mark all as read',
+                onPress: () => {},
+              },
+            ]}
+          />
+        </HStack>
+      }
+    />
+  );
+};
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const theme = useTheme<Theme>();
@@ -96,18 +131,72 @@ const TabItem: FC<TabItemProps> = ({
   count,
   selected = false,
 }) => {
+  const theme = useAppTheme();
+  const {triggerHaptic} = useHaptics();
+
+  const opacity = useSharedValue(1);
+  const scale = useSharedValue(1);
+  // 0 for unselected, 1 for selected
+  const selectedAnimation = useSharedValue(0);
+
+  useEffect(() => {
+    selectedAnimation.value = withTiming(selected ? 1 : 0, {
+      duration: 100,
+    });
+  }, [selected, selectedAnimation]);
+
+  const internalOnPress = async () => {
+    await triggerHaptic({
+      iOS: HapticFeedbackTypes.selection,
+      android: HapticFeedbackTypes.impactLight,
+    });
+    onPress();
+  };
+
+  const onPressIn = () => {
+    opacity.value = withTiming(0.66, {duration: 88});
+    scale.value = withTiming(0.98, {duration: 66});
+  };
+
+  const onPressOut = () => {
+    opacity.value = withTiming(1, {duration: 88});
+    scale.value = withTiming(1, {duration: 88});
+  };
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      borderRadius: theme.borderRadii.pill,
+      borderColor: theme.colors.divider,
+      opacity: opacity.value,
+      transform: [{scale: scale.value}],
+      borderWidth: StyleSheet.hairlineWidth,
+      backgroundColor: interpolateColor(
+        selectedAnimation.value,
+        [0, 1],
+        [
+          theme.colors.pillUnselectedBackground,
+          theme.colors.pillSelectedBackground,
+        ],
+      ),
+    };
+  }, [
+    theme.borderRadii.pill,
+    theme.colors.divider,
+    theme.colors.pillUnselectedBackground,
+    theme.colors.pillSelectedBackground,
+  ]);
+
   return (
-    <Pressable onPress={onPress}>
-      <Badge text={count.toString()} hidden={count === 0}>
-        <Center
-          py="xxsY"
-          px="s"
-          borderRadius="m"
-          borderColor="divider"
-          bg={selected ? 'cardBackground' : 'none'}
-          borderWidth={StyleSheet.hairlineWidth}>
-          <Text variant="medium">{title}</Text>
-        </Center>
+    <Pressable
+      onPress={internalOnPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}>
+      <Badge text={count.toString()} size="small" hidden={count === 0}>
+        <Animated.View style={animatedStyle}>
+          <Center py="xxsY" px="s">
+            <Text variant="medium">{title}</Text>
+          </Center>
+        </Animated.View>
       </Badge>
     </Pressable>
   );
@@ -158,7 +247,7 @@ const InboxScreen: FC = () => {
       .from('notifications')
       .select('*')
       .eq('user_id', user?.id)
-      .order('delivered_at', {ascending: false});
+      .order('created_at', {ascending: false});
 
     if (error) {
       console.error(error);
@@ -203,7 +292,7 @@ const InboxScreen: FC = () => {
 
     data.forEach(n => {
       // Get the date without time for comparison
-      const date = new Date(n.delivered_at!).toISOString().split('T')[0];
+      const date = new Date(n.created_at!).toISOString().split('T')[0];
       const notificationDate = dayjs(date);
 
       if (notificationDate.isSame(today, 'day')) {
@@ -290,7 +379,7 @@ const InboxScreen: FC = () => {
               id={item.id}
               title={item.type}
               body={item.body || ''}
-              timestamp={item.delivered_at || new Date().toString()}
+              timestamp={item.delivered_at || item.created_at}
               read={item.read_at !== null}
             />
           )}

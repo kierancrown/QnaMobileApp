@@ -2,7 +2,7 @@ import {Header} from '@codeherence/react-native-header';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {Center, HStack, Text} from 'app/components/common';
 import {Theme, useAppTheme} from 'app/styles/theme';
-import React from 'react';
+import React, {useState} from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {SharedValue} from 'react-native-reanimated';
 
@@ -23,6 +23,9 @@ import MostLikedIcon from 'app/assets/icons/actions/sortBy/heart.svg';
 import NewestIcon from 'app/assets/icons/actions/sortBy/Clock.svg';
 import OldestIcon from 'app/assets/icons/actions/sortBy/ClockOld.svg';
 import RandomIcon from 'app/assets/icons/actions/sortBy/shuffle.svg';
+import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
+
+import CheckIcon from 'app/assets/icons/check.svg';
 
 export const menuItems = (
   isOwner: boolean,
@@ -36,10 +39,11 @@ export const menuItems = (
           left: (
             <TrashIcon
               color={theme.colors.destructiveAction}
-              width={theme.iconSizes.intermediate}
-              height={theme.iconSizes.intermediate}
+              width={theme.iconSizes.popover}
+              height={theme.iconSizes.popover}
             />
           ),
+          onPress: () => {},
         },
       ] as PopoverMenuItemsProps)
     : ([
@@ -48,10 +52,11 @@ export const menuItems = (
           left: (
             <HideIcon
               fill={theme.colors.cardText}
-              width={theme.iconSizes.intermediate}
-              height={theme.iconSizes.intermediate}
+              width={theme.iconSizes.popover}
+              height={theme.iconSizes.popover}
             />
           ),
+          onPress: () => {},
         },
         {
           title: 'Report',
@@ -59,10 +64,11 @@ export const menuItems = (
           left: (
             <ReportIcon
               color={theme.colors.destructiveAction}
-              width={theme.iconSizes.intermediate}
-              height={theme.iconSizes.intermediate}
+              width={theme.iconSizes.popover}
+              height={theme.iconSizes.popover}
             />
           ),
+          onPress: () => {},
         },
       ] as PopoverMenuItemsProps);
 
@@ -72,47 +78,113 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
   const {goBack} = useNavigation();
   const theme = useAppTheme();
+  const [sortBy, setSortBy] = useState<
+    'mostLiked' | 'newest' | 'oldest' | 'random'
+  >('mostLiked');
 
   const sortByMenuItems: PopoverMenuItemsProps = [
+    {
+      title: 'Find in Responses',
+      left: (
+        <SearchIcon
+          fill={theme.colors.cardText}
+          width={theme.iconSizes.popover}
+          height={theme.iconSizes.popover}
+        />
+      ),
+      onPress: () => {},
+    },
+    'divider',
+    {
+      title: 'Sort by',
+    },
     {
       title: 'Most Liked',
       left: (
         <MostLikedIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.intermediate}
-          height={theme.iconSizes.intermediate}
+          width={theme.iconSizes.popover}
+          height={theme.iconSizes.popover}
         />
       ),
+      right: sortBy === 'mostLiked' && (
+        <Center>
+          <CheckIcon
+            fill={theme.colors.brand}
+            width={theme.iconSizes.popover}
+            height={theme.iconSizes.popover}
+          />
+        </Center>
+      ),
+      backgroundColor: sortBy === 'mostLiked' ? 'inputBackground' : 'none',
+      onPress: () => setSortBy('mostLiked'),
+      closeOnPress: true,
     },
     {
       title: 'Newest',
       left: (
         <NewestIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.intermediate}
-          height={theme.iconSizes.intermediate}
+          width={theme.iconSizes.popover}
+          height={theme.iconSizes.popover}
         />
       ),
+      right: sortBy === 'newest' && (
+        <Center>
+          <CheckIcon
+            fill={theme.colors.brand}
+            width={theme.iconSizes.popover}
+            height={theme.iconSizes.popover}
+          />
+        </Center>
+      ),
+      backgroundColor: sortBy === 'newest' ? 'inputBackground' : 'none',
+      onPress: () => setSortBy('newest'),
+      closeOnPress: true,
     },
     {
       title: 'Oldest',
       left: (
         <OldestIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.intermediate}
-          height={theme.iconSizes.intermediate}
+          width={theme.iconSizes.popover}
+          height={theme.iconSizes.popover}
         />
       ),
+      right: sortBy === 'oldest' && (
+        <Center>
+          <CheckIcon
+            fill={theme.colors.brand}
+            width={theme.iconSizes.popover}
+            height={theme.iconSizes.popover}
+          />
+        </Center>
+      ),
+      backgroundColor: sortBy === 'oldest' ? 'inputBackground' : 'none',
+      onPress: () => setSortBy('oldest'),
+      closeOnPress: true,
     },
     {
       title: 'Random',
       left: (
         <RandomIcon
           color={theme.colors.cardText}
-          width={theme.iconSizes.intermediate}
-          height={theme.iconSizes.intermediate}
+          width={theme.iconSizes.popover}
+          height={theme.iconSizes.popover}
         />
       ),
+      right: sortBy === 'random' && (
+        <Center>
+          <CheckIcon
+            fill={theme.colors.brand}
+            width={theme.iconSizes.popover}
+            height={theme.iconSizes.popover}
+          />
+        </Center>
+      ),
+      backgroundColor: sortBy === 'random' ? 'inputBackground' : 'none',
+      onPress: () => setSortBy('random'),
+      closeOnPress: true,
     },
   ];
 

@@ -28,10 +28,10 @@ const ResponseItem: React.FC<ResponseItemProps> = ({
   avatarImage,
   timestamp,
   response,
-  likes,
   isOwner,
   onDelete,
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteAnswer = async (responseId: number) => {
     const {error} = await supabase
       .from('responses')
@@ -71,48 +71,3 @@ const ResponseItem: React.FC<ResponseItemProps> = ({
 };
 
 export default ResponseItem;
-
-/*
-<Pressable
-  onLongPress={() => {
-    if (item.user_id === user?.id) {
-      Alert.alert(
-        'Delete Response',
-        'Are you sure you want to delete this response?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: () => deleteAnswer(item.id),
-          },
-        ],
-      );
-    }
-  }}>
-  <Box
-    backgroundColor="cardBackground"
-    my="xsY"
-    px="xs"
-    mx="xs"
-    py="xsY"
-    borderRadius="m">
-    <VStack rowGap="xsY">
-      <HStack alignItems="center" justifyContent="space-between">
-        <Text
-          fontWeight="600"
-          color={item.user_id === user?.id ? 'brand' : 'cardText'}>
-          {item.user_metadata?.username ?? 'Anonymous'}
-        </Text>
-        <Text color="cardText">
-          {dayjs(item.created_at).fromNow()}
-        </Text>
-      </HStack>
-      <Text variant="body">{item.response}</Text>
-    </VStack>
-  </Box>
-</Pressable>
-*/

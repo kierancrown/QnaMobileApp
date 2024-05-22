@@ -50,7 +50,9 @@ const SettingsScren = () => {
             height={theme.iconSizes.intermediate}
           />
         }
-        onPress={() => {}}
+        onPress={() => {
+          navigate('SettingsAccount', {headerTitle: 'Account'});
+        }}
       />
       <SettingsItem
         title="Notifications"

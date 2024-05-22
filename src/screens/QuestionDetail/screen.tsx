@@ -348,11 +348,6 @@ const QuestionDetail: FC = () => {
         [],
       );
 
-      console.log(
-        'mergedData',
-        mergedData.map(item => item.id),
-      );
-
       if (data.length === 0) {
         setNoMoreResponses(true);
       } else {
@@ -423,6 +418,7 @@ const QuestionDetail: FC = () => {
       <FlashListWithHeaders
         HeaderComponent={HeaderComponent}
         LargeHeaderComponent={LargeHeaderComponent}
+        indicatorStyle="white"
         data={responses}
         ref={scrollRef}
         keyExtractor={item => item.id.toString()}

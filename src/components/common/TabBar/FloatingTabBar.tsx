@@ -26,6 +26,7 @@ import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 import PlusIcon from 'app/assets/icons/actions/Plus.svg';
 import ReplyIcon from 'app/assets/icons/actions/Comment.svg';
 import Badge from '../Badge';
+import {useHaptics, HapticFeedbackTypes} from 'app/hooks/useHaptics';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -48,6 +49,8 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const theme = useTheme<Theme>();
   const activeColor = theme.colors.tabBarIconActive;
   const inactiveColor = theme.colors.tabBarIconInactive;
+
+  const {triggerHaptic} = useHaptics();
 
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
@@ -178,7 +181,10 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
 
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
-              // await triggerHaptic('impactLight');
+              await triggerHaptic({
+                iOS: HapticFeedbackTypes.selection,
+                android: HapticFeedbackTypes.impactLight,
+              });
             }
           };
 

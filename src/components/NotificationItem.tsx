@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {Pressable, StyleSheet} from 'react-native';
+import {Platform, Pressable, StyleSheet} from 'react-native';
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'app/styles/theme';
 import Avatar from './common/Avatar';
@@ -115,22 +115,29 @@ const NotificationItem: FC<NotificationItemProps> = ({
   return (
     <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[animatedStyle]}>
-        <VStack px="m" py="sY" my="xxxxxs" backgroundColor="cardBackground">
+        <VStack
+          flex={1}
+          rowGap="xsY"
+          px="s"
+          py="xsY"
+          my="xxsY"
+          mx={Platform.select({
+            ios: 'xs',
+            android: 's',
+          })}
+          borderRadius="l"
+          backgroundColor="cardBackground">
           <HStack alignItems="center" columnGap="s">
             {renderIcon(title, theme, read === false)}
-            <VStack rowGap="xxsY">
-              <HStack alignItems="center" columnGap="xs">
-                <Text variant="smaller" fontWeight="400">
-                  {getTitleFromType(title)}
-                </Text>
-                <Text variant="username" color="cardText">
-                  {dayjs(timestamp).fromNow(true)}
-                </Text>
-              </HStack>
-              <HStack columnGap="xs" alignItems="center">
-                <Text variant="questionBody">{body}</Text>
-              </HStack>
+            <VStack rowGap="xxsY" flex={1}>
+              <Text variant="smaller">{getTitleFromType(title)}</Text>
+              <Text variant={'tiny'} color="cardText">
+                {dayjs(timestamp).fromNow()}
+              </Text>
             </VStack>
+          </HStack>
+          <HStack columnGap="xs" alignItems="center">
+            <Text variant="smallBody">{body}</Text>
           </HStack>
         </VStack>
       </Animated.View>

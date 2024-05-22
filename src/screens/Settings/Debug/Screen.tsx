@@ -14,6 +14,11 @@ import {
   getFreeDiskStorageSync,
   getTotalDiskCapacitySync,
 } from 'react-native-device-info';
+import {Alert} from 'react-native';
+
+const convertBytesToMB = (bytes: number) => {
+  return Math.round(bytes / 1024 / 1024);
+};
 
 const SettingsDebugScreen = () => {
   const theme = useAppTheme();
@@ -28,8 +33,11 @@ const SettingsDebugScreen = () => {
     })();
   });
 
-  const clearCacheHandler = () => {
-    clearCache();
+  const clearCacheHandler = async () => {
+    const result = await clearCache();
+    if (result === true) {
+      Alert.alert('Cache Cleared', 'The cache has been cleared successfully');
+    }
   };
 
   return (
@@ -59,7 +67,11 @@ const SettingsDebugScreen = () => {
         color="cardText"
         paddingHorizontal="s"
         marginBottom="mY">
-        {`Free Disk Space: ${getFreeDiskStorageSync()} / Total Disk Space: ${getTotalDiskCapacitySync()}`}
+        {`Free Disk Space: ${convertBytesToMB(
+          getFreeDiskStorageSync(),
+        )}Mb / Total Disk Space: ${convertBytesToMB(
+          getTotalDiskCapacitySync(),
+        )}Mb`}
       </Text>
     </ScrollViewWithHeaders>
   );

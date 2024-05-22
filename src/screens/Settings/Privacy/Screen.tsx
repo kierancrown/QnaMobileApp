@@ -12,7 +12,7 @@ const SettingsPrivacyScreen = () => {
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   useHiddenTabBar();
 
-  const [auth2F, setAuth2F] = useState(true);
+  const [auth2F, setAuth2F] = useState(false);
 
   return (
     <ScrollViewWithHeaders

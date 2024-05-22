@@ -80,6 +80,7 @@ const palette = {
   lightBackground: '#fff',
 
   darkSecondaryBackground: '#222222',
+  darkSecondaryBackground2: '#333333',
   lightSecondaryBackground: '#FAF9F6',
 
   sheetBackdropLight: '#f5f5f5E0',
@@ -144,6 +145,9 @@ const theme = createTheme({
     cardBackground: palette.darkSecondaryBackground,
     backdrop: palette.primary[800],
     sheetBackdrop: palette.sheetBackdropDark,
+    // Pill
+    pillUnselectedBackground: `${palette.Grey[400]}1A`,
+    pillSelectedBackground: palette.Grey[400],
     // Button
     buttonDisabled: palette.Grey[800],
     // Badge
@@ -224,6 +228,7 @@ const theme = createTheme({
     xs: s(8),
     s: s(12),
     m: s(16),
+    popover: s(18),
     intermediate: s(20),
     l: s(24),
     commentAvatar: s(26),
@@ -293,6 +298,14 @@ const theme = createTheme({
     smallBody: {
       fontSize: mvs(14),
     },
+    smallBodySemiBold: {
+      fontFamily: fonts.semiBold,
+      fontSize: mvs(14),
+    },
+    smallBodyBold: {
+      fontFamily: fonts.bold,
+      fontSize: mvs(14),
+    },
     smallInput: {
       fontSize: mvs(14),
       lineHeight: mvs(16),
@@ -316,6 +329,16 @@ const theme = createTheme({
       lineHeight: mvs(14),
     },
     body: {
+      fontSize: mvs(16),
+      lineHeight: mvs(24),
+    },
+    bodySemiBold: {
+      fontFamily: fonts.semiBold,
+      fontSize: mvs(16),
+      lineHeight: mvs(24),
+    },
+    bodyBold: {
+      fontFamily: fonts.bold,
       fontSize: mvs(16),
       lineHeight: mvs(24),
     },

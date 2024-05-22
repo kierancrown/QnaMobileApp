@@ -35,12 +35,34 @@ interface PopoverMenuItemProps {
   titleColor?: keyof Theme['colors'];
   left?: React.ReactNode;
   right?: React.ReactNode;
+  backgroundColor?: keyof Theme['colors'];
   onPress?: () => void;
   closeOnPress?: boolean;
   onClosePress?: () => void;
 }
 
-export type PopoverMenuItemsProps = (PopoverMenuItemProps | 'divider')[];
+interface PopoverMenuTitleProps {
+  title: string;
+  titleColor?: keyof Theme['colors'];
+  left?: React.ReactNode;
+  right?: React.ReactNode;
+}
+
+export type PopoverMenuItemsProps = (
+  | PopoverMenuItemProps
+  | PopoverMenuTitleProps
+  | 'divider'
+)[];
+
+// Type guard for PopoverMenuItemProps
+function isPopoverMenuItemProps(item: any): item is PopoverMenuItemProps {
+  return typeof item === 'object' && item !== null && 'onPress' in item;
+}
+
+// Type guard for PopoverMenuTitleProps
+function isPopoverMenuTitleProps(item: any): item is PopoverMenuTitleProps {
+  return typeof item === 'object' && item !== null && !('onPress' in item);
+}
 
 interface PopoverMenuProps extends TouchableOpacityProps {
   triggerComponent: React.ReactNode;
@@ -90,15 +112,32 @@ const PopoverMenuItem: React.FC<PopoverMenuItemProps> = item => {
       onPressIn={onPressIn}
       onPressOut={onPressOut}>
       <Animated.View style={animatedStyle}>
-        <HStack px="s" columnGap="xs" alignItems="center">
+        <HStack
+          px="s"
+          py="xsY"
+          columnGap="xs"
+          alignItems="center"
+          backgroundColor={item.backgroundColor}>
           {item.left}
-          <Text variant="body" color={item.titleColor ?? 'cardText'}>
+          <Text variant="bodySemiBold" color={item.titleColor ?? 'cardText'}>
             {item.title}
           </Text>
           <Flex alignItems="flex-end">{item.right}</Flex>
         </HStack>
       </Animated.View>
     </Pressable>
+  );
+};
+
+const PopoverMenuTitleItem: React.FC<PopoverMenuTitleProps> = item => {
+  return (
+    <HStack px="s" py="xsY" columnGap="xs" alignItems="center">
+      {item.left}
+      <Text variant="smallBodySemiBold" color={item.titleColor ?? 'cardText'}>
+        {item.title}
+      </Text>
+      <Flex alignItems="flex-end">{item.right}</Flex>
+    </HStack>
   );
 };
 
@@ -155,14 +194,16 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
               {triggerComponent}
             </TouchableOpacity>
           }>
-          <VStack rowGap="sY" py="sY" minWidth={POPOVER_MIN_WIDTH}>
+          <VStack minWidth={POPOVER_MIN_WIDTH}>
             {items.map((item, index) =>
-              item !== 'divider' ? (
+              isPopoverMenuItemProps(item) ? (
                 <PopoverMenuItem
                   key={index}
                   {...item}
                   onClosePress={closePopover}
                 />
+              ) : isPopoverMenuTitleProps(item) ? (
+                <PopoverMenuTitleItem key={index} {...item} />
               ) : (
                 <Box
                   key={index}
