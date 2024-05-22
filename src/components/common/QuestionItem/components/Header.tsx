@@ -1,8 +1,6 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {HStack, Text, VStack} from 'ui';
-import Avatar from '../../Avatar';
 import {FC} from 'react';
-import useProfile from 'app/hooks/useProfile';
 import Username from 'app/components/Username';
 import dayjs from 'dayjs';
 
@@ -15,24 +13,36 @@ import {Pressable} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 import Skeleton from 'react-native-reanimated-skeleton';
+import OfflineAvatar from '../../OfflineAvatar';
 
 interface QuestionItemHeaderProps {
   userId: string;
+  username: string;
+  verified: boolean;
+  avatarImage: {
+    uri?: string;
+    blurhash?: string;
+  };
   isOwner?: boolean;
   timestamp: string;
   hideActions?: boolean;
+  loading?: boolean;
+  size?: 'small' | 'large';
 }
 
 const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
   userId,
+  username,
+  verified,
+  avatarImage,
   timestamp,
   isOwner,
   hideActions,
+  loading = false,
+  size,
 }) => {
   const theme = useAppTheme();
-  const {username, verified} = useProfile(userId);
   const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
-  const loading = useMemo(() => !username, [username]);
 
   const onUserPress = () => {
     navigate('Profile', {userId, displayBackButton: true});
@@ -49,16 +59,26 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
         highlightColor={theme.colors.skeleton}
         layout={[
           {
-            width: theme.iconSizes.xl,
-            height: theme.iconSizes.xl,
+            width:
+              size === 'small'
+                ? theme.iconSizes.commentAvatar
+                : theme.iconSizes.xl,
+            height:
+              size === 'small'
+                ? theme.iconSizes.commentAvatar
+                : theme.iconSizes.xl,
             borderRadius: theme.borderRadii.pill,
           },
         ]}>
         <Pressable onPress={onUserPress}>
-          <Avatar userId={userId} size="xl" />
+          <OfflineAvatar
+            uri={avatarImage.uri}
+            blurhash={avatarImage.blurhash}
+            size={size === 'small' ? 'commentAvatar' : 'xl'}
+          />
         </Pressable>
       </Skeleton>
-      <VStack rowGap="xxxsY" flex={1}>
+      <VStack rowGap={size === 'small' ? 'none' : 'xxxsY'} flex={1}>
         <HStack alignItems="center" flex={1} justifyContent="space-between">
           <Skeleton
             containerStyle={{
@@ -69,21 +89,24 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
             highlightColor={theme.colors.skeleton}
             layout={[
               {
-                width: 133,
-                height: theme.textVariants.headline.fontSize,
+                width: size === 'small' ? 100 : 133,
+                height:
+                  size === 'small'
+                    ? theme.textVariants.smaller.fontSize
+                    : theme.textVariants.headline.fontSize,
                 borderRadius: theme.borderRadii.s,
               },
             ]}>
             <Pressable onPress={onUserPress}>
               <Username
-                variant="headline"
-                username={username ?? 'Profile'}
+                variant={size === 'small' ? 'smaller' : 'headline'}
+                username={username ?? 'Anonymous'}
                 isVerified={verified}
                 noHighlight
               />
             </Pressable>
           </Skeleton>
-          {!hideActions && (
+          {!hideActions && size !== 'small' && (
             <PopoverMenu
               accessibilityLabel="Open Question Options"
               accessibilityRole="button"
@@ -107,12 +130,17 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
           highlightColor={theme.colors.skeleton}
           layout={[
             {
-              width: 118,
-              height: theme.textVariants.smaller.fontSize,
+              width: size === 'small' ? 96 : 118,
+              height:
+                size === 'small'
+                  ? theme.textVariants.tiny.fontSize
+                  : theme.textVariants.smaller.fontSize,
               borderRadius: theme.borderRadii.s,
             },
           ]}>
-          <Text variant="smaller" color="cardText">
+          <Text
+            variant={size === 'small' ? 'tiny' : 'smaller'}
+            color="cardText">
             {dayjs(timestamp).fromNow(false)}
           </Text>
         </Skeleton>

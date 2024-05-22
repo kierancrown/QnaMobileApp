@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@bam.tech/react-native-image-resizer": "^3.0.7",
-    "@candlefinance/faster-image": "^1.5.0",
+    "@candlefinance/faster-image": "^1.5.3",
     "@codeherence/react-native-header": "^0.12.1",
     "@gorhom/bottom-sheet": "^4.6.1",
     "@notifee/react-native": "^7.8.2",

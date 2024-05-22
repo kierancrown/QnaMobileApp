@@ -163,6 +163,13 @@ const Questions: FC = () => {
               userVerified={item.user_metadata?.verified || false}
               isOwner={item.user_id === user?.id}
               id={item.id}
+              avatarImage={{
+                // @ts-ignore
+                uri: item.user_metadata?.profile_picture?.path ?? undefined,
+                blurhash:
+                  // @ts-ignore
+                  item.user_metadata?.profile_picture?.thumbhash ?? undefined,
+              }}
             />
           )}
         />

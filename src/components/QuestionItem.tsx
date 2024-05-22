@@ -33,12 +33,18 @@ interface QuestionItemProps {
   nsfw?: boolean;
   topics?: string[];
   userVerified?: boolean;
+  avatarImage: {
+    uri?: string;
+    blurhash?: string;
+  };
 }
 
 const QuestionItem: FC<QuestionItemProps> = ({
   onPress,
   id,
   userId,
+  username,
+  userVerified,
   question,
   body,
   topics,
@@ -48,6 +54,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   liked,
   nsfw,
   isOwner,
+  avatarImage,
 }) => {
   const theme = useTheme<Theme>();
   const votes = formatNumber(voteCount);
@@ -121,7 +128,14 @@ const QuestionItem: FC<QuestionItemProps> = ({
           })}
           borderRadius="xl"
           backgroundColor="cardBackground">
-          <Header userId={userId} timestamp={timestamp} isOwner={isOwner} />
+          <Header
+            userId={userId}
+            username={username}
+            verified={userVerified ?? false}
+            avatarImage={avatarImage}
+            timestamp={timestamp}
+            isOwner={isOwner}
+          />
 
           {/* Main question body */}
           <VStack rowGap="xsY">

@@ -12,7 +12,7 @@ const SectionHeader: FC<SectionHeaderProps> = ({title}) => {
       alignItems="center"
       paddingHorizontal="s"
       paddingVertical="xsY">
-      <Text variant="medium" color="cardText">
+      <Text variant="highlight" color="cardText">
         {title}
       </Text>
     </HStack>

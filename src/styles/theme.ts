@@ -226,6 +226,7 @@ const theme = createTheme({
     m: s(16),
     intermediate: s(20),
     l: s(24),
+    commentAvatar: s(26),
     xl: s(32),
     ll: s(36),
     xxl: s(48),

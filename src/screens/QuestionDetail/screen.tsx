@@ -1,7 +1,6 @@
 import {
   ActivityIndicator,
   Alert,
-  Pressable,
   RefreshControl,
   StyleProp,
   ViewStyle,
@@ -18,7 +17,6 @@ import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
-import dayjs from 'dayjs';
 import {RouteProp, useFocusEffect, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 
@@ -46,6 +44,7 @@ import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import HeaderComponent from './components/Header';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@gorhom/bottom-sheet';
+import ResponseItem from 'app/components/common/ResponseItem';
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {
@@ -85,6 +84,16 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
             {question?.user_id && question.created_at && (
               <Header
                 userId={question.user_id}
+                loading={loading}
+                username={question.user_metadata?.username ?? 'Anonymous'}
+                verified={question.user_metadata?.verified ?? false}
+                avatarImage={{
+                  uri:
+                    question.user_metadata?.profile_picture?.path ?? undefined,
+                  blurhash:
+                    question.user_metadata?.profile_picture?.thumbhash ??
+                    undefined,
+                }}
                 timestamp={question.created_at}
                 hideActions
               />
@@ -260,6 +269,7 @@ const QuestionDetail: FC = () => {
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
 
   const [responses, setResponses] = useState<Responses>([]);
+  const [offset, setOffset] = useState(0);
   const [loadingMoreResponses, setLoadingMoreResponses] = useState(false);
   const [noMoreResponses, setNoMoreResponses] = useState(false);
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
@@ -299,7 +309,7 @@ const QuestionDetail: FC = () => {
 
   const fetchNextPage = async () => {
     setLoadingMoreResponses(true);
-    const prevCount = responses.length;
+    const prevOffset = offset;
     const {data, error} = await supabase
       .from('responses')
       .select(
@@ -317,7 +327,7 @@ const QuestionDetail: FC = () => {
       )
       .eq('question_id', questionId)
       .order('created_at', {ascending: false})
-      .range(responses.length, responses.length + ESTIMATED_PAGE_SIZE);
+      .range(prevOffset, prevOffset + ESTIMATED_PAGE_SIZE);
 
     setLoadingMoreResponses(false);
 
@@ -327,14 +337,30 @@ const QuestionDetail: FC = () => {
     }
 
     if (data) {
-      const mergedData = [...responses, ...data];
-      if (mergedData.length <= prevCount) {
+      // Filter out duplicates
+      const mergedData = [...responses, ...data].reduce(
+        (unique: Responses, item) => {
+          if (!unique.some(response => response.id === item.id)) {
+            unique.push(item);
+          }
+          return unique;
+        },
+        [],
+      );
+
+      console.log(
+        'mergedData',
+        mergedData.map(item => item.id),
+      );
+
+      if (data.length === 0) {
         setNoMoreResponses(true);
       } else {
-        if (noMoreResponses === true) {
+        if (noMoreResponses) {
           setNoMoreResponses(false);
         }
         setResponses(mergedData);
+        setOffset(prevOffset + data.length); // Update offset
       }
     } else {
       setNoMoreResponses(true);
@@ -392,18 +418,6 @@ const QuestionDetail: FC = () => {
     };
   });
 
-  const deleteAnswer = async (responseId: number) => {
-    const {error} = await supabase
-      .from('responses')
-      .delete()
-      .eq('id', responseId);
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      setResponses(responses.filter(r => r.id !== responseId));
-    }
-  };
-
   return (
     <Flex>
       <FlashListWithHeaders
@@ -456,48 +470,23 @@ const QuestionDetail: FC = () => {
         onEndReachedThreshold={0.5}
         onEndReached={fetchNextPage}
         renderItem={({item}) => (
-          <Pressable
-            onLongPress={() => {
-              if (item.user_id === user?.id) {
-                Alert.alert(
-                  'Delete Response',
-                  'Are you sure you want to delete this response?',
-                  [
-                    {
-                      text: 'Cancel',
-                      style: 'cancel',
-                    },
-                    {
-                      text: 'Delete',
-                      style: 'destructive',
-                      onPress: () => deleteAnswer(item.id),
-                    },
-                  ],
-                );
-              }
-            }}>
-            <Box
-              backgroundColor="cardBackground"
-              my="xsY"
-              px="xs"
-              mx="xs"
-              py="xsY"
-              borderRadius="m">
-              <VStack rowGap="xsY">
-                <HStack alignItems="center" justifyContent="space-between">
-                  <Text
-                    fontWeight="600"
-                    color={item.user_id === user?.id ? 'brand' : 'cardText'}>
-                    {item.user_metadata?.username ?? 'Anonymous'}
-                  </Text>
-                  <Text color="cardText">
-                    {dayjs(item.created_at).fromNow()}
-                  </Text>
-                </HStack>
-                <Text variant="body">{item.response}</Text>
-              </VStack>
-            </Box>
-          </Pressable>
+          <ResponseItem
+            key={item.id}
+            avatarImage={{
+              // @ts-expect-error user_meta is not defined
+              uri: item.user_metadata?.profile_picture?.path ?? undefined,
+              blurhash:
+                // @ts-expect-error user_meta is not defined
+                item.user_metadata?.profile_picture?.thumbhash ?? undefined,
+            }}
+            response={item.response}
+            likes={0}
+            timestamp={item.created_at}
+            username={item.user_metadata?.username ?? 'Anonymous'}
+            verified={item.user_metadata?.verified ?? false}
+            userId={item.user_id}
+            isOwner={item.user_id === user?.id}
+          />
         )}
       />
     </Flex>

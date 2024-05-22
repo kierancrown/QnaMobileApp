@@ -9,7 +9,11 @@ import SectionHeader from '../components/SectionHeader';
 import {Text} from 'app/components/common';
 import {useNotification} from 'app/context/PushNotificationContext';
 import useMount from 'app/hooks/useMount';
-// import {clearCache} from '@candlefinance/faster-image';
+import {clearCache} from '@candlefinance/faster-image';
+import {
+  getFreeDiskStorageSync,
+  getTotalDiskCapacitySync,
+} from 'react-native-device-info';
 
 const SettingsDebugScreen = () => {
   const theme = useAppTheme();
@@ -25,7 +29,7 @@ const SettingsDebugScreen = () => {
   });
 
   const clearCacheHandler = () => {
-    // clearCache();
+    clearCache();
   };
 
   return (
@@ -50,6 +54,13 @@ const SettingsDebugScreen = () => {
         titleColor="destructiveAction"
         onPress={clearCacheHandler}
       />
+      <Text
+        variant="smaller"
+        color="cardText"
+        paddingHorizontal="s"
+        marginBottom="mY">
+        {`Free Disk Space: ${getFreeDiskStorageSync()} / Total Disk Space: ${getTotalDiskCapacitySync()}`}
+      </Text>
     </ScrollViewWithHeaders>
   );
 };
