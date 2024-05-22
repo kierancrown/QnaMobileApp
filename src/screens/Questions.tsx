@@ -153,6 +153,8 @@ const Questions: FC = () => {
               username={item.user_metadata?.username || 'Anonymous'}
               userId={item.user_id}
               question={item.question}
+              body={item.body || undefined}
+              topics={item.question_metadata?.topics || []}
               answerCount={item.question_metadata?.response_count || 0}
               voteCount={item.question_metadata?.upvote_count || 0}
               timestamp={item.created_at}

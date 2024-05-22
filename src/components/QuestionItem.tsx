@@ -1,11 +1,9 @@
 import React, {FC} from 'react';
 import {Box, Center, HStack, Text, VStack} from './common';
-import dayjs from 'dayjs';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartIcon from 'app/assets/icons/actions/Heart.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
-import TimeIcon from 'app/assets/icons/TimeFive.svg';
 
 import {formatNumber} from 'app/utils/numberFormatter';
 import {Theme} from 'app/styles/theme';
@@ -15,15 +13,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {Alert, Pressable} from 'react-native';
-import Username from './Username';
+import {Alert, Platform, Pressable} from 'react-native';
 import {supabase} from 'app/lib/supabase';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {HomeStackParamList} from 'app/navigation/HomeStack';
-import PopoverMenu from './common/PopoverMenu';
 
-import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
-import {menuItems} from 'app/screens/QuestionDetail/components/Header';
+import Header from 'app/components/common/QuestionItem/components/Header';
 
 interface QuestionItemProps {
   onPress: () => void;
@@ -31,37 +24,37 @@ interface QuestionItemProps {
   userId: string;
   username: string;
   question: string;
+  body?: string;
   answerCount: number;
   liked?: boolean;
   isOwner?: boolean;
   voteCount: number;
   timestamp: string;
   nsfw?: boolean;
-  tags?: string[];
+  topics?: string[];
   userVerified?: boolean;
 }
-
-const ICON_SIZE = 13;
 
 const QuestionItem: FC<QuestionItemProps> = ({
   onPress,
   id,
   userId,
-  username,
   question,
+  body,
+  topics,
   answerCount,
   voteCount,
   timestamp,
   liked,
   nsfw,
-  userVerified,
   isOwner,
 }) => {
   const theme = useTheme<Theme>();
   const votes = formatNumber(voteCount);
   const answers = formatNumber(answerCount);
   const opacity = useSharedValue(1);
-  const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
+
+  const ICON_SIZE = theme.iconSizes.m;
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -121,9 +114,17 @@ const QuestionItem: FC<QuestionItemProps> = ({
           rowGap="sY"
           px="m"
           py="sY"
-          my="xxxxxs"
+          my="xxsY"
+          mx={Platform.select({
+            ios: 'xs',
+            android: 's',
+          })}
+          borderRadius="xl"
           backgroundColor="cardBackground">
-          <HStack alignItems="flex-start" justifyContent="space-between">
+          <Header userId={userId} timestamp={timestamp} isOwner={isOwner} />
+
+          {/* Main question body */}
+          <VStack rowGap="xsY">
             <Text variant="questionBody">
               {question}
               {nsfw && (
@@ -141,42 +142,33 @@ const QuestionItem: FC<QuestionItemProps> = ({
                 </HStack>
               )}
             </Text>
-            <PopoverMenu
-              accessibilityLabel="Open Question Options"
-              accessibilityRole="button"
-              accessibilityHint="Report or hide this question"
-              triggerComponent={
-                <ElipsisIcon
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
-                />
-              }
-              items={menuItems(isOwner ?? false, theme)}
-            />
-          </HStack>
-          <VStack rowGap="xsY">
-            <HStack alignItems="center">
-              <Text variant="username" fontWeight="400">
-                Asked by{' '}
+
+            {body && (
+              <Text
+                variant="questionDetail"
+                numberOfLines={4}
+                ellipsizeMode="tail">
+                {body}
               </Text>
-              <Username
-                variant="username"
-                fontWeight="600"
-                username={username}
-                isVerified={userVerified}
-                onPress={() => {
-                  navigate('Profile', {
-                    userId,
-                    displayBackButton: true,
-                  });
-                }}
-              />
+            )}
+
+            {/* Topics */}
+            <HStack columnGap="xxs">
+              {topics?.map(topic => (
+                <Text key={topic} variant="tag" color="cardText">
+                  #{topic}
+                </Text>
+              ))}
             </HStack>
+          </VStack>
+
+          {/* Question metadata: likes, comments, etc */}
+          <VStack rowGap="xsY">
             <HStack alignItems="center" columnGap="s">
               <HStack alignItems="center" columnGap="xxs">
                 {liked ? (
                   <HeartIcon
-                    fill={theme.colors.cardText}
+                    fill={theme.colors.heartAction}
                     width={ICON_SIZE}
                     height={ICON_SIZE}
                   />
@@ -187,7 +179,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
                     height={ICON_SIZE}
                   />
                 )}
-                <Text color="cardText" variant="smaller">
+                <Text color="cardText" variant="smallBody">
                   {votes}
                 </Text>
               </HStack>
@@ -197,18 +189,8 @@ const QuestionItem: FC<QuestionItemProps> = ({
                   width={ICON_SIZE}
                   height={ICON_SIZE}
                 />
-                <Text color="cardText" variant="smaller">
+                <Text color="cardText" variant="smallBody">
                   {answers}
-                </Text>
-              </HStack>
-              <HStack alignItems="center" columnGap="xxs">
-                <TimeIcon
-                  fill={theme.colors.cardText}
-                  width={ICON_SIZE}
-                  height={ICON_SIZE}
-                />
-                <Text color="cardText" variant="smaller">
-                  {dayjs(timestamp).fromNow(true)}
                 </Text>
               </HStack>
             </HStack>

@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import React, {FC, useCallback, useEffect, useRef, useState} from 'react';
+import React, {FC, useCallback, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
@@ -68,10 +68,6 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
   const [bookmarked, setBookmarked] = useState(false);
 
-  useEffect(() => {
-    console.log({hasUpvoted, question, loading, upvoteQuestion});
-  }, [loading, question, hasUpvoted, upvoteQuestion]);
-
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
     paddingHorizontal: 0,
@@ -94,6 +90,22 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     <LargeHeader headerStyle={headerStyle}>
       <ScalingView scrollY={scrollY} style={scalingViewStyle}>
         <VStack rowGap="sY" px="m">
+          {/* Topics */}
+          <HStack columnGap="xxs">
+            {question?.question_metadata?.topics &&
+              question?.question_metadata?.topics.map(topic => (
+                <Box
+                  key={topic}
+                  backgroundColor="cardBackground"
+                  borderRadius="s"
+                  px="xs"
+                  py="xxs">
+                  <Text variant="tag" color="foreground">
+                    {topic}
+                  </Text>
+                </Box>
+              ))}
+          </HStack>
           <Skeleton
             isLoading={loading}
             containerStyle={{}}

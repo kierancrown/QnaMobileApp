@@ -138,6 +138,7 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
           response_count,
           view_count,
           visible,
+          topics,
           location (
             name
           )

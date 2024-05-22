@@ -307,8 +307,12 @@ const theme = createTheme({
     },
     questionBody: {
       fontFamily: fonts.semiBold,
+      fontSize: mvs(15),
+      lineHeight: mvs(19),
+    },
+    questionDetail: {
       fontSize: mvs(14),
-      lineHeight: mvs(18),
+      lineHeight: mvs(14),
     },
     body: {
       fontSize: mvs(16),

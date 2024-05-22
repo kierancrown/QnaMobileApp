@@ -203,7 +203,7 @@ export type Database = {
           location: number | null
           question_id: number
           response_count: number
-          tags: string[] | null
+          topics: string[] | null
           updated_at: string
           upvote_count: number
           user_id: string
@@ -215,7 +215,7 @@ export type Database = {
           location?: number | null
           question_id: number
           response_count?: number
-          tags?: string[] | null
+          topics?: string[] | null
           updated_at?: string
           upvote_count?: number
           user_id?: string
@@ -227,7 +227,7 @@ export type Database = {
           location?: number | null
           question_id?: number
           response_count?: number
-          tags?: string[] | null
+          topics?: string[] | null
           updated_at?: string
           upvote_count?: number
           user_id?: string
@@ -306,6 +306,7 @@ export type Database = {
       }
       questions: {
         Row: {
+          body: string | null
           created_at: string
           id: number
           nsfw: boolean
@@ -314,6 +315,7 @@ export type Database = {
           user_meta: number
         }
         Insert: {
+          body?: string | null
           created_at?: string
           id?: number
           nsfw?: boolean
@@ -322,6 +324,7 @@ export type Database = {
           user_meta: number
         }
         Update: {
+          body?: string | null
           created_at?: string
           id?: number
           nsfw?: boolean

@@ -19,6 +19,7 @@ export interface QuestionsDetailData {
     response_count: number;
     view_count: number;
     visible: boolean;
+    topics: string[];
     location?: {
       name: string;
     };
