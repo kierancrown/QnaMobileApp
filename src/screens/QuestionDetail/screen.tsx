@@ -467,7 +467,6 @@ const QuestionDetail: FC = () => {
         onEndReached={fetchNextPage}
         renderItem={({item}) => (
           <ResponseItem
-            key={item.id}
             avatarImage={{
               // @ts-expect-error user_meta is not defined
               uri: item.user_metadata?.profile_picture?.path ?? undefined,

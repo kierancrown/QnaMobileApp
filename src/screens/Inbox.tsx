@@ -1,3 +1,6 @@
+// IMPORTANT
+// - https://shopify.github.io/flash-list/docs/guides/section-list/
+
 import React, {FC, useEffect, useRef, useState} from 'react';
 import {Center, Flex, HStack, Text, VStack} from 'ui';
 import {Database} from 'app/types/supabase';
