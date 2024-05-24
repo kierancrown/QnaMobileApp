@@ -56,7 +56,7 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
       <Pressable onPress={focusInput}>
         <HStack
           alignItems="center"
-          columnGap="s"
+          columnGap="xs"
           bg="inputBackground"
           px="s"
           py="sY"

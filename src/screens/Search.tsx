@@ -42,6 +42,7 @@ const HeaderComponent = () => {
             focused &&
             searchTerm.length > 0 && (
               <TouchableOpacity
+                hitSlop={8}
                 onPress={() => {
                   setSearchTerm('');
                 }}>
