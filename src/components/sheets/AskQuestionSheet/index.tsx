@@ -31,6 +31,7 @@ import {
 } from '@react-navigation/native';
 import {
   createStackNavigator,
+  StackCardStyleInterpolator,
   StackNavigationOptions,
   TransitionPresets,
 } from '@react-navigation/stack';
@@ -60,13 +61,58 @@ const Stack = createStackNavigator<AskQuestionStackParamList>();
 const Navigator: FC = () => {
   const theme = useAppTheme();
 
+  const forSlide: StackCardStyleInterpolator = useCallback(
+    // ({current, next, layouts}) => {
+    ({current, layouts}) => {
+      const progress = current.progress;
+      // const nextProgress = next ? next.progress : undefined;
+
+      return {
+        cardStyle: {
+          transform: [
+            {
+              translateX: progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [layouts.screen.width, 0],
+              }),
+            },
+          ],
+          backgroundColor: theme.colors.mainBackground,
+          borderTopLeftRadius: theme.borderRadii.xl,
+          borderTopRightRadius: theme.borderRadii.xl,
+          overflow: 'hidden',
+        },
+        // containerStyle: {
+        //   transform: [
+        //     {
+        //       translateX: nextProgress
+        //         ? nextProgress.interpolate({
+        //             inputRange: [0, 1],
+        //             outputRange: [0, -layouts.screen.width * 0.3],
+        //           })
+        //         : 0,
+        //     },
+        //   ],
+        // },
+      };
+    },
+    [theme],
+  );
+
   const screenOptions = useMemo<StackNavigationOptions>(
     () => ({
       ...TransitionPresets.SlideFromRightIOS,
       headerShown: false,
       safeAreaInsets: {top: 0},
+      cardStyleInterpolator: forSlide,
+      cardStyle: {
+        backgroundColor: theme.colors.mainBackground,
+        borderStartStartRadius: theme.borderRadii.xl,
+        borderStartEndRadius: theme.borderRadii.xl,
+        overflow: 'hidden',
+      },
     }),
-    [],
+    [forSlide, theme.borderRadii.xl, theme.colors.mainBackground],
   );
 
   return (
@@ -77,7 +123,7 @@ const Navigator: FC = () => {
         ...DefaultTheme,
         colors: {
           ...DefaultTheme.colors,
-          background: theme.colors.mainBackground,
+          background: theme.colors.none,
         },
       }}>
       <Stack.Navigator screenOptions={screenOptions}>

@@ -5,36 +5,16 @@ import {useAppTheme} from 'app/styles/theme';
 import React, {FC, useRef, useState} from 'react';
 import {TextInput} from 'react-native';
 import {Center, HStack, Text, VStack} from 'ui';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
-import ClearIcon from 'app/assets/icons/CircleCloseSolid.svg';
 import {FlashListWithHeaders, Header} from '@codeherence/react-native-header';
-import Animated, {
-  SharedValue,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import {SharedValue, useSharedValue} from 'react-native-reanimated';
 
 const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const searchInput = useRef<TextInput>(null);
-  const [focused, setFocused] = useState(false);
   const theme = useAppTheme();
   const showNavBar = useSharedValue(1);
-
-  const rightAdornmentAnimatedStyle = useAnimatedStyle(() => {
-    const show = focused && searchTerm.length > 0;
-    return {
-      opacity: withTiming(show ? 1 : 0, {duration: 220}),
-      transform: [
-        {
-          translateX: withTiming(show ? 0 : theme.spacing.xs, {duration: 220}),
-        },
-      ],
-    };
-  }, [focused, searchTerm, theme.spacing.xs]);
 
   return (
     <Header
@@ -48,12 +28,6 @@ const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
           <HStack py="sY" px="xs">
             <Input
               placeholder="topics, users, or questions, etc"
-              onFocus={() => {
-                setFocused(true);
-              }}
-              onBlur={() => {
-                setFocused(false);
-              }}
               leftAdornment={
                 <Center>
                   <SearchIcon
@@ -63,23 +37,10 @@ const HeaderComponent = ({}: {showNavBar: SharedValue<number>}) => {
                   />
                 </Center>
               }
-              rightAdornment={
-                <Animated.View style={rightAdornmentAnimatedStyle}>
-                  <TouchableOpacity
-                    hitSlop={8}
-                    onPress={() => {
-                      setSearchTerm('');
-                    }}>
-                    <Center>
-                      <ClearIcon
-                        width={theme.iconSizes.intermediate}
-                        height={theme.iconSizes.intermediate}
-                        fill={theme.colors.inputPlaceholder}
-                      />
-                    </Center>
-                  </TouchableOpacity>
-                </Animated.View>
-              }
+              clearButton
+              onClear={() => {
+                setSearchTerm('');
+              }}
               ref={searchInput}
               value={searchTerm}
               onChangeText={setSearchTerm}

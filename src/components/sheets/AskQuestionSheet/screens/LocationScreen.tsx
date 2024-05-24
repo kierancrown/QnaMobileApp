@@ -98,6 +98,9 @@ const LocationsScreen: FC = () => {
           onChangeText={setSearchTerm}
           returnKeyType="search"
           insideBottomSheet
+          borderRadius="pill"
+          clearButton
+          onClear={() => setSearchTerm('')}
         />
       </VStack>
 
