@@ -28,7 +28,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {HapticFeedbackTypes} from 'react-native-haptic-feedback';
 import {useHaptics} from 'app/hooks/useHaptics';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {EdgeInsets, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 interface PopoverMenuItemProps {
   title: string;
@@ -70,6 +70,7 @@ interface PopoverMenuProps extends TouchableOpacityProps {
   items: PopoverMenuItemsProps;
   mode?: PopoverMode;
   placement?: PopoverPlacement;
+  customInsets?: EdgeInsets;
 }
 
 export interface PopoverRef {
@@ -149,6 +150,7 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
       minWidth,
       mode = PopoverMode.RN_MODAL,
       placement = PopoverPlacement.AUTO,
+      customInsets,
       ...rest
     },
     ref,
@@ -180,7 +182,7 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
           placement={placement}
           onRequestClose={closePopover}
           verticalOffset={verticalOffset}
-          displayAreaInsets={insets}
+          displayAreaInsets={customInsets ?? insets}
           arrowSize={{width: 0, height: 0}}
           popoverStyle={{
             backgroundColor: theme.colors.cardBackground,
