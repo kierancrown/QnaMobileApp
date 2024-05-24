@@ -72,7 +72,10 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
         {
           translateY: hideTabBar
             ? withTiming(ESTIMATED_TABBAR_HEIGHT * 3)
-            : withSpring(0),
+            : withSpring(0, {
+                damping: 10,
+                stiffness: 100,
+              }),
         },
       ],
     };

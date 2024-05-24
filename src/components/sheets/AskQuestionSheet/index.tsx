@@ -232,6 +232,14 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     };
   }, [actionButton]);
 
+  const locationButtonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(actionButton === 'close' ? 0 : 1, {
+        duration: 200,
+      }),
+    };
+  }, [actionButton]);
+
   useEffect(() => {
     dispatch(setSheetState(open ? 'open' : 'closed'));
   }, [dispatch, open]);

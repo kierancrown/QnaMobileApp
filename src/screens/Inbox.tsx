@@ -1,7 +1,4 @@
-// IMPORTANT
-// - https://shopify.github.io/flash-list/docs/guides/section-list/
-
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {FC, useMemo, useRef, useState} from 'react';
 import {Center, Flex, HStack, Text, VStack} from 'ui';
 import {Database} from 'app/types/supabase';
 import {supabase} from 'app/lib/supabase';
@@ -15,57 +12,62 @@ import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
 import {
   ActivityIndicator,
   Alert,
-  Pressable,
   StyleProp,
-  StyleSheet,
   ViewStyle,
   RefreshControl,
 } from 'react-native';
 import useMount from 'app/hooks/useMount';
 import {
-  SectionListWithHeaders,
   Header,
   LargeHeader,
   ScalingView,
+  FlashListWithHeaders,
 } from '@codeherence/react-native-header';
-import Animated, {
-  SharedValue,
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import {SharedValue} from 'react-native-reanimated';
 import NotificationItem from 'app/components/NotificationItem';
-import Badge from 'app/components/common/Badge';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
 import PopoverMenu from 'app/components/common/PopoverMenu';
+import HeaderBar from 'app/components/common/HeaderBar';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
-const HeaderTabs = ['All', 'Requested', 'Notifications'] as const;
+const HeaderTabs = [
+  'All',
+  'Requested',
+  'Notifications',
+  'Another super long title',
+  'Another Another one',
+];
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const theme = useAppTheme();
+  const [selectedTab, setSelectedTab] =
+    useState<(typeof HeaderTabs)[number]>('All');
 
   return (
     <Header
       showNavBar={showNavBar}
       noBottomBorder
+      headerCenterFadesIn={false}
+      headerCenterStyle={{
+        paddingHorizontal: theme.spacing.none,
+        marginHorizontal: theme.spacing.none,
+      }}
       headerCenter={
-        <Center py="xxsY">
-          <Text variant="medium">Inbox - All</Text>
-        </Center>
-      }
-      headerRight={
-        <HStack alignItems="center" columnGap="xs">
+        <HStack flex={1} py="sY">
+          <HeaderBar
+            tabItems={HeaderTabs}
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
           <PopoverMenu
             accessibilityLabel="Open Inbox Options"
             accessibilityRole="button"
             accessibilityHint="Mark all as read"
             triggerComponent={
-              <Center py="xxsY" px="xxs">
+              <Center py="xsY" px="xs">
                 <ElipsisIcon
                   width={theme.iconSizes.l}
                   height={theme.iconSizes.l}
@@ -87,8 +89,6 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const theme = useTheme<Theme>();
-  const [selectedTab, setSelectedTab] =
-    useState<(typeof HeaderTabs)[number]>('All');
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
     marginBottom: theme.spacing.mY,
@@ -104,104 +104,9 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
             paddingVertical="none">
             Inbox
           </Text>
-          <HStack columnGap="xs">
-            {HeaderTabs.map(tab => (
-              <TabItem
-                key={tab}
-                onPress={() => setSelectedTab(tab)}
-                title={tab}
-                count={0}
-                selected={selectedTab === tab}
-              />
-            ))}
-          </HStack>
         </VStack>
       </ScalingView>
     </LargeHeader>
-  );
-};
-
-interface TabItemProps {
-  selected?: boolean;
-  onPress: () => void;
-  title: string;
-  count: number;
-}
-
-const TabItem: FC<TabItemProps> = ({
-  onPress,
-  title,
-  count,
-  selected = false,
-}) => {
-  const theme = useAppTheme();
-  const {triggerHaptic} = useHaptics();
-
-  const opacity = useSharedValue(1);
-  const scale = useSharedValue(1);
-  // 0 for unselected, 1 for selected
-  const selectedAnimation = useSharedValue(0);
-
-  useEffect(() => {
-    selectedAnimation.value = withTiming(selected ? 1 : 0, {
-      duration: 100,
-    });
-  }, [selected, selectedAnimation]);
-
-  const internalOnPress = async () => {
-    await triggerHaptic({
-      iOS: HapticFeedbackTypes.selection,
-      android: HapticFeedbackTypes.impactLight,
-    });
-    onPress();
-  };
-
-  const onPressIn = () => {
-    opacity.value = withTiming(0.66, {duration: 88});
-    scale.value = withTiming(0.98, {duration: 66});
-  };
-
-  const onPressOut = () => {
-    opacity.value = withTiming(1, {duration: 88});
-    scale.value = withTiming(1, {duration: 88});
-  };
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      borderRadius: theme.borderRadii.pill,
-      borderColor: theme.colors.divider,
-      opacity: opacity.value,
-      transform: [{scale: scale.value}],
-      borderWidth: StyleSheet.hairlineWidth,
-      backgroundColor: interpolateColor(
-        selectedAnimation.value,
-        [0, 1],
-        [
-          theme.colors.pillUnselectedBackground,
-          theme.colors.pillSelectedBackground,
-        ],
-      ),
-    };
-  }, [
-    theme.borderRadii.pill,
-    theme.colors.divider,
-    theme.colors.pillUnselectedBackground,
-    theme.colors.pillSelectedBackground,
-  ]);
-
-  return (
-    <Pressable
-      onPress={internalOnPress}
-      onPressIn={onPressIn}
-      onPressOut={onPressOut}>
-      <Badge text={count.toString()} size="small" hidden={count === 0}>
-        <Animated.View style={animatedStyle}>
-          <Center py="xxsY" px="s">
-            <Text variant="medium">{title}</Text>
-          </Center>
-        </Animated.View>
-      </Badge>
-    </Pressable>
   );
 };
 
@@ -212,12 +117,26 @@ const InboxScreen: FC = () => {
   const {user} = useUser();
   const dispatch = useDispatch<AppDispatch>();
 
-  const [notifications, setNotifications] = useState<
-    {date: string; data: Notification[]}[]
-  >([]);
+  const [notifications, setNotifications] = useState<(string | Notification)[]>(
+    [],
+  );
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef(null);
+
+  const stickyHeaderIndices = useMemo(
+    () =>
+      notifications
+        .map((item, index) => {
+          if (typeof item === 'string') {
+            return index;
+          } else {
+            return null;
+          }
+        })
+        .filter(item => item !== null) as number[],
+    [notifications],
+  );
 
   useTabPress({
     tabName: 'InboxTab',
@@ -288,7 +207,7 @@ const InboxScreen: FC = () => {
   // Function to group notifications by date
   const groupNotificationsByDate = (
     data: Notification[],
-  ): {date: string; data: Notification[]}[] => {
+  ): (string | Notification)[] => {
     const groupedNotifications: {[date: string]: Notification[]} = {};
     const today = dayjs().startOf('day');
     const yesterday = dayjs().subtract(1, 'day').startOf('day');
@@ -319,19 +238,16 @@ const InboxScreen: FC = () => {
       }
     });
 
-    const sections = [];
+    const sections: (string | Notification)[] = [];
 
     if (groupedNotifications.Today) {
-      sections.push({date: 'Today', data: groupedNotifications.Today});
+      sections.push('Today', ...groupedNotifications.Today);
     }
     if (groupedNotifications.Yesterday) {
-      sections.push({
-        date: 'Yesterday',
-        data: groupedNotifications.Yesterday,
-      });
+      sections.push('Yesterday', ...groupedNotifications.Yesterday);
     }
     if (groupedNotifications.Earlier) {
-      sections.push({date: 'Earlier', data: groupedNotifications.Earlier});
+      sections.push('Earlier', ...groupedNotifications.Earlier);
     }
 
     return sections;
@@ -348,18 +264,14 @@ const InboxScreen: FC = () => {
           <ActivityIndicator size="small" color={theme.colors.brand} />
         </Center>
       ) : (
-        <SectionListWithHeaders
+        <FlashListWithHeaders
           ref={scrollRef}
           HeaderComponent={HeaderComponent}
           LargeHeaderComponent={LargeHeaderComponent}
-          sections={notifications}
-          renderSectionHeader={({section}) => (
-            <HStack bg="mainBackground" py="sY" px="m">
-              <Text variant="medium">{section.date}</Text>
-            </HStack>
-          )}
           data={notifications}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item =>
+            typeof item === 'string' ? item : item.id.toString()
+          }
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -373,19 +285,37 @@ const InboxScreen: FC = () => {
             paddingTop: theme.spacing.sY,
             paddingBottom: bottomListPadding,
           }}
-          renderItem={({item}) => (
-            <NotificationItem
-              onPress={() => {
-                triggerHaptic(HapticFeedbackTypes.selection).then();
-                // TODO: Decide based on notification type
-              }}
-              id={item.id}
-              title={item.type}
-              body={item.body || ''}
-              timestamp={item.delivered_at || item.created_at}
-              read={item.read_at !== null}
-            />
-          )}
+          estimatedItemSize={100}
+          renderItem={({item}) => {
+            if (typeof item === 'string') {
+              // Rendering header
+              return (
+                <HStack bg="mainBackground" py="sY" px="m">
+                  <Text variant="medium">{item}</Text>
+                </HStack>
+              );
+            } else {
+              // Render item
+              return (
+                <NotificationItem
+                  onPress={() => {
+                    triggerHaptic(HapticFeedbackTypes.selection).then();
+                    // TODO: Decide based on notification type
+                  }}
+                  id={item.id}
+                  title={item.type}
+                  body={item.body || ''}
+                  timestamp={item.delivered_at || item.created_at}
+                  read={item.read_at !== null}
+                />
+              );
+            }
+          }}
+          stickyHeaderIndices={stickyHeaderIndices}
+          getItemType={item => {
+            // To achieve better performance, specify the type based on the item
+            return typeof item === 'string' ? 'sectionHeader' : 'row';
+          }}
         />
       )}
     </Flex>

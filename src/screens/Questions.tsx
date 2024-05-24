@@ -6,9 +6,9 @@ import {
   ViewStyle,
 } from 'react-native';
 import React, {FC, useRef, useState} from 'react';
-import {Center, Flex, Text} from 'ui';
+import {Center, Flex, HStack, Text, VStack} from 'ui';
 
-import {Theme} from 'app/styles/theme';
+import {Theme, useAppTheme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import useMount from 'app/hooks/useMount';
 import {useNavigation} from '@react-navigation/native';
@@ -32,20 +32,51 @@ import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
 import {useUser} from 'app/lib/supabase/context/auth';
 
-const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => (
-  <Header
-    showNavBar={showNavBar}
-    noBottomBorder
-    headerCenter={
-      <Center py="xxsY">
-        <Text variant="medium">Questions</Text>
-      </Center>
-    }
-  />
-);
+import FilterIcon from 'app/assets/icons/actions/Filter.svg';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import HeaderBar from 'app/components/common/HeaderBar';
+
+const HeaderTabs = ['For You', 'Trending', 'Near Me', 'Discover'];
+const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
+  const theme = useAppTheme();
+  const [selectedTab, setSelectedTab] =
+    useState<(typeof HeaderTabs)[number]>('For You');
+
+  return (
+    <Header
+      showNavBar={showNavBar}
+      noBottomBorder
+      headerCenterStyle={{
+        paddingHorizontal: theme.spacing.none,
+        marginHorizontal: theme.spacing.none,
+      }}
+      headerCenterFadesIn={false}
+      headerCenter={
+        <Flex py="sY">
+          <HStack columnGap="xs" alignItems="center">
+            <HeaderBar
+              tabItems={HeaderTabs}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+            <Center paddingEnd="xs">
+              <TouchableOpacity hitSlop={8}>
+                <FilterIcon
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
+                />
+              </TouchableOpacity>
+            </Center>
+          </HStack>
+        </Flex>
+      }
+    />
+  );
+};
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const theme = useTheme<Theme>();
+
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
     marginBottom: theme.spacing.mY,
@@ -53,12 +84,14 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   return (
     <LargeHeader headerStyle={headerStyle}>
       <ScalingView scrollY={scrollY}>
-        <Text
-          variant="largeHeader"
-          marginVertical="none"
-          paddingVertical="none">
-          Questions
-        </Text>
+        <VStack rowGap="xsY">
+          <Text
+            variant="largeHeader"
+            marginVertical="none"
+            paddingVertical="none">
+            Questions
+          </Text>
+        </VStack>
       </ScalingView>
     </LargeHeader>
   );
@@ -106,7 +139,51 @@ const Questions: FC = () => {
       Alert.alert('Error', error.message);
     } else {
       const questionsWithCount: QuestionsWithCount = data;
-      setQuestions(questionsWithCount || []);
+      setQuestions(
+        [
+          ...questionsWithCount,
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 1,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 2,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 3,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 4,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 5,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 6,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 7,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 8,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 9,
+          })),
+          ...questionsWithCount.map(q => ({
+            ...q,
+            id: q.id + 10,
+          })),
+        ] || [],
+      );
     }
     setRefreshing(false);
     setLoading(false);

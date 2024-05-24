@@ -45,8 +45,9 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
 
   const setScrollY = (value: number) => {
     // Calculate the direction of the scroll
+    // || value >= scrollContentSize - hideThreshold / 2
     let direction: 'up' | 'down' = 'up';
-    if (value <= 0 || value >= scrollContentSize - hideThreshold / 2) {
+    if (value <= 0) {
       setScrollDirection(direction);
       return;
     }

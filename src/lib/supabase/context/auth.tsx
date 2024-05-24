@@ -168,6 +168,7 @@ export const AuthContextProvider = (props: any) => {
   useMount(() => {
     Linking.addEventListener('url', event => {
       let urlString = event.url;
+
       if (event.url.includes('login#')) {
         urlString = event.url.replace('login#', 'login?');
       } else {
@@ -204,6 +205,7 @@ export const AuthContextProvider = (props: any) => {
             access_token: accessToken,
           })
           .then(res => {
+            console.log('Auth success', res);
             setUser(res.data.user);
           })
           .catch(err => console.log({err}));
