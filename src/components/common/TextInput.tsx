@@ -26,6 +26,11 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
   const inputRef = useRef<TextInput | BottomSheetTextInput>(null);
   const theme = useTheme<Theme>();
   const textVariant = theme.textVariants[props.variant || 'defaultTextInput'];
+  // Omit border radius
+  const textInputProps = {
+    ...props,
+    borderRadius: undefined,
+  };
 
   const focusInput = () => {
     inputRef.current?.focus();
@@ -68,9 +73,10 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
               <BottomSheetTextInput
                 ref={inputRef}
                 placeholderTextColor={theme.colors.inputPlaceholder}
-                cursorColor={theme.colors.brand}
+                {...textInputProps}
                 selectionColor={theme.colors.brand}
-                {...props}
+                cursorColor={theme.colors.brand}
+                selectionHandleColor={theme.colors.brand}
                 style={[
                   inputStyle,
                   textVariant,
@@ -84,9 +90,10 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
               <TextInput
                 ref={inputRef}
                 placeholderTextColor={theme.colors.inputPlaceholder}
-                cursorColor={theme.colors.brand}
+                {...textInputProps}
                 selectionColor={theme.colors.brand}
-                {...props}
+                cursorColor={theme.colors.brand}
+                selectionHandleColor={theme.colors.brand}
                 style={[
                   inputStyle,
                   textVariant,

@@ -232,14 +232,6 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     };
   }, [actionButton]);
 
-  const locationButtonAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(actionButton === 'close' ? 0 : 1, {
-        duration: 200,
-      }),
-    };
-  }, [actionButton]);
-
   useEffect(() => {
     dispatch(setSheetState(open ? 'open' : 'closed'));
   }, [dispatch, open]);
@@ -255,6 +247,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   return (
     <>
       <Animated.View
+        pointerEvents={open ? 'auto' : 'none'}
         style={[
           styles.buttons,
           {bottom: snapPoints[0] + theme.spacing.sY},

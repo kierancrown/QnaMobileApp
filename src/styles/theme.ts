@@ -325,9 +325,13 @@ const theme = createTheme({
       fontSize: mvs(16),
       lineHeight: mvs(18),
     },
-    extraLargeInput: {
+    intermediateInput: {
       fontSize: mvs(18),
       lineHeight: mvs(22),
+    },
+    extraLargeInput: {
+      fontSize: mvs(17),
+      lineHeight: mvs(21),
     },
     questionBody: {
       fontFamily: fonts.semiBold,

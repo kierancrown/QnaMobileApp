@@ -33,6 +33,7 @@ interface FloatTabBarProps {
   descriptors: BottomTabDescriptorMap;
   navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
   onCtaPress?: () => void;
+  bottomPadding?: number;
 }
 
 export const ICON_SIZE = 24;
@@ -45,6 +46,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   descriptors,
   navigation,
   onCtaPress,
+  bottomPadding = 0,
 }) => {
   const theme = useTheme<Theme>();
   const activeColor = theme.colors.tabBarIconActive;
@@ -84,7 +86,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const ctaStyles: StyleProp<ViewStyle> = {
     position: 'absolute',
     top: -(CTA_SIZE / 2 - ICON_SIZE / 2 - theme.spacing.sY),
-    left: (WINDOW_WIDTH - theme.spacing.l * 2 - CTA_SIZE) / 2,
+    left: (WINDOW_WIDTH - CTA_SIZE) / 2,
     borderRadius: theme.borderRadii.pill,
     backgroundColor: activeColor,
     shadowColor: theme.colors.black,
@@ -152,111 +154,120 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
 
   return (
     <Animated.View style={animatedStyle}>
-      <HStack
-        width="100%"
-        justifyContent="space-around"
-        alignItems="center"
-        py="sY"
-        px="m"
-        columnGap="l"
-        borderRadius="pill"
-        backgroundColor="tabBarBackground"
-        shadowColor="black"
-        shadowOffset={{
-          width: 0,
-          height: 2,
-        }}
-        shadowOpacity={0.33}>
-        {state.routes.map((route, index) => {
-          const half = state.routes.length / 2;
-          const {options} = descriptors[route.key];
+      <Box
+        position="absolute"
+        bottom={0}
+        px="l"
+        width={WINDOW_WIDTH}
+        style={{
+          paddingBottom: bottomPadding,
+        }}>
+        <HStack
+          width="100%"
+          justifyContent="space-around"
+          alignItems="center"
+          py="sY"
+          px="m"
+          columnGap="l"
+          borderRadius="pill"
+          backgroundColor="tabBarBackground"
+          shadowColor="black"
+          shadowOffset={{
+            width: 0,
+            height: 2,
+          }}
+          shadowOpacity={0.33}>
+          {state.routes.map((route, index) => {
+            const half = state.routes.length / 2;
+            const {options} = descriptors[route.key];
 
-          const tabBarIcon = options.tabBarIcon;
-          const isFocused = state.index === index;
+            const tabBarIcon = options.tabBarIcon;
+            const isFocused = state.index === index;
 
-          const onPress = async () => {
-            fabEventEmitter.emit('tabPress', route.name);
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-              await triggerHaptic({
-                iOS: HapticFeedbackTypes.selection,
-                android: HapticFeedbackTypes.impactLight,
+            const onPress = async () => {
+              fabEventEmitter.emit('tabPress', route.name);
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
               });
-            }
-          };
 
-          const onLongPress = () => {
-            navigation.emit({
-              type: 'tabLongPress',
-              target: route.key,
-            });
-          };
+              if (!isFocused && !event.defaultPrevented) {
+                navigation.navigate(route.name);
+                await triggerHaptic({
+                  iOS: HapticFeedbackTypes.selection,
+                  android: HapticFeedbackTypes.impactLight,
+                });
+              }
+            };
 
-          return (
-            <Fragment key={route.key}>
-              {index === half && <Box width={CTA_SIZE * 0.8} />}
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={options.tabBarAccessibilityLabel}
-                testID={options.tabBarTestID}
-                hitSlop={16}
-                onPress={onPress}
-                onLongPress={onLongPress}>
-                <Badge size="xsmall" hidden={options.tabBarBadge == null}>
-                  <VStack alignItems="center">
-                    {tabBarIcon
-                      ? tabBarIcon({
-                          focused: isFocused,
-                          color: isFocused ? activeColor : inactiveColor,
-                          size: ICON_SIZE,
-                        })
-                      : null}
-                  </VStack>
-                </Badge>
-              </Pressable>
-            </Fragment>
-          );
-        })}
-      </HStack>
-      <Animated.View style={[ctaStyles, ctaAnimatedStyle]}>
-        <Pressable
-          onPress={internalCtaPress}
-          onPressIn={onPressIn}
-          onPressOut={onPressOut}>
-          <Center
-            width={CTA_SIZE}
-            height={CTA_SIZE}
-            backgroundColor="tabBarIconActive"
-            shadowColor="black"
-            shadowOffset={{
-              width: 0,
-              height: 2,
-            }}
-            shadowOpacity={0.33}
-            borderRadius="pill">
-            <Animated.View style={[ctaIconStyles, addAnimatedStyle]}>
-              <PlusIcon
-                width={ICON_SIZE * 1.2}
-                height={ICON_SIZE * 1.2}
-                fill={theme.colors.white}
-              />
-            </Animated.View>
-            <Animated.View style={[ctaIconStyles, replyAnimatedStyle]}>
-              <ReplyIcon
-                width={ICON_SIZE * 1.2}
-                height={ICON_SIZE * 1.2}
-                fill={theme.colors.white}
-              />
-            </Animated.View>
-          </Center>
-        </Pressable>
-      </Animated.View>
+            const onLongPress = () => {
+              navigation.emit({
+                type: 'tabLongPress',
+                target: route.key,
+              });
+            };
+
+            return (
+              <Fragment key={route.key}>
+                {index === half && <Box width={CTA_SIZE * 0.8} />}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={options.tabBarAccessibilityLabel}
+                  testID={options.tabBarTestID}
+                  hitSlop={16}
+                  onPress={onPress}
+                  onLongPress={onLongPress}>
+                  <Badge size="xsmall" hidden={options.tabBarBadge == null}>
+                    <VStack alignItems="center">
+                      {tabBarIcon
+                        ? tabBarIcon({
+                            focused: isFocused,
+                            color: isFocused ? activeColor : inactiveColor,
+                            size: ICON_SIZE,
+                          })
+                        : null}
+                    </VStack>
+                  </Badge>
+                </Pressable>
+              </Fragment>
+            );
+          })}
+        </HStack>
+        <Animated.View style={[ctaStyles, ctaAnimatedStyle]}>
+          <Pressable
+            onPress={internalCtaPress}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}>
+            <Center
+              width={CTA_SIZE}
+              height={CTA_SIZE}
+              backgroundColor="tabBarIconActive"
+              shadowColor="black"
+              shadowOffset={{
+                width: 0,
+                height: 2,
+              }}
+              shadowOpacity={0.33}
+              borderRadius="pill">
+              <Animated.View style={[ctaIconStyles, addAnimatedStyle]}>
+                <PlusIcon
+                  width={ICON_SIZE * 1.2}
+                  height={ICON_SIZE * 1.2}
+                  fill={theme.colors.white}
+                />
+              </Animated.View>
+              <Animated.View style={[ctaIconStyles, replyAnimatedStyle]}>
+                <ReplyIcon
+                  width={ICON_SIZE * 1.2}
+                  height={ICON_SIZE * 1.2}
+                  fill={theme.colors.white}
+                />
+              </Animated.View>
+            </Center>
+          </Pressable>
+        </Animated.View>
+      </Box>
     </Animated.View>
   );
 };

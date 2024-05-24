@@ -1,9 +1,7 @@
 import React from 'react';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 
-import {useTheme} from '@shopify/restyle';
-import {Theme} from 'app/styles/theme';
+import {useAppTheme} from 'app/styles/theme';
 import {useUser} from 'app/lib/supabase/context/auth';
 
 import AuthStack from './AuthStack';
@@ -13,7 +11,7 @@ import TabStack from './TabStack';
 import OnboardingStack from './OnboardingStack';
 
 const RootStack = () => {
-  const theme = useTheme<Theme>();
+  const theme = useAppTheme();
   const {user} = useUser();
 
   const authData = useSelector((state: RootState) => state.persistent.auth);
@@ -41,20 +39,18 @@ const RootStack = () => {
 
   return (
     <>
-      <SafeAreaProvider>
-        <NavigationContainer
-          theme={{
-            ...DefaultTheme,
-            colors: {
-              ...DefaultTheme.colors,
-              background: theme.colors.mainBackground,
-              primary: theme.colors.brand,
-              text: theme.colors.foreground,
-            },
-          }}>
-          {determineStack()}
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <NavigationContainer
+        theme={{
+          ...DefaultTheme,
+          colors: {
+            ...DefaultTheme.colors,
+            background: theme.colors.mainBackground,
+            primary: theme.colors.brand,
+            text: theme.colors.foreground,
+          },
+        }}>
+        {determineStack()}
+      </NavigationContainer>
     </>
   );
 };

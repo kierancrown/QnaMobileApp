@@ -184,7 +184,7 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
           arrowSize={{width: 0, height: 0}}
           popoverStyle={{
             backgroundColor: theme.colors.cardBackground,
-            borderRadius: theme.borderRadii.m,
+            borderRadius: theme.borderRadii.l,
           }}
           from={
             <TouchableOpacity

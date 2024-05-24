@@ -31,6 +31,7 @@ import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {TabBarProvider} from 'app/context/tabBarContext';
 import {useSelector} from 'react-redux';
 import {RootState} from 'app/redux/store';
+import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -59,31 +60,32 @@ const TabBarContainer = (props: TabBarContainerProps) => {
         });
 
   return (
-    <Box
-      px="l"
-      position="absolute"
-      bottom={0}
-      style={{
-        paddingBottom: bottomPadding,
-      }}>
-      <LinearGradient
-        colors={['transparent', bottomColor]}
-        locations={[0, 1]}
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          right: -theme.spacing.l,
-          left: -theme.spacing.l,
-        }}
-      />
-      <FloatingTabBar {...props} />
-    </Box>
+    <>
+      <Box
+        pointerEvents="none"
+        position="absolute"
+        bottom={0}
+        px="l"
+        height={ESTIMATED_TABBAR_HEIGHT * 2}
+        width={WINDOW_WIDTH}>
+        <LinearGradient
+          colors={['transparent', bottomColor]}
+          locations={[0, 1]}
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            right: -theme.spacing.l,
+            left: -theme.spacing.l,
+          }}
+        />
+      </Box>
+
+      <FloatingTabBar {...props} bottomPadding={bottomPadding} />
+    </>
   );
 };
 
 export default function TabStack() {
   const {triggerHaptic} = useHaptics();
-  const insets = useSafeAreaInsets();
-  const theme = useTheme<Theme>();
   const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
 
   const unreadNotificationCount = useSelector(
@@ -108,17 +110,6 @@ export default function TabStack() {
         )}
         screenOptions={{
           headerShown: false,
-          tabBarLabelStyle: {
-            paddingBottom: 5,
-            fontSize: 12,
-            fontWeight: 'bold',
-          },
-          tabBarStyle: {
-            padding: 10,
-            height: insets.bottom + 66,
-            backgroundColor: theme.colors.cardBackground,
-            borderTopColor: theme.colors.segmentBackground,
-          },
           tabBarHideOnKeyboard: true,
         }}>
         <Tab.Group>

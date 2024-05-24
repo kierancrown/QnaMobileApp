@@ -33,13 +33,7 @@ import PopoverMenu from 'app/components/common/PopoverMenu';
 import HeaderBar from 'app/components/common/HeaderBar';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
-const HeaderTabs = [
-  'All',
-  'Requested',
-  'Notifications',
-  'Another super long title',
-  'Another Another one',
-];
+const HeaderTabs = ['All', 'Requested', 'Notifications'];
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const theme = useAppTheme();
