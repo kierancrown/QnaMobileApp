@@ -62,38 +62,32 @@ const Navigator: FC = () => {
   const theme = useAppTheme();
 
   const forSlide: StackCardStyleInterpolator = useCallback(
-    // ({current, next, layouts}) => {
-    ({current, layouts}) => {
+    ({current, next}) => {
       const progress = current.progress;
-      // const nextProgress = next ? next.progress : undefined;
+      const nextProgress = next ? next.progress : undefined;
 
       return {
         cardStyle: {
           transform: [
             {
-              translateX: progress.interpolate({
+              translateY: progress.interpolate({
                 inputRange: [0, 1],
-                outputRange: [layouts.screen.width, 0],
+                outputRange: [theme.spacing.xlY, 0],
               }),
             },
           ],
+          opacity: progress,
           backgroundColor: theme.colors.mainBackground,
           borderTopLeftRadius: theme.borderRadii.xl,
           borderTopRightRadius: theme.borderRadii.xl,
           overflow: 'hidden',
         },
-        // containerStyle: {
-        //   transform: [
-        //     {
-        //       translateX: nextProgress
-        //         ? nextProgress.interpolate({
-        //             inputRange: [0, 1],
-        //             outputRange: [0, -layouts.screen.width * 0.3],
-        //           })
-        //         : 0,
-        //     },
-        //   ],
-        // },
+        containerStyle: {
+          opacity: nextProgress?.interpolate({
+            inputRange: [0, 1],
+            outputRange: [1, 0],
+          }),
+        },
       };
     },
     [theme],
