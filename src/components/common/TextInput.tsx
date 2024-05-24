@@ -6,6 +6,7 @@ import {Theme} from 'app/styles/theme';
 import Box from './Box';
 import Animated, {useAnimatedStyle} from 'react-native-reanimated';
 import HStack from './HStack';
+import Flex from './Flex';
 
 export interface InputProps extends BoxProps<Theme>, Partial<TextInputProps> {
   variant?: keyof Theme['textVariants'];
@@ -62,39 +63,41 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
           borderRadius="textInput"
           {...props}>
           {props.leftAdornment && <Box>{props.leftAdornment}</Box>}
-          {props.insideBottomSheet ? (
-            <BottomSheetTextInput
-              ref={inputRef}
-              placeholderTextColor={theme.colors.inputPlaceholder}
-              cursorColor={theme.colors.brand}
-              selectionColor={theme.colors.brand}
-              {...props}
-              style={[
-                inputStyle,
-                textVariant,
-                // eslint-disable-next-line react-native/no-inline-styles
-                {
-                  borderWidth: 0,
-                },
-              ]}
-            />
-          ) : (
-            <TextInput
-              ref={inputRef}
-              placeholderTextColor={theme.colors.inputPlaceholder}
-              cursorColor={theme.colors.brand}
-              selectionColor={theme.colors.brand}
-              {...props}
-              style={[
-                inputStyle,
-                textVariant,
-                // eslint-disable-next-line react-native/no-inline-styles
-                {
-                  borderWidth: 0,
-                },
-              ]}
-            />
-          )}
+          <Flex>
+            {props.insideBottomSheet ? (
+              <BottomSheetTextInput
+                ref={inputRef}
+                placeholderTextColor={theme.colors.inputPlaceholder}
+                cursorColor={theme.colors.brand}
+                selectionColor={theme.colors.brand}
+                {...props}
+                style={[
+                  inputStyle,
+                  textVariant,
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  {
+                    borderWidth: 0,
+                  },
+                ]}
+              />
+            ) : (
+              <TextInput
+                ref={inputRef}
+                placeholderTextColor={theme.colors.inputPlaceholder}
+                cursorColor={theme.colors.brand}
+                selectionColor={theme.colors.brand}
+                {...props}
+                style={[
+                  inputStyle,
+                  textVariant,
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  {
+                    borderWidth: 0,
+                  },
+                ]}
+              />
+            )}
+          </Flex>
           {props.rightAdornment && <Box>{props.rightAdornment}</Box>}
         </HStack>
       </Pressable>
