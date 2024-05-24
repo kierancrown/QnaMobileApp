@@ -203,6 +203,9 @@ const AskSheetContent: FC = () => {
                     blurOnSubmit={false}
                     placeholder="What do you want to know?"
                     returnKeyType="next"
+                    selectionColor={theme.colors.brand}
+                    cursorColor={theme.colors.brand}
+                    selectionHandleColor={theme.colors.brand}
                     onSubmitEditing={() => extraInfoRef.current?.focus()}
                     editable={!isLoading}
                     placeholderTextColor={theme.colors.inputPlaceholder}
@@ -215,7 +218,6 @@ const AskSheetContent: FC = () => {
                         color: theme.colors.foreground,
                       },
                     ]}
-                    cursorColor={theme.colors.foreground}
                     onChangeText={text => {
                       dispatch(setQuestion(text));
                     }}
@@ -238,6 +240,9 @@ const AskSheetContent: FC = () => {
                     }}
                     placeholder="Add extra info here... (optional)"
                     keyboardType="default"
+                    selectionColor={theme.colors.brand}
+                    cursorColor={theme.colors.brand}
+                    selectionHandleColor={theme.colors.brand}
                     editable={!isLoading}
                     ref={extraInfoRef}
                     placeholderTextColor={theme.colors.inputPlaceholder}
@@ -249,7 +254,6 @@ const AskSheetContent: FC = () => {
                         color: theme.colors.foreground,
                       },
                     ]}
-                    cursorColor={theme.colors.foreground}
                     onChangeText={text => {
                       dispatch(setQuestionDetail(text));
                     }}

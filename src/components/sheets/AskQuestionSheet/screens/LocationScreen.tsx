@@ -13,7 +13,13 @@ import {AppDispatch, RootState} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {ActivityIndicator, StyleProp, TextInput, ViewStyle} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  StyleProp,
+  TextInput,
+  ViewStyle,
+} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
@@ -24,6 +30,8 @@ import {AskQuestionStackParamList} from '..';
 import {useAppTheme} from 'app/styles/theme';
 import LinearGradient from 'react-native-linear-gradient';
 import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+import {useDebounceValue} from 'usehooks-ts';
+import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 
 const LocationsScreen: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,6 +45,9 @@ const LocationsScreen: FC = () => {
   const searchInput = useRef<TextInput>(null);
   const theme = useAppTheme();
 
+  const [debouncedSearchTerm] = useDebounceValue(searchTerm, 1000);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [loadingResults, setLoadingResults] = useState(false);
   const listHeaderGradientStyles: StyleProp<ViewStyle> = useMemo(
     () => ({
       width: '100%',
@@ -53,7 +64,6 @@ const LocationsScreen: FC = () => {
     try {
       Geolocation.getCurrentPosition(info => {
         (async () => {
-          console.log(info);
           const data = await findNearestLocation({
             lat: info.coords.latitude,
             long: info.coords.longitude,
@@ -66,27 +76,54 @@ const LocationsScreen: FC = () => {
           } else {
             setResults(data);
           }
+          setInitialLoad(false);
         })();
       });
     } catch (error) {
       console.log(error);
+      setInitialLoad(false);
     }
   };
 
   useMount(getCurrent);
 
   useEffect(() => {
-    if (searchTerm.length > 2) {
+    if (searchTerm.trim().length < 2 || searchTerm.trim() === '') {
+      setLoadingResults(false);
+      return;
+    }
+    if (searchTerm.trim() !== debouncedSearchTerm.trim()) {
+      setLoadingResults(true);
+    }
+  }, [debouncedSearchTerm, searchTerm]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm.trim().length > 1) {
       (async () => {
-        const data = await searchLocations(searchTerm);
-        // @ts-ignore
-        setResults(data);
+        try {
+          const data = await searchLocations(debouncedSearchTerm.trim());
+          if (data.length === 0) {
+            console.log('No results found');
+            setResults([]);
+          } else {
+            // @ts-ignore
+            setResults(data);
+          }
+        } catch (error) {
+          setResults([]);
+          Alert.alert(
+            'Error',
+            'An error occurred while searching for locations',
+          );
+        } finally {
+          setLoadingResults(false);
+        }
       })();
     } else {
       getCurrent();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
+  }, [debouncedSearchTerm]);
 
   return (
     <VStack flex={1}>
@@ -100,6 +137,23 @@ const LocationsScreen: FC = () => {
           insideBottomSheet
           borderRadius="pill"
           clearButton
+          leftAdornment={
+            <Center>
+              {loadingResults ? (
+                <Center
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}>
+                  <ActivityIndicator size="small" />
+                </Center>
+              ) : (
+                <SearchIcon
+                  width={theme.iconSizes.intermediate}
+                  height={theme.iconSizes.intermediate}
+                  fill={theme.colors.inputPlaceholder}
+                />
+              )}
+            </Center>
+          }
           onClear={() => setSearchTerm('')}
         />
       </VStack>
@@ -115,10 +169,24 @@ const LocationsScreen: FC = () => {
         </Box>
         {results.length === 0 ? (
           <Center flex={1}>
-            <HStack alignItems="center" columnGap="xs">
-              <ActivityIndicator size="small" />
-              <Text>Searching for you...</Text>
-            </HStack>
+            {initialLoad ? (
+              <HStack alignItems="center" columnGap="xs">
+                <ActivityIndicator size="small" />
+                <Text>Searching for you...</Text>
+              </HStack>
+            ) : (
+              <Center flex={1}>
+                <VStack rowGap="xxsY">
+                  <Text textAlign="center" variant="markdownH2">
+                    No results found
+                  </Text>
+                  <Text textAlign="center" variant="body">
+                    <Text variant="bodyBold">"{debouncedSearchTerm}"</Text> not
+                    found.
+                  </Text>
+                </VStack>
+              </Center>
+            )}
           </Center>
         ) : (
           <BottomSheetFlatList
@@ -128,6 +196,11 @@ const LocationsScreen: FC = () => {
             contentContainerStyle={{
               paddingVertical: theme.spacing.mY,
             }}
+            ListEmptyComponent={
+              <Center flex={1}>
+                <Text>No results found</Text>
+              </Center>
+            }
             renderItem={({item}) => (
               <SelectionItem
                 title={item.name}

@@ -61,8 +61,9 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
     color: theme.colors[props.color || 'white'],
   };
 
+  const value = props.value || '';
   const clearButtonAnimatedStyle = useAnimatedStyle(() => {
-    const show = focused && props.value && props.value.length > 0;
+    const show = focused && value.length > 0;
     return {
       opacity: withTiming(show ? 1 : 0, {duration: 220}),
       transform: [
@@ -71,7 +72,7 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
         },
       ],
     };
-  }, [focused, props.value, theme.spacing.xs]);
+  }, [focused, value, theme.spacing.xs]);
 
   return (
     <Animated.View style={animatedStyle}>
