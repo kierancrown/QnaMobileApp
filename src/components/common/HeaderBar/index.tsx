@@ -29,6 +29,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
   const scrollX = useSharedValue(0);
   const scrollContentSize = useSharedValue(0);
   const scrollViewWidth = useSharedValue(0);
+  // @ts-ignore
   const scrollViewRef = useRef<ScrollView>(null);
   const [tabWidths, setTabWidths] = useState<number[]>([]);
 
@@ -40,7 +41,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
         [direction]: 0,
         bottom: 0,
         height: '100%',
-        width: theme.spacing.l,
+        width: theme.spacing.xl,
         zIndex: 10,
         pointerEvents: 'none',
       } as StyleProp<ViewStyle>;
