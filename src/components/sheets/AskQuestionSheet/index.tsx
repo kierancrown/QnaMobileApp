@@ -33,7 +33,6 @@ import {
   createStackNavigator,
   StackCardStyleInterpolator,
   StackNavigationOptions,
-  TransitionPresets,
 } from '@react-navigation/stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from 'app/redux/store';
@@ -61,7 +60,7 @@ const Stack = createStackNavigator<AskQuestionStackParamList>();
 const Navigator: FC = () => {
   const theme = useAppTheme();
 
-  const forSlide: StackCardStyleInterpolator = useCallback(
+  const forCardPopin: StackCardStyleInterpolator = useCallback(
     ({current, next}) => {
       const progress = current.progress;
       const nextProgress = next ? next.progress : undefined;
@@ -95,10 +94,9 @@ const Navigator: FC = () => {
 
   const screenOptions = useMemo<StackNavigationOptions>(
     () => ({
-      ...TransitionPresets.SlideFromRightIOS,
       headerShown: false,
       safeAreaInsets: {top: 0},
-      cardStyleInterpolator: forSlide,
+      cardStyleInterpolator: forCardPopin,
       cardStyle: {
         backgroundColor: theme.colors.mainBackground,
         borderStartStartRadius: theme.borderRadii.xl,
@@ -106,7 +104,7 @@ const Navigator: FC = () => {
         overflow: 'hidden',
       },
     }),
-    [forSlide, theme.borderRadii.xl, theme.colors.mainBackground],
+    [forCardPopin, theme.borderRadii.xl, theme.colors.mainBackground],
   );
 
   return (
