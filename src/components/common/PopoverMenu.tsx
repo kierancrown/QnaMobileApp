@@ -5,6 +5,7 @@ import React, {
   useImperativeHandle,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
 import {
   TouchableOpacity,
@@ -15,7 +16,7 @@ import Popover, {
   PopoverPlacement,
 } from 'react-native-popover-view';
 import VStack from './VStack';
-import {Platform, Pressable, StyleSheet} from 'react-native';
+import {Keyboard, Platform, Pressable, StyleSheet} from 'react-native';
 import HStack from './HStack';
 import Box from './Box';
 import Text from './Text';
@@ -71,6 +72,7 @@ interface PopoverMenuProps extends TouchableOpacityProps {
   mode?: PopoverMode;
   placement?: PopoverPlacement;
   customInsets?: EdgeInsets;
+  handleKeyboard?: boolean;
 }
 
 export interface PopoverRef {
@@ -90,7 +92,10 @@ const PopoverMenuItem: React.FC<PopoverMenuItemProps> = item => {
   }, []);
 
   const onInternalPress = async () => {
-    await triggerHaptic(HapticFeedbackTypes.impactLight);
+    await triggerHaptic({
+      iOS: HapticFeedbackTypes.selection,
+      android: HapticFeedbackTypes.effectClick,
+    });
     item.onPress?.();
     if (item.closeOnPress) {
       item.onClosePress?.();
@@ -151,6 +156,7 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
       mode = PopoverMode.RN_MODAL,
       placement = PopoverPlacement.AUTO,
       customInsets,
+      handleKeyboard,
       ...rest
     },
     ref,
@@ -161,7 +167,7 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
     const verticalOffset =
       Platform.OS === 'android' ? -(insets.bottom + 5) : -5;
     const [popoverOpen, setPopoverOpen] = useState(false);
-
+    const [trigger, setTrigger] = useState(false);
     const closePopover = useCallback(() => {
       setPopoverOpen(false);
     }, []);
@@ -169,6 +175,34 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
     useImperativeHandle(ref, () => ({
       closePopover,
     }));
+
+    useEffect(() => {
+      if (!Keyboard.isVisible() && trigger && Platform.OS !== 'android') {
+        setTrigger(false);
+        setPopoverOpen(true);
+        return () => Keyboard.removeAllListeners('keyboardDidHide');
+      }
+
+      Keyboard.addListener('keyboardDidHide', () => {
+        if (handleKeyboard && trigger) {
+          setTrigger(false);
+          setPopoverOpen(true);
+        }
+      });
+
+      return () => Keyboard.removeAllListeners('keyboardDidHide');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [trigger]);
+
+    const onTrigger = () => {
+      if (handleKeyboard && Keyboard.isVisible() && Platform.OS === 'ios') {
+        setTrigger(true);
+        Keyboard.dismiss();
+      } else {
+        setTrigger(false);
+        setPopoverOpen(true);
+      }
+    };
 
     return (
       <Box
@@ -189,10 +223,7 @@ const PopoverMenu = forwardRef<PopoverRef, PopoverMenuProps>(
             borderRadius: theme.borderRadii.l,
           }}
           from={
-            <TouchableOpacity
-              hitSlop={8}
-              {...rest}
-              onPress={() => setPopoverOpen(true)}>
+            <TouchableOpacity hitSlop={8} {...rest} onPress={onTrigger}>
               {triggerComponent}
             </TouchableOpacity>
           }>

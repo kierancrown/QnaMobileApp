@@ -293,7 +293,10 @@ const InboxScreen: FC = () => {
               return (
                 <NotificationItem
                   onPress={() => {
-                    triggerHaptic(HapticFeedbackTypes.selection).then();
+                    triggerHaptic({
+                      iOS: HapticFeedbackTypes.selection,
+                      android: HapticFeedbackTypes.effectClick,
+                    }).then();
                     // TODO: Decide based on notification type
                   }}
                   id={item.id}

@@ -6,7 +6,7 @@ import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {useHiddenTabBar} from 'app/context/tabBarContext';
 import SettingsItem from '../components/SettingsItem';
 import SectionHeader from '../components/SectionHeader';
-import {Text} from 'app/components/common';
+import {Button, Text} from 'app/components/common';
 import {useNotification} from 'app/context/PushNotificationContext';
 import useMount from 'app/hooks/useMount';
 import {clearCache} from '@candlefinance/faster-image';
@@ -15,6 +15,7 @@ import {
   getTotalDiskCapacitySync,
 } from 'react-native-device-info';
 import {Alert} from 'react-native';
+import RNReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 const convertBytesToMB = (bytes: number) => {
   return Math.round(bytes / 1024 / 1024);
@@ -73,6 +74,16 @@ const SettingsDebugScreen = () => {
           getTotalDiskCapacitySync(),
         )}Mb`}
       </Text>
+      <SectionHeader title="Haptics" />
+      <Button
+        title="Vibrate"
+        onPress={() => {
+          RNReactNativeHapticFeedback.trigger('soft', {
+            enableVibrateFallback: false,
+            ignoreAndroidSystemSettings: true,
+          });
+        }}
+      />
     </ScrollViewWithHeaders>
   );
 };

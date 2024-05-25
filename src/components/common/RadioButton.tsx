@@ -1,6 +1,6 @@
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useAppTheme} from 'app/styles/theme';
-import React, {forwardRef, useEffect, useImperativeHandle} from 'react';
+import React, {forwardRef, useImperativeHandle} from 'react';
 import {Pressable} from 'react-native';
 import Animated, {
   interpolate,
@@ -36,25 +36,25 @@ const RadioButton = (
   const pressInState = useSharedValue(0);
   const {triggerHaptic} = useHaptics();
 
-  useEffect(() => {
-    if (selected === true) {
-      triggerHaptic(HapticFeedbackTypes.rigid);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
-
   const onPressIn = () => {
     parentOnPressIn?.();
     pressInState.value = withTiming(1, {
       duration: 88,
     });
-    triggerHaptic(HapticFeedbackTypes.selection);
+    triggerHaptic({
+      iOS: HapticFeedbackTypes.selection,
+      android: HapticFeedbackTypes.virtualKey,
+    });
   };
 
   const onPressOut = () => {
     parentOnPressOut?.();
     pressInState.value = withTiming(0, {
       duration: 66,
+    });
+    triggerHaptic({
+      iOS: HapticFeedbackTypes.rigid,
+      android: HapticFeedbackTypes.virtualKeyRelease,
     });
   };
 

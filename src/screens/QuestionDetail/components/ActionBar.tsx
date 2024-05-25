@@ -46,7 +46,10 @@ const ActionBarIcon: FC<ActionBarIconProps> = ({
   const {triggerHaptic} = useHaptics();
 
   const internalOnPress = async () => {
-    await triggerHaptic(HapticFeedbackTypes.selection);
+    await triggerHaptic({
+      iOS: HapticFeedbackTypes.selection,
+      android: HapticFeedbackTypes.effectClick,
+    });
     onPress?.();
   };
 

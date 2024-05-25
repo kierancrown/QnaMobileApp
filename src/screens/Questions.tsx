@@ -220,7 +220,10 @@ const Questions: FC = () => {
           renderItem={({item}) => (
             <QuestionItem
               onPress={() => {
-                triggerHaptic(HapticFeedbackTypes.selection).then();
+                triggerHaptic({
+                  iOS: HapticFeedbackTypes.selection,
+                  android: HapticFeedbackTypes.effectClick,
+                }).then();
                 navigate('QuestionDetail', {
                   questionId: item.id,
                   responseCount: item.question_metadata?.response_count || 0,

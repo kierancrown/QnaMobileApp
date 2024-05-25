@@ -36,7 +36,7 @@ const MagicLinkSentSheet: FC<MagicLinkSentSheetProps> = ({
         onClose?.();
       } else if (index === 0) {
         (async () => {
-          await triggerHaptic(HapticFeedbackTypes.impactLight);
+          await triggerHaptic(HapticFeedbackTypes.soft);
         })();
       }
     },

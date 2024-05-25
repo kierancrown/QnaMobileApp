@@ -196,7 +196,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
                 navigation.navigate(route.name);
                 await triggerHaptic({
                   iOS: HapticFeedbackTypes.selection,
-                  android: HapticFeedbackTypes.impactLight,
+                  android: HapticFeedbackTypes.effectClick,
                 });
               }
             };

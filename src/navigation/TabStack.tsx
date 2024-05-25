@@ -101,7 +101,7 @@ export default function TabStack() {
             onCtaPress={() => {
               triggerHaptic({
                 iOS: HapticFeedbackTypes.impactMedium,
-                android: HapticFeedbackTypes.impactMedium,
+                android: HapticFeedbackTypes.effectHeavyClick,
               }).then();
               setQuestionSheetOpen(true);
             }}

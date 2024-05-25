@@ -61,7 +61,10 @@ export const useHaptics = () => {
           iOS?: HapticFeedbackTypes;
           android?: HapticFeedbackTypes;
         },
-    options?: HapticOptions,
+    options: HapticOptions = {
+      enableVibrateFallback: false,
+      ignoreAndroidSystemSettings: true,
+    },
   ) => {
     const haptic =
       typeof type === 'string'
@@ -77,8 +80,6 @@ export const useHaptics = () => {
 
     if (await hapticsAvailable(haptic)) {
       haptics.trigger(haptic, options);
-    } else {
-      console.log(`Haptic feedback type ${type} not available`);
     }
   };
 

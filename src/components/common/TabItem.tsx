@@ -44,7 +44,7 @@ const TabItem: FC<TabItemProps> = ({
   const internalOnPress = async () => {
     await triggerHaptic({
       iOS: HapticFeedbackTypes.selection,
-      android: HapticFeedbackTypes.impactLight,
+      android: HapticFeedbackTypes.effectClick,
     });
     onPress();
   };

@@ -9,9 +9,9 @@ import SettingsRadioList from '../../components/SettingsRadioList';
 import useSyncedPreference from 'app/hooks/useSyncedPreference';
 
 const SettingsMentionsScreen = () => {
+  useHiddenTabBar();
   const theme = useAppTheme();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
-  useHiddenTabBar();
 
   const [menionedBy, setMentionedBy, {loading: loadingMentionedBy}] =
     useSyncedPreference<number>('mentionedBy', 0);

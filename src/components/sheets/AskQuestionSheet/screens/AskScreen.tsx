@@ -312,6 +312,7 @@ const AskSheetContent: FC = () => {
               size={'small'}>
               <PopoverMenu
                 ref={mediaPopover}
+                handleKeyboard
                 onLongPress={openPhotoLibrary}
                 triggerComponent={
                   <PhotosIcon
