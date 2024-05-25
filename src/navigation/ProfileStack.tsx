@@ -4,12 +4,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import ProfileScreen from 'app/screens/Profile';
+
 import SettingsScren from 'app/screens/Settings/Screen';
 import SettingsAboutScreen from 'app/screens/Settings/About/Screen';
 import SettingsHelpScreen from 'app/screens/Settings/Help/Screen';
 import SettingsDebugScreen from 'app/screens/Settings/Debug/Screen';
 import SettingsAboutDocumentViewScreen from 'app/screens/Settings/About/PublicDocViewer/Screen';
 import SettingsNotificationScreen from 'app/screens/Settings/Notifications/Screen';
+import SettingsMentionsScreen from 'app/screens/Settings/Privacy/Mentions/Screen';
 import SettingsPrivacyScreen from 'app/screens/Settings/Privacy/Screen';
 import SettingsAccountScreen from 'app/screens/Settings/Account/Screen';
 
@@ -35,6 +37,7 @@ export type ProfileStackParamList = {
   SettingsAccount: SettingsScreenParams;
   SettingsNotifications: SettingsScreenParams;
   SettingsPrivacySecurity: SettingsScreenParams;
+  SettingsMentionsScreen: SettingsScreenParams;
   SettingsHelp: SettingsScreenParams;
   SettingsAbout: SettingsScreenParams;
   SettingsDocumentViewer: SettingsScreenParams & SettingsDocViewerScreenParams;
@@ -75,6 +78,11 @@ const ProfileStack = () => {
         name="SettingsPrivacySecurity"
         initialParams={{headerTitle: 'Privacy & Security'}}
         component={SettingsPrivacyScreen}
+      />
+      <Stack.Screen
+        name="SettingsMentionsScreen"
+        initialParams={{headerTitle: 'Mentions'}}
+        component={SettingsMentionsScreen}
       />
       <Stack.Screen
         name="SettingsHelp"

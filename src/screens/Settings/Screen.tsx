@@ -3,12 +3,8 @@ import React from 'react';
 import HeaderComponent from './components/Header';
 import {useAppTheme} from 'app/styles/theme';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
-import {useTabBar} from 'app/context/tabBarContext';
-import {
-  NavigationProp,
-  useFocusEffect,
-  useNavigation,
-} from '@react-navigation/native';
+import {useHiddenTabBar} from 'app/context/tabBarContext';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import SettingsItem from './components/SettingsItem';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import SectionHeader from './components/SectionHeader';
@@ -23,17 +19,8 @@ import DebugIcon from 'app/assets/icons/settings/Debug.svg';
 const SettingsScren = () => {
   const theme = useAppTheme();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
-  const {setHidden} = useTabBar();
   const {navigate} = useNavigation<NavigationProp<ProfileStackParamList>>();
-
-  useFocusEffect(() => {
-    console.log('SettingsScren focused');
-    setHidden(true);
-    return () => {
-      console.log('SettingsScren unfocused');
-      setHidden(false);
-    };
-  });
+  useHiddenTabBar();
 
   return (
     <ScrollViewWithHeaders
@@ -42,6 +29,7 @@ const SettingsScren = () => {
         paddingTop: theme.spacing.mY,
         paddingBottom: bottomListPadding,
       }}>
+      <SectionHeader title="Account Settings" />
       <SettingsItem
         title="Account"
         icon={
@@ -80,6 +68,7 @@ const SettingsScren = () => {
           });
         }}
       />
+      <SectionHeader title="App Settings" />
       <SettingsItem
         title="Help"
         icon={
