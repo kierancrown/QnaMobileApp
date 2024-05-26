@@ -43,6 +43,8 @@ import {
 } from 'app/redux/slices/askSheetSlice';
 import LocationsScreen from './screens/LocationScreen';
 import useAndroidBack from 'app/hooks/useAndroidBack';
+import {supabase} from 'app/lib/supabase';
+import {useUser} from 'app/lib/supabase/context/auth';
 
 interface AskQuestionSheetProps {
   open?: boolean;
@@ -145,6 +147,12 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   } = useSelector((state: RootState) => state.nonPersistent.askSheet);
   const theme = useAppTheme();
   const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
+
+  const {user} = useUser();
+
+  const askSheetData = useSelector(
+    (state: RootState) => state.nonPersistent.askSheet,
+  );
 
   const enablePanDown = useMemo(
     () => !isLoading && actionButton === 'close',
@@ -276,6 +284,57 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
 
   const submit = async () => {
     dispatch(setLoading(true));
+    const askData = askSheetData;
+    const userId = user?.id;
+
+    if (!userId) {
+      dispatch(setLoading(false));
+      return;
+    }
+
+    const userMetaId = await supabase
+      .from('user_metadata')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+
+    if (!userMetaId.data) {
+      // Error
+      Alert.alert('Error posting', 'Cannot post');
+      return;
+    }
+
+    const {data} = await supabase
+      .from('questions')
+      .insert([
+        {
+          question,
+          body: askData.questionDetail ?? undefined,
+          nsfw: false,
+          user_meta: userMetaId.data.id,
+          user_id: userId,
+        },
+      ])
+      .select();
+    if (data && data.length > 0) {
+      const insertedId = data[0].id;
+      console.log('Inserted ID:', insertedId);
+      // Now update question metdata
+      const {data: questionMeta} = await supabase
+        .from('question_metadata')
+        .update({
+          location: askData.selectedLocation
+            ? askData.selectedLocation.id
+            : null,
+        })
+        .eq('question_id', insertedId)
+        .select();
+
+      console.log('Question Meta:', questionMeta);
+    } else {
+      console.log('No data returned after insert');
+    }
+
     setTimeout(() => {
       dispatch(resetSheet());
       onDismiss();

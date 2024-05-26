@@ -139,51 +139,7 @@ const Questions: FC = () => {
       Alert.alert('Error', error.message);
     } else {
       const questionsWithCount: QuestionsWithCount = data;
-      setQuestions(
-        [
-          ...questionsWithCount,
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 1,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 2,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 3,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 4,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 5,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 6,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 7,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 8,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 9,
-          })),
-          ...questionsWithCount.map(q => ({
-            ...q,
-            id: q.id + 10,
-          })),
-        ] || [],
-      );
+      setQuestions(questionsWithCount || []);
     }
     setRefreshing(false);
     setLoading(false);

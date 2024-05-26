@@ -76,7 +76,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
     };
   });
 
-  return (
+  return question ? (
     <LargeHeader headerStyle={headerStyle}>
       <ScalingView scrollY={scrollY} style={scalingViewStyle}>
         <VStack rowGap="sY" px="m">
@@ -240,7 +240,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
         </VStack>
       </ScalingView>
     </LargeHeader>
-  );
+  ) : null;
 };
 
 const ESTIMATED_PAGE_SIZE = parseInt(
