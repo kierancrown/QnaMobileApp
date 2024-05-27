@@ -172,7 +172,7 @@ const Questions: FC = () => {
             paddingTop: theme.spacing.sY,
             paddingBottom: bottomListPadding,
           }}
-          estimatedItemSize={100}
+          estimatedItemSize={220}
           renderItem={({item}) => (
             <QuestionItem
               onPress={() => {
@@ -195,6 +195,7 @@ const Questions: FC = () => {
               voteCount={item.question_metadata?.upvote_count || 0}
               timestamp={item.created_at}
               liked={false}
+              media={item.question_metadata?.media || null}
               nsfw={item.nsfw}
               userVerified={item.user_metadata?.verified || false}
               isOwner={item.user_id === user?.id}

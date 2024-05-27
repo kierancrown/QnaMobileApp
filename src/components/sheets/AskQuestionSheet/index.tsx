@@ -20,7 +20,6 @@ import CustomBackground from '../../common/Sheets/Background';
 import CustomBackdrop from './Backdrop';
 import {Button, Center, Flex, HStack, Icon} from 'app/components/common';
 import {useAppTheme} from 'app/styles/theme';
-
 import CloseIcon from 'app/assets/icons/actions/Close.svg';
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
 
@@ -45,6 +44,8 @@ import LocationsScreen from './screens/LocationScreen';
 import useAndroidBack from 'app/hooks/useAndroidBack';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
+import {Asset} from 'react-native-image-picker';
+import {decode} from 'base64-arraybuffer';
 
 interface AskQuestionSheetProps {
   open?: boolean;
@@ -282,6 +283,31 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     dispatch(setSheetState(open ? 'open' : 'closed'));
   }, [dispatch, open]);
 
+  const uploadAsset = async (asset: Asset): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!asset.base64 || !user?.id) {
+        return;
+      }
+
+      supabase.storage
+        .from('question_attatchments')
+        .upload(
+          `public/${user.id}/${asset.timestamp ?? Date.now()}.jpg`,
+          decode(asset.base64),
+          {
+            contentType: 'image/jpg',
+          },
+        )
+        .then(({data, error}) => {
+          if (error) {
+            reject(error);
+          } else if (data) {
+            resolve(data.path);
+          }
+        });
+    });
+  };
+
   const submit = async () => {
     dispatch(setLoading(true));
     const askData = askSheetData;
@@ -304,6 +330,20 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
       return;
     }
 
+    // Upload any media first
+    let mediaUploads: string[] = [];
+    try {
+      mediaUploads = await Promise.all(
+        askData.questionMedia.map(media => uploadAsset(media)),
+      );
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      Alert.alert('Error uploading media', 'Cannot post');
+      dispatch(setLoading(false));
+      return;
+    }
+
+    // Now insert question
     const {data} = await supabase
       .from('questions')
       .insert([
@@ -316,29 +356,28 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         },
       ])
       .select();
+
+    // Update question metadata
     if (data && data.length > 0) {
       const insertedId = data[0].id;
-      console.log('Inserted ID:', insertedId);
-      // Now update question metdata
       const {data: questionMeta} = await supabase
         .from('question_metadata')
         .update({
           location: askData.selectedLocation
             ? askData.selectedLocation.id
             : null,
+          media: mediaUploads.length > 0 ? mediaUploads : null,
         })
         .eq('question_id', insertedId)
         .select();
 
       console.log('Question Meta:', questionMeta);
+
+      dispatch(resetSheet());
+      onDismiss();
     } else {
       console.log('No data returned after insert');
     }
-
-    setTimeout(() => {
-      dispatch(resetSheet());
-      onDismiss();
-    }, 2000);
   };
 
   return (

@@ -3,7 +3,14 @@ import Text from 'app/components/common/Text';
 import VStack from 'app/components/common/VStack';
 import {useAppTheme} from 'app/styles/theme';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Alert, Linking, Platform} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Alert,
+  Linking,
+  Platform,
+  Keyboard,
+} from 'react-native';
 import {
   NativeViewGestureHandler,
   ScrollView,
@@ -24,6 +31,7 @@ import CameraIcon from 'app/assets/icons/compose/camera.svg';
 import PollIcon from 'app/assets/icons/compose/poll.svg';
 import PollFilledIcon from 'app/assets/icons/compose/pollFilled.svg';
 import LocationIcon from 'app/assets/icons/compose/location-dot.svg';
+import FormatIcon from 'app/assets/icons/compose/format.svg';
 
 import {
   Asset,
@@ -68,12 +76,12 @@ const AskSheetContent: FC = () => {
   } = useSelector((state: RootState) => state.nonPersistent.askSheet);
 
   const [showPoll, setShowPoll] = useState(false);
-  const [selectedInput, setSelectedInput] = useState<'question' | 'extraInfo'>(
-    'question',
-  );
+  const [selectedInput, setSelectedInput] = useState<
+    'question' | 'extraInfo' | null
+  >(null);
   const charsRemaining = useMemo(
     () =>
-      selectedInput === 'question'
+      selectedInput !== 'extraInfo'
         ? charLimit - question.length
         : extraInfoLimit - questionDetail.length,
     [question, selectedInput, questionDetail],
@@ -96,6 +104,7 @@ const AskSheetContent: FC = () => {
 
   const dismissKeyboard = () => {
     inputRef.current?.blur();
+    extraInfoRef.current?.blur();
   };
 
   const focusInput = () => {
@@ -112,9 +121,23 @@ const AskSheetContent: FC = () => {
     dispatch(setActionButton('close'));
   });
 
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidHide', () => {
+      if (
+        !inputRef.current?.isFocused() &&
+        !extraInfoRef.current?.isFocused()
+      ) {
+        setSelectedInput(null);
+      }
+    });
+    return () => {
+      Keyboard.removeAllListeners('keyboardDidHide');
+    };
+  });
+
   const openPhotoLibrary = () => {
-    if (questionMedia.length >= 5) {
-      Alert.alert('Maximum photos reached', 'You can only add 5 photos');
+    if (questionMedia.length >= 4) {
+      Alert.alert('Maximum photos reached', 'You can only add 4 photos');
       mediaPopover.current?.closePopover();
       return;
     }
@@ -123,7 +146,7 @@ const AskSheetContent: FC = () => {
         mediaType: 'photo',
         includeBase64: true,
         quality: 0.5,
-        selectionLimit: 5 - questionMedia.length,
+        selectionLimit: 4 - questionMedia.length,
       },
       response => {
         dispatch(
@@ -135,8 +158,8 @@ const AskSheetContent: FC = () => {
   };
 
   const openCamera = () => {
-    if (questionMedia.length >= 5) {
-      Alert.alert('Maximum photos reached', 'You can only add 5 photos');
+    if (questionMedia.length >= 4) {
+      Alert.alert('Maximum photos reached', 'You can only add 4 photos');
       mediaPopover.current?.closePopover();
       return;
     }
@@ -189,6 +212,12 @@ const AskSheetContent: FC = () => {
     });
   };
 
+  const handleChangeText = (text: string) => {
+    // Remove any new line characters
+    const sanitizedText = text.replace(/\n/g, '');
+    dispatch(setQuestion(sanitizedText));
+  };
+
   return (
     <>
       <Pressable style={styles.wrapper} onPress={dismissKeyboard}>
@@ -201,6 +230,13 @@ const AskSheetContent: FC = () => {
                 <Box pt="sY" px="m">
                   <BottomSheetTextInput
                     blurOnSubmit={false}
+                    multiline
+                    onKeyPress={e => {
+                      const {nativeEvent} = e;
+                      if (nativeEvent.key === 'Enter') {
+                        extraInfoRef.current?.focus();
+                      }
+                    }}
                     placeholder="What do you want to know?"
                     returnKeyType="next"
                     selectionColor={theme.colors.brand}
@@ -218,9 +254,7 @@ const AskSheetContent: FC = () => {
                         color: theme.colors.foreground,
                       },
                     ]}
-                    onChangeText={text => {
-                      dispatch(setQuestion(text));
-                    }}
+                    onChangeText={handleChangeText}
                     value={question}
                   />
                 </Box>
@@ -312,7 +346,7 @@ const AskSheetContent: FC = () => {
               size={'small'}>
               <PopoverMenu
                 ref={mediaPopover}
-                handleKeyboard
+                handleKeyboard={selectedInput != null}
                 onLongPress={openPhotoLibrary}
                 triggerComponent={
                   <PhotosIcon
@@ -396,6 +430,20 @@ const AskSheetContent: FC = () => {
                 )}
               </HStack>
             </TouchableOpacity>
+            {selectedInput === 'extraInfo' && (
+              <TouchableOpacity>
+                <HStack
+                  alignItems="center"
+                  columnGap="xxxs"
+                  marginLeft="xxxsMinus">
+                  <FormatIcon
+                    width={theme.iconSizes.intermediate}
+                    height={theme.iconSizes.intermediate}
+                    fill={theme.colors.inputPlaceholder}
+                  />
+                </HStack>
+              </TouchableOpacity>
+            )}
             <Flex />
             <Text
               variant="smallBody"

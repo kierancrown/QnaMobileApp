@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {Box, Center, HStack, Text, VStack} from './common';
+import {Box, Center, HStack, Text, VStack} from '../common';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartIcon from 'app/assets/icons/actions/Heart.svg';
@@ -17,6 +17,7 @@ import {Alert, Platform, Pressable} from 'react-native';
 import {supabase} from 'app/lib/supabase';
 
 import Header from 'app/components/common/QuestionItem/components/Header';
+import MediaPreview from './components/MediaPreview';
 
 interface QuestionItemProps {
   onPress: () => void;
@@ -33,6 +34,7 @@ interface QuestionItemProps {
   nsfw?: boolean;
   topics?: string[];
   userVerified?: boolean;
+  media: string[] | null;
   avatarImage: {
     uri?: string;
     blurhash?: string;
@@ -53,6 +55,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   timestamp,
   liked,
   nsfw,
+  media,
   isOwner,
   avatarImage,
 }) => {
@@ -62,6 +65,11 @@ const QuestionItem: FC<QuestionItemProps> = ({
   const opacity = useSharedValue(1);
 
   const ICON_SIZE = theme.iconSizes.m;
+  const mediaUrls =
+    media?.map(path => {
+      return supabase.storage.from('question_attatchments').getPublicUrl(path)
+        .data.publicUrl;
+    }) || [];
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -165,6 +173,9 @@ const QuestionItem: FC<QuestionItemProps> = ({
                 {body}
               </Text>
             )}
+
+            {/* Media */}
+            {mediaUrls.length > 0 && <MediaPreview media={mediaUrls} />}
 
             {/* Topics */}
             <HStack columnGap="xxs">

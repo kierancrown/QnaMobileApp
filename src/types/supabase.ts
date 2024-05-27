@@ -201,6 +201,7 @@ export type Database = {
         Row: {
           id: number
           location: number | null
+          media: string[] | null
           question_id: number
           response_count: number
           topics: string[] | null
@@ -213,6 +214,7 @@ export type Database = {
         Insert: {
           id?: number
           location?: number | null
+          media?: string[] | null
           question_id: number
           response_count?: number
           topics?: string[] | null
@@ -225,6 +227,7 @@ export type Database = {
         Update: {
           id?: number
           location?: number | null
+          media?: string[] | null
           question_id?: number
           response_count?: number
           topics?: string[] | null

@@ -24,5 +24,6 @@ export interface QuestionsDetailData {
     location?: {
       name: string;
     };
+    media: string[] | null;
   };
 }

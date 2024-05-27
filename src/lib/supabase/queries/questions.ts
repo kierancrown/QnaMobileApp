@@ -19,7 +19,8 @@ export const questionsWithCountQuery = supabase
     response_count,
     view_count,
     visible,
-    topics
+    topics,
+    media
   )
 `,
   )

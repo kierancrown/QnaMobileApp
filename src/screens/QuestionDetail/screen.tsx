@@ -43,8 +43,9 @@ import {
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import HeaderComponent from './components/Header';
 import Skeleton from 'react-native-reanimated-skeleton';
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@gorhom/bottom-sheet';
+import {SCREEN_HEIGHT, SCREEN_WIDTH, WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 import ResponseItem from 'app/components/common/ResponseItem';
+import MediaPreview from 'app/components/QuestionItem/components/MediaPreview';
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {
@@ -57,6 +58,12 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {setFabAction} = useTabBar();
   const [bookmarked, setBookmarked] = useState(false);
   const ICON_SIZE = theme.iconSizes.m;
+
+  const mediaUrls =
+    question?.question_metadata.media?.map(path => {
+      return supabase.storage.from('question_attatchments').getPublicUrl(path)
+        .data.publicUrl;
+    }) || [];
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
@@ -168,6 +175,26 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                     },
                   ]}>
                   <Text variant="smallBody">{question.body}</Text>
+                </Skeleton>
+              )}
+
+              {mediaUrls.length && (
+                <Skeleton
+                  containerStyle={{
+                    padding: theme.spacing.none,
+                  }}
+                  isLoading={loading}
+                  boneColor={theme.colors.skeletonBackground}
+                  highlightColor={theme.colors.skeleton}
+                  layout={[
+                    {
+                      width: WINDOW_WIDTH - theme.spacing.m * 2,
+                      height: WINDOW_WIDTH - theme.spacing.m * 2,
+                      borderRadius: theme.borderRadii.m,
+                      marginBottom: theme.spacing.xxsY,
+                    },
+                  ]}>
+                  <MediaPreview media={mediaUrls} />
                 </Skeleton>
               )}
             </VStack>

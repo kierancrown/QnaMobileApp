@@ -141,7 +141,8 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
           topics,
           location (
             name
-          )
+          ),
+          media
         )
       `,
       )
