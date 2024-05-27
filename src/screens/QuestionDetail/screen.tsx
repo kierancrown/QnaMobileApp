@@ -178,7 +178,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                 </Skeleton>
               )}
 
-              {mediaUrls.length && (
+              {mediaUrls.length > 0 && (
                 <Skeleton
                   containerStyle={{
                     padding: theme.spacing.none,
