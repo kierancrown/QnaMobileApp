@@ -210,6 +210,11 @@ const LocationsScreen: FC = () => {
                 }
                 selected={selectedLocation?.id === item.id}
                 onSelected={() => {
+                  if (selectedLocation?.id === item.id) {
+                    dispatch(setSelectedLocation(undefined));
+                    goBack();
+                    return;
+                  }
                   dispatch(setSelectedLocation(item));
                   goBack();
                 }}
