@@ -340,7 +340,7 @@ const theme = createTheme({
     },
     questionDetail: {
       fontSize: mvs(14),
-      lineHeight: mvs(14),
+      lineHeight: mvs(18),
     },
     body: {
       fontSize: mvs(16),

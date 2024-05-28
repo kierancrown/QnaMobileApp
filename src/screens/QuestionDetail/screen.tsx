@@ -12,13 +12,14 @@ import {resetAuth} from 'app/redux/slices/authSlice';
 import {Box, Button, Center, Flex, HStack, Text, VStack} from 'ui';
 import {SharedValue} from 'react-native-reanimated';
 
-import {Theme} from 'app/styles/theme';
+import {Theme, useAppTheme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
 import useMount from 'app/hooks/useMount';
 import {RouteProp, useFocusEffect, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
+import ImageView from 'react-native-image-viewing';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
@@ -46,6 +47,33 @@ import Skeleton from 'react-native-reanimated-skeleton';
 import {SCREEN_HEIGHT, SCREEN_WIDTH, WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 import ResponseItem from 'app/components/common/ResponseItem';
 import MediaPreview from 'app/components/QuestionItem/components/MediaPreview';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Color from 'color';
+
+interface ViewerFooterProps {
+  imageIndex: number;
+  totalImages: number;
+}
+
+const ViewerFooter: FC<ViewerFooterProps> = ({imageIndex, totalImages}) => {
+  const theme = useAppTheme();
+  const bottomInset = useSafeAreaInsets().bottom;
+  const bottomColor = Color(theme.colors.mainBackground).alpha(0.4).hexa();
+
+  return (
+    <Center style={{paddingBottom: bottomInset}}>
+      <Center
+        borderRadius="pill"
+        px="m"
+        py="xsY"
+        style={{backgroundColor: bottomColor}}>
+        <Text variant="smallBodyBold" color="cardText">
+          {imageIndex + 1} / {totalImages}
+        </Text>
+      </Center>
+    </Center>
+  );
+};
 
 const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const {
@@ -57,6 +85,8 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const theme = useTheme<Theme>();
   const {setFabAction} = useTabBar();
   const [bookmarked, setBookmarked] = useState(false);
+  const [viewerVisible, setIsVisible] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
   const ICON_SIZE = theme.iconSizes.m;
 
   const mediaUrls =
@@ -85,6 +115,20 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
 
   return question ? (
     <LargeHeader headerStyle={headerStyle}>
+      <ImageView
+        images={mediaUrls.map(url => ({uri: url}))}
+        imageIndex={viewerIndex}
+        visible={viewerVisible}
+        backgroundColor={theme.colors.mainBackground}
+        // eslint-disable-next-line react/no-unstable-nested-components
+        FooterComponent={({imageIndex}) => (
+          <ViewerFooter
+            imageIndex={imageIndex}
+            totalImages={mediaUrls.length}
+          />
+        )}
+        onRequestClose={() => setIsVisible(false)}
+      />
       <ScalingView scrollY={scrollY} style={scalingViewStyle}>
         <VStack rowGap="sY" px="m">
           <VStack rowGap="sY">
@@ -194,7 +238,14 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
                       marginBottom: theme.spacing.xxsY,
                     },
                   ]}>
-                  <MediaPreview media={mediaUrls} />
+                  <MediaPreview
+                    media={mediaUrls}
+                    isTouchEnabled
+                    onImageTouch={index => {
+                      setIsVisible(true);
+                      setViewerIndex(index);
+                    }}
+                  />
                 </Skeleton>
               )}
             </VStack>
