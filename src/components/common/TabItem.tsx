@@ -3,21 +3,28 @@ import {useAppTheme} from 'app/styles/theme';
 import React, {FC, useEffect} from 'react';
 import {Pressable, StyleSheet, ViewProps} from 'react-native';
 import Animated, {
+  FadeInLeft,
+  FadeOut,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  LinearTransition,
 } from 'react-native-reanimated';
 import Badge from './Badge';
 import Center from './Center';
 import Text from './Text';
 import Box from './Box';
+import HStack from './HStack';
 
 interface TabItemProps extends ViewProps {
   selected?: boolean;
   onPress: () => void;
   title: string;
   count: number;
+  small?: boolean;
+  icon?: React.ReactNode;
+  layoutAnimation?: boolean;
 }
 
 const TabItem: FC<TabItemProps> = ({
@@ -25,6 +32,9 @@ const TabItem: FC<TabItemProps> = ({
   title,
   count,
   selected = false,
+  small = false,
+  icon,
+  layoutAnimation,
   ...rest
 }) => {
   const theme = useAppTheme();
@@ -83,21 +93,34 @@ const TabItem: FC<TabItemProps> = ({
   ]);
 
   return (
-    <Box {...rest}>
-      <Pressable
-        hitSlop={8}
-        onPress={internalOnPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}>
-        <Badge text={count.toString()} size="small" hidden={count === 0}>
-          <Animated.View style={animatedStyle}>
-            <Center py="xxsY" px="s">
-              <Text variant="medium">{title}</Text>
-            </Center>
-          </Animated.View>
-        </Badge>
-      </Pressable>
-    </Box>
+    <Animated.View
+      entering={layoutAnimation ? FadeInLeft : undefined}
+      exiting={layoutAnimation ? FadeOut : undefined}
+      layout={layoutAnimation ? LinearTransition : undefined}>
+      <Box {...rest}>
+        <Pressable
+          hitSlop={8}
+          onPress={internalOnPress}
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}>
+          <Badge
+            text={count.toString()}
+            size={small ? 'xsmall' : 'small'}
+            hidden={count === 0}>
+            <Animated.View style={animatedStyle}>
+              <Center py="xxsY" px="s">
+                <HStack columnGap="xxs" alignItems="center">
+                  {icon}
+                  <Text variant={small ? 'smallBodyBold' : 'medium'}>
+                    {title}
+                  </Text>
+                </HStack>
+              </Center>
+            </Animated.View>
+          </Badge>
+        </Pressable>
+      </Box>
+    </Animated.View>
   );
 };
 

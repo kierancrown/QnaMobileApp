@@ -1,9 +1,10 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect} from 'react';
 import {Text, HStack, Center, VStack} from 'ui';
 import {Pressable} from 'react-native';
 import CheckIcon from 'app/assets/icons/check.svg';
 import {Theme, useAppTheme} from 'app/styles/theme';
 import Animated, {
+  interpolate,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
@@ -16,6 +17,7 @@ interface SelectionItemProps {
   titleColor?: keyof Theme['colors'];
   onSelected?: () => void;
   selected?: boolean;
+  highlight?: boolean;
 }
 
 const SelectionItem: FC<SelectionItemProps> = ({
@@ -24,9 +26,11 @@ const SelectionItem: FC<SelectionItemProps> = ({
   titleColor,
   onSelected,
   selected,
+  highlight = true,
 }) => {
   const theme = useAppTheme();
-  const bgAnimation = useSharedValue(selected ? 1 : 0);
+  const bgAnimation = useSharedValue(selected && highlight ? 1 : 0);
+  const checkOpacity = useSharedValue(selected ? 1 : 0);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -38,8 +42,29 @@ const SelectionItem: FC<SelectionItemProps> = ({
     };
   }, [selected]);
 
+  const checkAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: checkOpacity.value,
+      transform: [
+        {
+          translateX: interpolate(
+            checkOpacity.value,
+            [0, 1],
+            [theme.spacing.xxs, 0],
+          ),
+        },
+      ],
+    };
+  }, []);
+
+  useEffect(() => {
+    checkOpacity.value = withTiming(selected ? 1 : 0, {
+      duration: 100,
+    });
+  }, [checkOpacity, selected]);
+
   const onPressIn = () => {
-    if (selected) {
+    if (selected && highlight) {
       return;
     }
     bgAnimation.value = withTiming(1, {
@@ -48,7 +73,7 @@ const SelectionItem: FC<SelectionItemProps> = ({
   };
 
   const onPressOut = () => {
-    if (selected) {
+    if (selected && highlight) {
       return;
     }
     bgAnimation.value = withTiming(0, {
@@ -82,9 +107,9 @@ const SelectionItem: FC<SelectionItemProps> = ({
             </VStack>
           </HStack>
           <Center>
-            {selected && (
+            <Animated.View style={checkAnimatedStyle}>
               <CheckIcon width={theme.iconSizes.m} height={theme.iconSizes.m} />
-            )}
+            </Animated.View>
           </Center>
         </HStack>
       </Animated.View>

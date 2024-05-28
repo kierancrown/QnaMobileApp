@@ -1,6 +1,5 @@
 import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
-import Screen from './screens/AskScreen';
 import {
   ActivityIndicator,
   Alert,
@@ -40,12 +39,16 @@ import {
   setLoading,
   setSheetState,
 } from 'app/redux/slices/askSheetSlice';
-import LocationsScreen from './screens/LocationScreen';
+
 import useAndroidBack from 'app/hooks/useAndroidBack';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {Asset} from 'react-native-image-picker';
 import {decode} from 'base64-arraybuffer';
+
+import Screen from './screens/AskScreen';
+import LocationsScreen from './screens/LocationScreen';
+import ManageTagsScreen from './screens/ManageTagsScreen';
 
 interface AskQuestionSheetProps {
   open?: boolean;
@@ -55,6 +58,7 @@ interface AskQuestionSheetProps {
 export type AskQuestionStackParamList = {
   AskScreen: undefined;
   LocationScreen: undefined;
+  ManageTagsScreen: undefined;
 };
 
 export const navigationRef = createNavigationContainerRef();
@@ -124,6 +128,7 @@ const Navigator: FC = () => {
       <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="AskScreen" component={Screen} />
         <Stack.Screen name="LocationScreen" component={LocationsScreen} />
+        <Stack.Screen name="ManageTagsScreen" component={ManageTagsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -31,7 +31,7 @@ import CameraIcon from 'app/assets/icons/compose/camera.svg';
 import PollIcon from 'app/assets/icons/compose/poll.svg';
 import PollFilledIcon from 'app/assets/icons/compose/pollFilled.svg';
 import LocationIcon from 'app/assets/icons/compose/location-dot.svg';
-import FormatIcon from 'app/assets/icons/compose/format.svg';
+import PlusIcon from 'app/assets/icons/compose/plus-large.svg';
 
 import {
   Asset,
@@ -53,6 +53,7 @@ import {AskQuestionStackParamList} from '..';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from 'app/redux/store';
 import {
+  removeTopic,
   setActionButton,
   setCanSubmit,
   setQuestion,
@@ -60,6 +61,7 @@ import {
   setQuestionMedia,
   setQuestionPoll,
 } from 'app/redux/slices/askSheetSlice';
+import TabItem from 'app/components/common/TabItem';
 
 const charLimit = 120;
 const extraInfoLimit = 1000;
@@ -73,6 +75,7 @@ const AskSheetContent: FC = () => {
     questionDetail,
     questionMedia,
     questionPoll,
+    selectedTopics,
   } = useSelector((state: RootState) => state.nonPersistent.askSheet);
 
   const [showPoll, setShowPoll] = useState(false);
@@ -212,6 +215,10 @@ const AskSheetContent: FC = () => {
     });
   };
 
+  const openTagManager = () => {
+    navigate('ManageTagsScreen');
+  };
+
   const handleChangeText = (text: string) => {
     // Remove any new line characters
     const sanitizedText = text.replace(/\n/g, '');
@@ -260,7 +267,10 @@ const AskSheetContent: FC = () => {
                 </Box>
               </Pressable>
               {/* Extra info */}
-              <Pressable>
+              <Pressable
+                onPress={() => {
+                  extraInfoRef.current?.focus();
+                }}>
                 <Box px="m">
                   <BottomSheetTextInput
                     blurOnSubmit={false}
@@ -295,6 +305,57 @@ const AskSheetContent: FC = () => {
                   />
                 </Box>
               </Pressable>
+
+              <HStack
+                flexWrap="wrap"
+                columnGap="xs"
+                rowGap="xsY"
+                px="s"
+                py="sY">
+                {selectedTopics.map(topic => (
+                  <TabItem
+                    key={topic}
+                    title={topic}
+                    count={0}
+                    layoutAnimation
+                    small
+                    selected={false}
+                    onPress={() => {
+                      Alert.alert(
+                        'Remove tag',
+                        'Are you sure you want to remove?',
+                        [
+                          {
+                            text: 'Cancel',
+                            style: 'cancel',
+                          },
+                          {
+                            text: 'Remove',
+                            style: 'destructive',
+                            onPress: () => {
+                              dispatch(removeTopic(topic));
+                            },
+                          },
+                        ],
+                      );
+                    }}
+                  />
+                ))}
+                <TabItem
+                  icon={
+                    <PlusIcon
+                      width={theme.iconSizes.s}
+                      height={theme.iconSizes.s}
+                    />
+                  }
+                  title="Add tags"
+                  layoutAnimation
+                  count={0}
+                  small
+                  selected={false}
+                  onPress={openTagManager}
+                />
+              </HStack>
 
               {showPoll ? (
                 <PollContainer
@@ -430,20 +491,7 @@ const AskSheetContent: FC = () => {
                 )}
               </HStack>
             </TouchableOpacity>
-            {selectedInput === 'extraInfo' && (
-              <TouchableOpacity>
-                <HStack
-                  alignItems="center"
-                  columnGap="xxxs"
-                  marginLeft="xxxsMinus">
-                  <FormatIcon
-                    width={theme.iconSizes.intermediate}
-                    height={theme.iconSizes.intermediate}
-                    fill={theme.colors.inputPlaceholder}
-                  />
-                </HStack>
-              </TouchableOpacity>
-            )}
+
             <Flex />
             <Text
               variant="smallBody"
