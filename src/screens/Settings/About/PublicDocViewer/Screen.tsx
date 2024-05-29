@@ -11,6 +11,8 @@ import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {generateSkeletonTextLines} from 'app/utils/skeletonHelpers';
 import {useTimeout} from 'usehooks-ts';
+import {Text} from 'app/components/common';
+import dayjs from 'dayjs';
 
 // Random time between 1000 and 1800
 const randomTime = Math.floor(Math.random() * 800) + 1000;
@@ -19,6 +21,7 @@ const SettingsAboutDocumentViewScreen = () => {
   useHiddenTabBar();
   const theme = useAppTheme();
   const [document, setDocument] = useState<string>();
+  const [updatedAt, setUpdatedAt] = useState<string>();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const skeletonLayout = useMemo(
     () => [
@@ -66,6 +69,7 @@ const SettingsAboutDocumentViewScreen = () => {
           console.error('Error fetching privacy policy', error);
         } else {
           setDocument(data?.content);
+          setUpdatedAt(data?.updated_at);
         }
       });
   }, randomTime);
@@ -84,6 +88,12 @@ const SettingsAboutDocumentViewScreen = () => {
         highlightColor={theme.colors.skeleton}
         layout={skeletonLayout}>
         <MarkdownParser text={document || ''} />
+        <Text
+          variant="body"
+          color="cardText"
+          style={{marginTop: theme.spacing.mY}}>
+          Last updated: {dayjs(updatedAt).format('MMMM D, YYYY')}
+        </Text>
       </Skeleton>
     </ScrollViewWithHeaders>
   );

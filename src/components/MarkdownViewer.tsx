@@ -1,13 +1,37 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {Linking} from 'react-native';
 import {HStack, Text, VStack} from './common';
 import {mvs} from 'react-native-size-matters';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 
 interface MarkdownProps {
   text: string;
 }
 
 const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
+  const {push} = useNavigation<NavigationProp<ProfileStackParamList>>() as any;
+
+  const parseUrl = useCallback(
+    (url: string) => {
+      const parts = url.split('::');
+      const isExternal = parts[0] === 'external';
+      if (isExternal) {
+        Linking.openURL(parts[1]);
+      } else {
+        const internalParts = parts[1].split('/');
+        const headerTitle = internalParts[0];
+        const documentName = internalParts[1];
+
+        push('SettingsDocumentViewer', {
+          headerTitle,
+          documentName,
+        });
+      }
+    },
+    [push],
+  );
+
   const processInlineMarkdown = (line: string, key: number) => {
     const boldRegex = /(\*\*|__)(.*?)\1/g;
     const elements = [];
@@ -92,22 +116,45 @@ const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
         line.includes('](') &&
         line.includes(')')
       ) {
-        const startIdx = line.indexOf('[');
-        const endIdx = line.indexOf(']');
-        const str = line.substring(startIdx + 1, endIdx);
-        const urlStartIdx = line.indexOf('(');
-        const urlEndIdx = line.indexOf(')');
-        const url = line.substring(urlStartIdx + 1, urlEndIdx);
+        const elements = [];
+        let lastIndex = 0;
+
+        line.replace(
+          /\[([^\]]+)\]\(([^\)]+)\)/g,
+          (match, urlText, url, offset) => {
+            if (offset > lastIndex) {
+              elements.push(line.substring(lastIndex, offset));
+            }
+            elements.push(
+              <Text
+                key={offset}
+                onPress={() => parseUrl(url)}
+                variant="bodyUnderline"
+                color="brand">
+                {urlText}
+              </Text>,
+            );
+            lastIndex = offset + match.length;
+            return match;
+          },
+        );
+
+        if (lastIndex < line.length) {
+          elements.push(line.substring(lastIndex));
+        }
+
         return (
-          <Text key={index} onPress={() => Linking.openURL(url)} variant="body">
-            {str}
+          <Text key={index} variant="body">
+            {elements.map((el, idx) =>
+              typeof el === 'string' ? <Text key={idx}>{el}</Text> : el,
+            )}
           </Text>
         );
       } else {
         return processInlineMarkdown(line, index);
       }
     });
-  }, [text]);
+  }, [parseUrl, text]);
 
   return <VStack paddingHorizontal="s">{parseMarkdown}</VStack>;
 };

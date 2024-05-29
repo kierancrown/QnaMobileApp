@@ -346,6 +346,11 @@ const theme = createTheme({
       fontSize: mvs(16),
       lineHeight: mvs(24),
     },
+    bodyUnderline: {
+      fontSize: mvs(16),
+      lineHeight: mvs(24),
+      textDecorationLine: 'underline',
+    },
     bodySemiBold: {
       fontFamily: fonts.semiBold,
       fontSize: mvs(16),
