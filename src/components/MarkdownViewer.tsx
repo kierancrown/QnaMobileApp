@@ -8,6 +8,41 @@ interface MarkdownProps {
 }
 
 const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
+  const processInlineMarkdown = (line: string, key: number) => {
+    const boldRegex = /(\*\*|__)(.*?)\1/g;
+    const elements = [];
+    let lastIndex = 0;
+
+    line.replace(boldRegex, (match, p1, p2, offset) => {
+      // Add text before the match
+      if (offset > lastIndex) {
+        elements.push(line.substring(lastIndex, offset));
+      }
+      // Add the bold text
+      elements.push(
+        <Text key={offset} variant="bodyBold">
+          {p2}
+        </Text>,
+      );
+      // Update lastIndex
+      lastIndex = offset + match.length;
+      return match; // returning match as required by replace callback
+    });
+
+    // Add the remaining text after the last match
+    if (lastIndex < line.length) {
+      elements.push(line.substring(lastIndex));
+    }
+
+    return (
+      <Text key={key} variant="body">
+        {elements.map((el, idx) =>
+          typeof el === 'string' ? <Text key={idx}>{el}</Text> : el,
+        )}
+      </Text>
+    );
+  };
+
   const parseMarkdown = useMemo(() => {
     const lines = text.split('\n');
     return lines.map((line, index) => {
@@ -35,7 +70,21 @@ const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
             <Text fontSize={mvs(22)} lineHeight={26} fontWeight={'900'}>
               •
             </Text>
-            <Text variant="markdownBullet">{line.substring(2)}</Text>
+            {processInlineMarkdown(line.substring(2), index)}
+          </HStack>
+        );
+      } else if (/^\d+\.\s/.test(line)) {
+        const listItemMatch = line.match(/^\d+/);
+        const listItemNumber = listItemMatch ? listItemMatch[0] : '';
+        return (
+          <HStack key={index} paddingHorizontal="xs" columnGap="xs" pb="mY">
+            <Text fontSize={mvs(22)} lineHeight={26} fontWeight={'900'}>
+              {listItemNumber}.
+            </Text>
+            {processInlineMarkdown(
+              line.substring(listItemNumber.length + 2),
+              index,
+            )}
           </HStack>
         );
       } else if (
@@ -55,11 +104,7 @@ const MarkdownParser: React.FC<MarkdownProps> = ({text}) => {
           </Text>
         );
       } else {
-        return (
-          <Text key={index} variant="body">
-            {line}
-          </Text>
-        );
+        return processInlineMarkdown(line, index);
       }
     });
   }, [text]);
