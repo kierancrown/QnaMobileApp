@@ -1,11 +1,10 @@
-import React, {forwardRef, useEffect, useImperativeHandle} from 'react';
+import React, {forwardRef, useImperativeHandle} from 'react';
 import {Box} from './';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {ImageStyle, StyleProp} from 'react-native';
 
 import {FasterImageView} from '@candlefinance/faster-image';
-import {supabase} from 'app/lib/supabase';
 
 interface AvatarProps {
   uri?: string;
@@ -27,23 +26,12 @@ const DEFAULT_AVATAR =
   'https://api.askthat.co/storage/v1/object/public/user_profile_pictures/default.jpg';
 
 const OfflineAvatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
-  const [url, setUrl] = React.useState<string>();
   const {uri, blurhash, size, defaultAvatar} = props;
   const theme = useTheme<Theme>();
 
   useImperativeHandle(ref, () => ({
     refresh: () => {},
   }));
-
-  useEffect(() => {
-    if (!uri) {
-      return;
-    }
-    const generatedUrl = supabase.storage
-      .from('user_profile_pictures')
-      .getPublicUrl(uri).data;
-    setUrl(generatedUrl.publicUrl);
-  }, [uri]);
 
   return (
     <Box
@@ -63,7 +51,7 @@ const OfflineAvatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
           progressiveLoadingEnabled: true,
           showActivityIndicator: true,
           failureImage: DEFAULT_AVATAR,
-          url: defaultAvatar ? DEFAULT_AVATAR : url ?? DEFAULT_AVATAR,
+          url: defaultAvatar ? DEFAULT_AVATAR : uri ?? DEFAULT_AVATAR,
         }}
       />
     </Box>

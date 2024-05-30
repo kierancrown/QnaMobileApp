@@ -10,11 +10,11 @@ import Animated, {
 import {Platform, Pressable, StyleSheet} from 'react-native';
 import {useTheme} from '@shopify/restyle';
 import {Theme} from 'app/styles/theme';
-import Avatar from './common/Avatar';
 
 import UserSheildIcon from 'app/assets/icons/SharpShield.svg';
 import Badge from './common/Badge';
 import LinearGradient from 'react-native-linear-gradient';
+import OfflineAvatar from './common/OfflineAvatar';
 
 interface NotificationItemProps {
   onPress: () => void;
@@ -81,7 +81,7 @@ const renderIcon = (
           hidden={!unread}
           color={theme.colors.bookmarkAction}
           animateOnMount={false}>
-          <Avatar size="xl" defaultAvatar />
+          <OfflineAvatar size="xl" defaultAvatar />
         </Badge>
       );
   }

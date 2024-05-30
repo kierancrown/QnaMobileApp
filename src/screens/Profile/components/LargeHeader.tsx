@@ -7,11 +7,11 @@ import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import {Theme} from 'app/styles/theme';
 import {StyleProp, ViewStyle} from 'react-native';
 import {SharedValue} from 'react-native-reanimated';
-import Avatar from 'app/components/common/Avatar';
 import Username from 'app/components/Username';
 
 import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
 import useProfile from 'app/hooks/useProfile';
+import OfflineAvatar from 'app/components/common/OfflineAvatar';
 
 export const LargeProfileHeaderComponent = ({
   scrollY,
@@ -22,7 +22,7 @@ export const LargeProfileHeaderComponent = ({
     params: {userId},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
   const theme = useTheme<Theme>();
-  const {username, verified} = useProfile(userId);
+  const {username, verified, avatar} = useProfile(userId);
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,
@@ -41,7 +41,7 @@ export const LargeProfileHeaderComponent = ({
         scrollY={scrollY}
         style={scalingViewStyle}>
         <Center rowGap="mY">
-          <Avatar userId={userId} size="xxxxl" />
+          <OfflineAvatar uri={avatar} size="xxxxl" />
           <Username
             variant="header"
             username={username ?? 'Profile'}

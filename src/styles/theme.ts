@@ -142,6 +142,7 @@ const theme = createTheme({
     bookmarkAction: palette.cerulean[600],
     // Backgrounds
     mainBackground: palette.black,
+    mainBackgroundHalf: `${palette.black}80`,
     cardBackground: palette.darkSecondaryBackground,
     backdrop: palette.primary[800],
     sheetBackdrop: palette.sheetBackdropDark,

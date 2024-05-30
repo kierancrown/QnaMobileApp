@@ -200,21 +200,33 @@ const ProfileDetails = () => {
           .then(({data, error}) => {
             if (!error && data) {
               const url = data.path;
+
+              // Insert into the profile_pictures table
               supabase
-                .from('user_metadata')
-                .upsert(
-                  {
-                    user_id: user?.id,
-                    profile_picture_key: url,
-                    // profile_picture_thumbhash: thumbhash.toString(),
-                  },
-                  {onConflict: 'user_id'},
-                )
-                .then(({error: e}) => {
-                  if (e) {
-                    console.error('Error updating profile picture', e);
-                  } else {
-                    avatarRef.current?.refresh();
+                .from('profile_images')
+                .insert({
+                  path: url,
+                })
+                .select()
+                .single()
+                .then(({error: e, data: d}) => {
+                  if (d) {
+                    supabase
+                      .from('user_metadata')
+                      .insert(
+                        {
+                          user_id: user?.id,
+                          profile_picture: d.id.toString(),
+                        },
+                        {onConflict: 'user_id'},
+                      )
+                      .then(({error: e}) => {
+                        if (e) {
+                          console.error('Error updating profile picture', e);
+                        } else {
+                          avatarRef.current?.refresh();
+                        }
+                      });
                   }
                 });
             }
@@ -312,7 +324,7 @@ const ProfileDetails = () => {
               </Text>
             ) : loadingUsername ? (
               <HStack columnGap="xs" alignItems="center">
-                <ActivityLoader />
+                <ActivityLoader size="s" />
                 <Text>Checking username availability</Text>
               </HStack>
             ) : isUsernameAvailable === undefined ||

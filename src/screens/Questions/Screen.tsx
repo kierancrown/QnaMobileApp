@@ -1,8 +1,8 @@
-import {Alert, RefreshControl, StyleProp, ViewStyle} from 'react-native';
+import {Alert, RefreshControl} from 'react-native';
 import React, {FC, useRef, useState} from 'react';
-import {ActivityLoader, Center, Flex, HStack, Text, VStack} from 'ui';
+import {ActivityLoader, Center, Flex} from 'ui';
 
-import {Theme, useAppTheme} from 'app/styles/theme';
+import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import useMount from 'app/hooks/useMount';
 import {useNavigation} from '@react-navigation/native';
@@ -14,82 +14,12 @@ import {
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import QuestionItem from 'app/components/QuestionItem';
 
-import {
-  Header,
-  LargeHeader,
-  ScalingView,
-  FlashListWithHeaders,
-} from '@codeherence/react-native-header';
-
-import {SharedValue} from 'react-native-reanimated';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
 import {useUser} from 'app/lib/supabase/context/auth';
-
-import FilterIcon from 'app/assets/icons/actions/Filter.svg';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import HeaderBar from 'app/components/common/HeaderBar';
-
-const HeaderTabs = ['For You', 'Trending', 'Near Me', 'Discover'];
-const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
-  const theme = useAppTheme();
-  const [selectedTab, setSelectedTab] =
-    useState<(typeof HeaderTabs)[number]>('For You');
-
-  return (
-    <Header
-      showNavBar={showNavBar}
-      noBottomBorder
-      headerCenterStyle={{
-        paddingHorizontal: theme.spacing.none,
-        marginHorizontal: theme.spacing.none,
-      }}
-      headerCenterFadesIn={false}
-      headerCenter={
-        <Flex py="sY">
-          <HStack columnGap="xs" alignItems="center">
-            <HeaderBar
-              tabItems={HeaderTabs}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
-            <Center paddingEnd="xs">
-              <TouchableOpacity hitSlop={8}>
-                <FilterIcon
-                  width={theme.iconSizes.intermediate}
-                  height={theme.iconSizes.intermediate}
-                />
-              </TouchableOpacity>
-            </Center>
-          </HStack>
-        </Flex>
-      }
-    />
-  );
-};
-
-const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
-  const theme = useTheme<Theme>();
-
-  const headerStyle: StyleProp<ViewStyle> = {
-    paddingVertical: 0,
-    marginBottom: theme.spacing.mY,
-  };
-  return (
-    <LargeHeader headerStyle={headerStyle}>
-      <ScalingView scrollY={scrollY}>
-        <VStack rowGap="xsY">
-          <Text
-            variant="largeHeader"
-            marginVertical="none"
-            paddingVertical="none">
-            Questions
-          </Text>
-        </VStack>
-      </ScalingView>
-    </LargeHeader>
-  );
-};
+import {FlashList} from '@shopify/flash-list';
+import HeaderComponent from './components/header';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
@@ -102,6 +32,9 @@ const Questions: FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef(null);
+
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const topInset = useSafeAreaInsets().top;
 
   useTabPress({
     tabName: 'HomeTab',
@@ -145,25 +78,32 @@ const Questions: FC = () => {
 
   return (
     <Flex>
+      <HeaderComponent
+        onSize={({height}) => {
+          setHeaderHeight(height);
+        }}
+      />
       {loading && !refreshing ? (
         <Center flex={1}>
           <ActivityLoader />
         </Center>
       ) : (
-        <FlashListWithHeaders
+        <FlashList
           ref={scrollRef}
-          HeaderComponent={HeaderComponent}
-          LargeHeaderComponent={LargeHeaderComponent}
           data={questions}
+          scrollIndicatorInsets={{top: headerHeight - topInset}}
           keyExtractor={item => item.id.toString()}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={refreshQuestions} />
           }
-          onScrollWorklet={scrollHandlerWorklet}
+          scrollEventThrottle={16}
+          onScroll={({nativeEvent}) => {
+            scrollHandlerWorklet(nativeEvent);
+          }}
           refreshing={refreshing}
           onRefresh={refreshQuestions}
           contentContainerStyle={{
-            paddingTop: theme.spacing.sY,
+            paddingTop: theme.spacing.sY + headerHeight,
             paddingBottom: bottomListPadding,
           }}
           estimatedItemSize={220}

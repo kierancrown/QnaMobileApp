@@ -11,7 +11,6 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {Center, HStack} from 'app/components/common';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
-import Avatar from 'app/components/common/Avatar';
 
 import useProfile from 'app/hooks/useProfile';
 
@@ -33,6 +32,7 @@ import LockIcon from 'app/assets/icons/Lock.svg';
 import FlagIcon from 'app/assets/icons/Flag.svg';
 import BanIcon from 'app/assets/icons/Ban.svg';
 import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
+import OfflineAvatar from 'app/components/common/OfflineAvatar';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {goBack, navigate} =
@@ -40,7 +40,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {
     params: {userId, displayBackButton},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
-  const {username, verified} = useProfile(userId);
+  const {username, verified, avatar} = useProfile(userId);
   const {user} = useUser();
   const {logout} = useUser();
   const theme = useAppTheme();
@@ -162,7 +162,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
       headerCenter={
         <Center py="xxsY">
           <HStack columnGap="xs">
-            <Avatar userId={userId} size="l" />
+            <OfflineAvatar uri={avatar} size="l" />
             <Username
               username={username ?? 'Profile'}
               isVerified={verified}

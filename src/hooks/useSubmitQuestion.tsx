@@ -33,7 +33,12 @@ export const useSubmitQuestion = () => {
           if (error) {
             reject(error);
           } else if (data) {
-            resolve(data.path);
+            // Get public url to store
+            resolve(
+              supabase.storage
+                .from('question_attatchments')
+                .getPublicUrl(data.path).data.publicUrl,
+            );
           }
         });
     });

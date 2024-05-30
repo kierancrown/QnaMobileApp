@@ -3,7 +3,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import {SearchScreen} from 'app/screens/Search';
+import SearchScreen from 'app/screens/Search';
 
 export type SearchStackNavigationProp =
   NativeStackNavigationProp<SearchStackParamList>;

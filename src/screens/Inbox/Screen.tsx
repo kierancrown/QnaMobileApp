@@ -1,102 +1,25 @@
 import React, {FC, useMemo, useRef, useState} from 'react';
-import {ActivityLoader, Center, Flex, HStack, Text, VStack} from 'ui';
+import {ActivityLoader, Center, Flex, HStack, Text} from 'ui';
 import {Database} from 'app/types/supabase';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
-import {Theme, useAppTheme} from 'app/styles/theme';
+import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import dayjs from 'dayjs';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
-import {Alert, StyleProp, ViewStyle, RefreshControl} from 'react-native';
+import {Alert, RefreshControl} from 'react-native';
 import useMount from 'app/hooks/useMount';
-import {
-  Header,
-  LargeHeader,
-  ScalingView,
-  FlashListWithHeaders,
-} from '@codeherence/react-native-header';
-import {SharedValue} from 'react-native-reanimated';
 import NotificationItem from 'app/components/NotificationItem';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
-import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
-import PopoverMenu from 'app/components/common/PopoverMenu';
-import HeaderBar from 'app/components/common/HeaderBar';
+import {FlashList} from '@shopify/flash-list';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import HeaderComponent from './components/Header';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
-const HeaderTabs = ['All', 'Requested', 'Notifications'];
-
-const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
-  const theme = useAppTheme();
-  const [selectedTab, setSelectedTab] =
-    useState<(typeof HeaderTabs)[number]>('All');
-
-  return (
-    <Header
-      showNavBar={showNavBar}
-      noBottomBorder
-      headerCenterFadesIn={false}
-      headerCenterStyle={{
-        paddingHorizontal: theme.spacing.none,
-        marginHorizontal: theme.spacing.none,
-      }}
-      headerCenter={
-        <HStack flex={1} py="sY">
-          <HeaderBar
-            tabItems={HeaderTabs}
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
-          <PopoverMenu
-            accessibilityLabel="Open Inbox Options"
-            accessibilityRole="button"
-            accessibilityHint="Mark all as read"
-            triggerComponent={
-              <Center py="xsY" px="xs">
-                <ElipsisIcon
-                  width={theme.iconSizes.l}
-                  height={theme.iconSizes.l}
-                />
-              </Center>
-            }
-            items={[
-              {
-                title: 'Mark all as read',
-                onPress: () => {},
-              },
-            ]}
-          />
-        </HStack>
-      }
-    />
-  );
-};
-
-const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
-  const theme = useTheme<Theme>();
-  const headerStyle: StyleProp<ViewStyle> = {
-    paddingVertical: 0,
-    marginBottom: theme.spacing.mY,
-  };
-
-  return (
-    <LargeHeader headerStyle={headerStyle}>
-      <ScalingView scrollY={scrollY}>
-        <VStack rowGap="xsY">
-          <Text
-            variant="largeHeader"
-            marginVertical="none"
-            paddingVertical="none">
-            Inbox
-          </Text>
-        </VStack>
-      </ScalingView>
-    </LargeHeader>
-  );
-};
 
 const InboxScreen: FC = () => {
   const theme = useTheme<Theme>();
@@ -111,6 +34,9 @@ const InboxScreen: FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollRef = useRef(null);
+
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const topInset = useSafeAreaInsets().top;
 
   const stickyHeaderIndices = useMemo(
     () =>
@@ -247,16 +173,20 @@ const InboxScreen: FC = () => {
 
   return (
     <Flex>
+      <HeaderComponent
+        onSize={({height}) => {
+          setHeaderHeight(height);
+        }}
+      />
       {loading && !refreshing ? (
         <Center flex={1}>
           <ActivityLoader />
         </Center>
       ) : (
-        <FlashListWithHeaders
+        <FlashList
           ref={scrollRef}
-          HeaderComponent={HeaderComponent}
-          LargeHeaderComponent={LargeHeaderComponent}
           data={notifications}
+          scrollIndicatorInsets={{top: headerHeight - topInset}}
           keyExtractor={item =>
             typeof item === 'string' ? item : item.id.toString()
           }
@@ -266,11 +196,14 @@ const InboxScreen: FC = () => {
               onRefresh={refreshNotifications}
             />
           }
-          onScrollWorklet={scrollHandlerWorklet}
+          scrollEventThrottle={16}
+          onScroll={({nativeEvent}) => {
+            scrollHandlerWorklet(nativeEvent);
+          }}
           refreshing={refreshing}
           onRefresh={refreshNotifications}
           contentContainerStyle={{
-            paddingTop: theme.spacing.sY,
+            paddingTop: theme.spacing.sY + headerHeight,
             paddingBottom: bottomListPadding,
           }}
           estimatedItemSize={100}

@@ -65,11 +65,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   const opacity = useSharedValue(1);
 
   const ICON_SIZE = theme.iconSizes.m;
-  const mediaUrls =
-    media?.map(path => {
-      return supabase.storage.from('question_attatchments').getPublicUrl(path)
-        .data.publicUrl;
-    }) || [];
+  const mediaUrls = media ?? [];
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
