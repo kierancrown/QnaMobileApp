@@ -1,5 +1,5 @@
 import React, {FC, useMemo, useRef, useState} from 'react';
-import {Center, Flex, HStack, Text, VStack} from 'ui';
+import {ActivityLoader, Center, Flex, HStack, Text, VStack} from 'ui';
 import {Database} from 'app/types/supabase';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
@@ -9,13 +9,7 @@ import {useTheme} from '@shopify/restyle';
 import dayjs from 'dayjs';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
-import {
-  ActivityIndicator,
-  Alert,
-  StyleProp,
-  ViewStyle,
-  RefreshControl,
-} from 'react-native';
+import {Alert, StyleProp, ViewStyle, RefreshControl} from 'react-native';
 import useMount from 'app/hooks/useMount';
 import {
   Header,
@@ -255,7 +249,7 @@ const InboxScreen: FC = () => {
     <Flex>
       {loading && !refreshing ? (
         <Center flex={1}>
-          <ActivityIndicator size="small" color={theme.colors.brand} />
+          <ActivityLoader />
         </Center>
       ) : (
         <FlashListWithHeaders

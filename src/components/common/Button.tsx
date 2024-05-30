@@ -1,4 +1,4 @@
-import {ActivityIndicator, Pressable} from 'react-native';
+import {Pressable} from 'react-native';
 import {BoxProps} from '@shopify/restyle';
 import React from 'react';
 import {Theme} from 'app/styles/theme';
@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import HStack from './HStack';
+import ActivityLoader from './ActivityLoader';
 
 export interface ButtonProps extends BoxProps<Theme> {
   animateOnPress?: boolean;
@@ -99,9 +100,9 @@ const Button = ({
           {...rest}>
           <HStack alignItems="center" justifyContent="center" columnGap="xxs">
             {loading ? (
-              <ActivityIndicator
-                size="small"
-                color={variant === 'text' ? 'brand' : 'white'}
+              <ActivityLoader
+                size="xs"
+                // color={variant === 'text' ? 'brand' : 'white'}
               />
             ) : null}
             {leftNode}

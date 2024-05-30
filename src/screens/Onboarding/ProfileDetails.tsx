@@ -1,4 +1,13 @@
-import {Button, Center, Flex, HStack, SafeAreaView, Text, VStack} from 'ui';
+import {
+  ActivityLoader,
+  Button,
+  Center,
+  Flex,
+  HStack,
+  SafeAreaView,
+  Text,
+  VStack,
+} from 'ui';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Keyboard} from 'react-native';
 import Avatar, {AvatarRef} from 'app/components/common/Avatar';
@@ -10,7 +19,7 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {decode} from 'base64-arraybuffer';
 import {useDebounceValue} from 'usehooks-ts';
 import Input from 'app/components/common/TextInput';
-import {ActivityIndicator, Alert} from 'react-native';
+import {Alert} from 'react-native';
 import {useUsername} from 'app/hooks/useUsername';
 import {useOnboarding} from 'app/hooks/useOnboarding';
 
@@ -303,7 +312,7 @@ const ProfileDetails = () => {
               </Text>
             ) : loadingUsername ? (
               <HStack columnGap="xs" alignItems="center">
-                <ActivityIndicator color="white" />
+                <ActivityLoader />
                 <Text>Checking username availability</Text>
               </HStack>
             ) : isUsernameAvailable === undefined ||

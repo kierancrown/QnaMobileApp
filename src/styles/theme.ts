@@ -240,10 +240,13 @@ const theme = createTheme({
     logo: s(120),
   },
   spinnerSizes: {
+    xxs: s(12),
+    xs: s(18),
     s: s(36),
     m: s(54),
     l: s(72),
     xl: s(90),
+    xxl: s(108),
   },
   textVariants: {
     markdownH1: {

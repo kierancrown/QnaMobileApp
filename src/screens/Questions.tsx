@@ -1,12 +1,6 @@
-import {
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import {Alert, RefreshControl, StyleProp, ViewStyle} from 'react-native';
 import React, {FC, useRef, useState} from 'react';
-import {Center, Flex, HStack, Text, VStack} from 'ui';
+import {ActivityLoader, Center, Flex, HStack, Text, VStack} from 'ui';
 
 import {Theme, useAppTheme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -153,7 +147,7 @@ const Questions: FC = () => {
     <Flex>
       {loading && !refreshing ? (
         <Center flex={1}>
-          <ActivityIndicator size="small" color={theme.colors.brand} />
+          <ActivityLoader />
         </Center>
       ) : (
         <FlashListWithHeaders

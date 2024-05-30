@@ -1,5 +1,13 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {Box, Center, Flex, HStack, Text, VStack} from 'app/components/common';
+import {
+  ActivityLoader,
+  Box,
+  Center,
+  Flex,
+  HStack,
+  Text,
+  VStack,
+} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
 import {
   addTopic,
@@ -9,13 +17,7 @@ import {
 import {AppDispatch, RootState} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  ActivityIndicator,
-  Alert,
-  StyleProp,
-  TextInput,
-  ViewStyle,
-} from 'react-native';
+import {Alert, StyleProp, TextInput, ViewStyle} from 'react-native';
 import useMount from 'app/hooks/useMount';
 import SelectionItem from 'app/components/common/SelectionItem';
 import {useAppTheme} from 'app/styles/theme';
@@ -137,7 +139,7 @@ const ManageTagsScreen: FC = () => {
                 <Center
                   width={theme.iconSizes.intermediate}
                   height={theme.iconSizes.intermediate}>
-                  <ActivityIndicator size="small" />
+                  <ActivityLoader size="s" />
                 </Center>
               ) : (
                 <SearchIcon
@@ -165,8 +167,8 @@ const ManageTagsScreen: FC = () => {
           <Center flex={1}>
             {initialLoad ? (
               <HStack alignItems="center" columnGap="xs">
-                <ActivityIndicator size="small" />
-                <Text>Searching for you...</Text>
+                <ActivityLoader size="xs" />
+                <Text>Loading Tags</Text>
               </HStack>
             ) : (
               <Center flex={1}>

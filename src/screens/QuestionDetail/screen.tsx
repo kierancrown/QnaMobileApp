@@ -1,15 +1,18 @@
-import {
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import {Alert, RefreshControl, StyleProp, ViewStyle} from 'react-native';
 import React, {FC, useCallback, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {AppDispatch} from 'app/redux/store';
 import {resetAuth} from 'app/redux/slices/authSlice';
-import {Box, Button, Center, Flex, HStack, Text, VStack} from 'ui';
+import {
+  ActivityLoader,
+  Box,
+  Button,
+  Center,
+  Flex,
+  HStack,
+  Text,
+  VStack,
+} from 'ui';
 import {SharedValue} from 'react-native-reanimated';
 
 import {Theme, useAppTheme} from 'app/styles/theme';
@@ -519,8 +522,12 @@ const QuestionDetail: FC = () => {
         onRefresh={refreshResponses}
         ListFooterComponent={
           loadingMoreResponses ? (
-            <HStack my="xlY" justifyContent="center" columnGap="xs">
-              <ActivityIndicator size="small" />
+            <HStack
+              my="xlY"
+              alignItems="center"
+              justifyContent="center"
+              columnGap="xs">
+              <ActivityLoader size="s" />
               <Text variant="medium" color="cardText">
                 Loading more responses...
               </Text>

@@ -34,11 +34,11 @@ const Profile: FC = () => {
         data={[]}
         ref={scrollRef}
         keyExtractor={item => item}
-        refreshControl={<RefreshControl />}
+        refreshControl={<RefreshControl refreshing={false} />}
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
           <Center flex={1} my="xxxlY" py="xxxlY">
-            <ActivityLoader />
+            <ActivityLoader size="xl" />
             <Text
               variant="medium"
               my="xlY"

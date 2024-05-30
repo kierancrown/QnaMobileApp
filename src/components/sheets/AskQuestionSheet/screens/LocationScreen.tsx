@@ -3,7 +3,15 @@ import {
   useFocusEffect,
   useNavigation,
 } from '@react-navigation/native';
-import {Box, Center, Flex, HStack, Text, VStack} from 'app/components/common';
+import {
+  ActivityLoader,
+  Box,
+  Center,
+  Flex,
+  HStack,
+  Text,
+  VStack,
+} from 'app/components/common';
 import Input from 'app/components/common/TextInput';
 import {
   setActionButton,
@@ -13,13 +21,7 @@ import {AppDispatch, RootState} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {
-  ActivityIndicator,
-  Alert,
-  StyleProp,
-  TextInput,
-  ViewStyle,
-} from 'react-native';
+import {Alert, StyleProp, TextInput, ViewStyle} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
@@ -143,7 +145,7 @@ const LocationsScreen: FC = () => {
                 <Center
                   width={theme.iconSizes.intermediate}
                   height={theme.iconSizes.intermediate}>
-                  <ActivityIndicator size="small" />
+                  <ActivityLoader size="s" />
                 </Center>
               ) : (
                 <SearchIcon
@@ -171,8 +173,8 @@ const LocationsScreen: FC = () => {
           <Center flex={1}>
             {initialLoad ? (
               <HStack alignItems="center" columnGap="xs">
-                <ActivityIndicator size="small" />
-                <Text>Searching for you...</Text>
+                <ActivityLoader size="xs" />
+                <Text>Searching for you</Text>
               </HStack>
             ) : (
               <Center flex={1}>
