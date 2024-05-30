@@ -1,12 +1,6 @@
 import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
-import {
-  ActivityIndicator,
-  Alert,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-} from 'react-native';
+import {Keyboard, Pressable, StyleSheet} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Animated, {
   Extrapolation,
@@ -34,17 +28,9 @@ import {
 } from '@react-navigation/stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from 'app/redux/store';
-import {
-  resetSheet,
-  setLoading,
-  setSheetState,
-} from 'app/redux/slices/askSheetSlice';
+import {setSheetState} from 'app/redux/slices/askSheetSlice';
 
 import useAndroidBack from 'app/hooks/useAndroidBack';
-import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
-import {Asset} from 'react-native-image-picker';
-import {decode} from 'base64-arraybuffer';
 
 import Screen from './screens/AskScreen';
 import LocationsScreen from './screens/LocationScreen';
@@ -53,6 +39,7 @@ import ManageTagsScreen from './screens/ManageTagsScreen';
 interface AskQuestionSheetProps {
   open?: boolean;
   onClose?: () => void;
+  onSubmit: () => void;
 }
 
 export type AskQuestionStackParamList = {
@@ -137,33 +124,17 @@ const Navigator: FC = () => {
 const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   open = false,
   onClose,
+  onSubmit,
 }) => {
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const topSafeAreaInset = useSafeAreaInsets().top;
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    isLoading,
-    canSubmit,
-    actionButton,
-    question,
-    questionDetail,
-    questionMedia,
-    questionPoll,
-  } = useSelector((state: RootState) => state.nonPersistent.askSheet);
-  const theme = useAppTheme();
-  const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
-
-  const {user} = useUser();
-
-  const askSheetData = useSelector(
+  const {canSubmit, actionButton} = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,
   );
-
-  const enablePanDown = useMemo(
-    () => !isLoading && actionButton === 'close',
-    [isLoading, actionButton],
-  );
+  const theme = useAppTheme();
+  const BUTTON_CONTAINER_HEIGHT = theme.spacing.xlY;
 
   const snapPoints = useMemo(
     () => [
@@ -175,76 +146,13 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     [topSafeAreaInset, theme, BUTTON_CONTAINER_HEIGHT],
   );
 
-  const isEmpty = useMemo(
-    () =>
-      !question.length &&
-      !questionDetail.length &&
-      !questionMedia.length &&
-      !questionPoll.length,
-    [question, questionDetail, questionMedia, questionPoll],
-  );
-
-  const beforeClose = useCallback(() => {
-    if (isLoading) {
-      Alert.alert(
-        'Cancel posting',
-        'Are you sure you want to cancel posting this question? You will lose this data.',
-        [
-          {
-            text: 'Yes',
-            style: 'destructive',
-            onPress: () => {
-              dispatch(resetSheet());
-              sheetRef.current?.close();
-            },
-          },
-          {
-            text: 'No',
-            style: 'cancel',
-          },
-        ],
-      );
-      sheetRef.current?.snapToIndex(0);
-      return false;
-    }
-
-    if (!isEmpty) {
-      Alert.alert(
-        'Discard changes',
-        'Are you sure you want to discard changes? You will lose this data.',
-        [
-          {
-            text: 'Yes',
-            style: 'destructive',
-            onPress: () => {
-              dispatch(resetSheet());
-              sheetRef.current?.close();
-            },
-          },
-          {
-            text: 'No',
-            style: 'cancel',
-          },
-        ],
-      );
-      sheetRef.current?.snapToIndex(0);
-      return false;
-    }
-
-    return true;
-  }, [isLoading, isEmpty, dispatch]);
-
   const onDismiss = useCallback(() => {
-    console.log('onDismiss');
     if (actionButton === 'close') {
-      console.log('beforeClose', beforeClose());
-      if (beforeClose() === true) {
-        sheetRef.current?.close();
-      }
+      sheetRef.current?.close();
     } else {
       navigationRef.current?.goBack();
     }
-  }, [actionButton, beforeClose]);
+  }, [actionButton]);
 
   const handleSheetChanges = useCallback(
     (index: number) => {
@@ -288,103 +196,6 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     dispatch(setSheetState(open ? 'open' : 'closed'));
   }, [dispatch, open]);
 
-  const uploadAsset = async (asset: Asset): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      if (!asset.base64 || !user?.id) {
-        return;
-      }
-
-      supabase.storage
-        .from('question_attatchments')
-        .upload(
-          `public/${user.id}/${asset.timestamp ?? Date.now()}.jpg`,
-          decode(asset.base64),
-          {
-            contentType: 'image/jpg',
-          },
-        )
-        .then(({data, error}) => {
-          if (error) {
-            reject(error);
-          } else if (data) {
-            resolve(data.path);
-          }
-        });
-    });
-  };
-
-  const submit = async () => {
-    dispatch(setLoading(true));
-    const askData = askSheetData;
-    const userId = user?.id;
-
-    if (!userId) {
-      dispatch(setLoading(false));
-      return;
-    }
-
-    const userMetaId = await supabase
-      .from('user_metadata')
-      .select('id')
-      .eq('user_id', userId)
-      .single();
-
-    if (!userMetaId.data) {
-      // Error
-      Alert.alert('Error posting', 'Cannot post');
-      return;
-    }
-
-    // Upload any media first
-    let mediaUploads: string[] = [];
-    try {
-      mediaUploads = await Promise.all(
-        askData.questionMedia.map(media => uploadAsset(media)),
-      );
-    } catch (error) {
-      console.error('Error uploading media:', error);
-      Alert.alert('Error uploading media', 'Cannot post');
-      dispatch(setLoading(false));
-      return;
-    }
-
-    // Now insert question
-    const {data} = await supabase
-      .from('questions')
-      .insert([
-        {
-          question,
-          body: askData.questionDetail ?? undefined,
-          nsfw: false,
-          user_meta: userMetaId.data.id,
-          user_id: userId,
-        },
-      ])
-      .select();
-
-    // Update question metadata
-    if (data && data.length > 0) {
-      const insertedId = data[0].id;
-      const {data: questionMeta} = await supabase
-        .from('question_metadata')
-        .update({
-          location: askData.selectedLocation
-            ? askData.selectedLocation.id
-            : null,
-          media: mediaUploads.length > 0 ? mediaUploads : null,
-        })
-        .eq('question_id', insertedId)
-        .select();
-
-      console.log('Question Meta:', questionMeta);
-
-      dispatch(resetSheet());
-      onDismiss();
-    } else {
-      console.log('No data returned after insert');
-    }
-  };
-
   return (
     <>
       <Animated.View
@@ -397,9 +208,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         <HStack alignItems="center" height={BUTTON_CONTAINER_HEIGHT} px="m">
           <Pressable hitSlop={16} onPress={onDismiss}>
             <Center>
-              {isLoading ? (
-                <ActivityIndicator size="small" />
-              ) : actionButton === 'close' ? (
+              {actionButton === 'close' ? (
                 <Icon icon={<CloseIcon />} color="foreground" size="l" />
               ) : (
                 <Icon icon={<BackIcon />} color="foreground" size="l" />
@@ -409,34 +218,36 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
           <Flex />
           <Animated.View style={askButtonAnimatedStyle}>
             <Button
-              title={isLoading ? 'Asking' : 'Ask'}
+              title="Ask"
               disabled={!canSubmit}
               py="none"
               height={BUTTON_CONTAINER_HEIGHT}
               justifyContent="center"
               borderRadius="pill"
               px="l"
-              onPress={submit}
+              onPress={() => {
+                sheetRef.current?.close();
+                onSubmit();
+              }}
             />
           </Animated.View>
         </HStack>
       </Animated.View>
       <BottomSheet
-        snapPoints={snapPoints}
-        index={open ? 0 : -1}
         ref={sheetRef}
+        index={open ? 0 : -1}
         animateOnMount={false}
-        animatedIndex={animatedPosition}
-        enablePanDownToClose={enablePanDown}
-        keyboardBehavior="extend"
-        maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
-        onChange={handleSheetChanges}
-        backdropComponent={CustomBackdrop}
         handleComponent={null}
+        snapPoints={snapPoints}
+        keyboardBehavior="extend"
+        enablePanDownToClose={true}
+        onChange={handleSheetChanges}
+        animatedIndex={animatedPosition}
+        backdropComponent={CustomBackdrop}
         backgroundComponent={CustomBackground}
+        maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}
         onAnimate={(fromIndex, toIndex) => {
           if (fromIndex === 0 && toIndex === -1) {
-            beforeClose();
             Keyboard.dismiss();
           }
         }}>

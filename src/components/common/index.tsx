@@ -7,6 +7,7 @@ export {default as VStack} from './VStack';
 export {default as Flex} from './Flex';
 export {default as Button} from './Button';
 export {default as SafeAreaView} from './SafeAreaView';
+export {default as ActivityLoader} from './ActivityLoader';
 
 import CustomBackdrop from './Sheets/Backdrop';
 import CustomBackground from './Sheets/Background';

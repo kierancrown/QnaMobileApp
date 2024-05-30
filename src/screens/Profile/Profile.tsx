@@ -1,5 +1,5 @@
 import React, {FC, useRef} from 'react';
-import {Box, Center, Flex, Text} from 'app/components/common';
+import {Box, Center, Flex, Text, ActivityLoader} from 'app/components/common';
 import {FlashListWithHeaders} from '@codeherence/react-native-header';
 import {RefreshControl} from 'react-native-gesture-handler';
 import {useTabBarAnimation} from 'app/context/tabBarContext';
@@ -12,9 +12,7 @@ import {RouteProp, useRoute} from '@react-navigation/native';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 
 const Profile: FC = () => {
-  const {
-    params: {},
-  } = useRoute<RouteProp<ProfileStackParamList>>();
+  const {params} = useRoute<RouteProp<ProfileStackParamList>>();
 
   const theme = useAppTheme();
   const scrollRef = useRef(null);
@@ -40,6 +38,7 @@ const Profile: FC = () => {
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
           <Center flex={1} my="xxxlY" py="xxxlY">
+            <ActivityLoader />
             <Text
               variant="medium"
               my="xlY"

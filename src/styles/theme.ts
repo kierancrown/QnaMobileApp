@@ -239,6 +239,12 @@ const theme = createTheme({
     xxxxl: s(96),
     logo: s(120),
   },
+  spinnerSizes: {
+    s: s(36),
+    m: s(54),
+    l: s(72),
+    xl: s(90),
+  },
   textVariants: {
     markdownH1: {
       fontFamily: fonts.black,

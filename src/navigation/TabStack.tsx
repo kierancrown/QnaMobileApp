@@ -32,6 +32,8 @@ import {TabBarProvider} from 'app/context/tabBarContext';
 import {useSelector} from 'react-redux';
 import {RootState} from 'app/redux/store';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
+import PostingFab from 'app/components/PostingFab';
+import {useSubmitQuestion} from 'app/hooks/useSubmitQuestion';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -50,6 +52,9 @@ const TabBarContainer = (props: TabBarContainerProps) => {
   const {bottom} = useSafeAreaInsets();
   const theme = useTheme<Theme>();
   const bottomColor = Color(theme.colors.mainBackground).alpha(0.9).hexa();
+  const showPostingFab = useSelector(
+    (state: RootState) => state.nonPersistent.askSheet.isLoading,
+  );
 
   const bottomPadding =
     bottom === 0
@@ -79,6 +84,7 @@ const TabBarContainer = (props: TabBarContainerProps) => {
         />
       </Box>
 
+      <PostingFab isVisible={showPostingFab} />
       <FloatingTabBar {...props} bottomPadding={bottomPadding} />
     </>
   );
@@ -87,7 +93,7 @@ const TabBarContainer = (props: TabBarContainerProps) => {
 export default function TabStack() {
   const {triggerHaptic} = useHaptics();
   const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
-
+  const {submit} = useSubmitQuestion();
   const unreadNotificationCount = useSelector(
     (state: RootState) => state.persistent.notifications.unreadCount,
   );
@@ -154,6 +160,10 @@ export default function TabStack() {
 
       <AskQuestionSheet
         open={questionSheetOpen}
+        onSubmit={() => {
+          setQuestionSheetOpen(false);
+          submit().then();
+        }}
         onClose={() => {
           setQuestionSheetOpen(false);
         }}
