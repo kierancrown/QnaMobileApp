@@ -6,8 +6,11 @@ import React, {FC, useRef, useState} from 'react';
 import AnimatedHeader from 'app/components/common/Header/AnimatedHeader';
 import Input from 'app/components/common/TextInput';
 
-import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 import {TextInput} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+
+import FilterIcon from 'app/assets/icons/actions/Filter.svg';
+import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 
 const HeaderTabs = ['Topics', 'People', 'Questions'];
 
@@ -25,7 +28,7 @@ export const HeaderComponent: FC<HeaderComponentProps> = ({onSize}) => {
 
   return (
     <AnimatedHeader onSize={onSize} absoluteFill>
-      <VStack rowGap="xsY" bg="destructiveAction">
+      <VStack rowGap="xsY">
         <HStack px="xs" alignItems="center">
           <Input
             placeholder="topics, users, or questions, etc"
@@ -51,11 +54,21 @@ export const HeaderComponent: FC<HeaderComponentProps> = ({onSize}) => {
             variant="extraLargeInput"
           />
         </HStack>
-        <HeaderBar
-          tabItems={HeaderTabs}
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-        />
+        <HStack py="sY" columnGap="xs" alignItems="center">
+          <HeaderBar
+            tabItems={HeaderTabs}
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
+          <Center paddingEnd="xs">
+            <TouchableOpacity hitSlop={8}>
+              <FilterIcon
+                width={theme.iconSizes.intermediate}
+                height={theme.iconSizes.intermediate}
+              />
+            </TouchableOpacity>
+          </Center>
+        </HStack>
       </VStack>
     </AnimatedHeader>
   );

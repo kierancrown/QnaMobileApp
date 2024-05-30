@@ -1,6 +1,13 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {TabStackParamList} from 'app/navigation/TabStack';
-import React, {FC, createContext, useContext, useEffect, useState} from 'react';
+import React, {
+  FC,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {BackHandler, NativeScrollEvent} from 'react-native';
 import {SharedValue, runOnJS, useSharedValue} from 'react-native-reanimated';
 import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
@@ -11,9 +18,9 @@ export enum FabAction {
 }
 
 interface TabBarContextData {
-  lastScrollY: SharedValue<number>;
+  lastScrollY: number;
   scrollY: SharedValue<number>;
-  scrollContentSize: number;
+  // scrollContentSize: number;
   scrollDirection: 'up' | 'down';
   hideThreshold: number;
   fabAction: FabAction;
@@ -22,7 +29,7 @@ interface TabBarContextData {
   fabEventEmitter: EventEmitter;
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
-  setContentSize: (value: number) => void;
+  // setContentSize: (value: number) => void;
   setFabAction: (value: FabAction) => void;
 }
 
@@ -33,9 +40,9 @@ interface TabBarProviderProps {
 const TabBarContext = createContext<TabBarContextData>({} as TabBarContextData);
 
 export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
-  const lastScrollY = useSharedValue(0);
+  const lastScrollY = useRef(0);
   const scrollY = useSharedValue(0);
-  const [scrollContentSize, setContentSize] = useState<number>(0);
+  // const [scrollContentSize, setContentSize] = useState<number>(0);
   const [fabAction, setFabAction] = useState<FabAction>(FabAction.ADD);
 
   const [hidden, setHidden] = useState<boolean>(false);
@@ -62,7 +69,7 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
     if (scrollAmount >= hideThreshold) {
       // Update the scroll direction and last scrollY
       setScrollDirection(direction);
-      lastScrollY.value = scrollY.value;
+      lastScrollY.current = scrollY.value;
       // Update the scrollY value
       scrollY.value = value;
     }
@@ -75,14 +82,14 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
     <TabBarContext.Provider
       value={{
         scrollY,
-        lastScrollY,
-        scrollContentSize,
+        lastScrollY: lastScrollY.current,
+        // scrollContentSize,
         scrollDirection,
         hideThreshold,
         fabAction,
         fabEventEmitter,
         setHideThreshold,
-        setContentSize,
+        // setContentSize,
         setScrollY,
         setFabAction,
         hidden,
@@ -104,12 +111,12 @@ interface UseTabBarAnimationProps {
 
 export const useTabBarAnimation = ({scrollToTop}: UseTabBarAnimationProps) => {
   const navigation = useNavigation();
-  const {setScrollY, setContentSize, scrollY, hideThreshold} = useTabBar();
+  const {setScrollY, scrollY, hideThreshold} = useTabBar();
 
   const scrollHandlerWorklet = (evt: NativeScrollEvent) => {
     'worklet';
-    const maxScrollY = evt.contentSize.height - evt.layoutMeasurement.height;
-    runOnJS(setContentSize)(maxScrollY);
+    // const maxScrollY = evt.contentSize.height - evt.layoutMeasurement.height;
+    // runOnJS(setContentSize)(maxScrollY);
     runOnJS(setScrollY)(evt.contentOffset.y);
   };
 

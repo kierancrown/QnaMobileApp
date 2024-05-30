@@ -92,11 +92,7 @@ const LargeHeaderComponent = ({scrollY}: {scrollY: SharedValue<number>}) => {
   const [viewerIndex, setViewerIndex] = useState(0);
   const ICON_SIZE = theme.iconSizes.m;
 
-  const mediaUrls =
-    question?.question_metadata.media?.map(path => {
-      return supabase.storage.from('question_attatchments').getPublicUrl(path)
-        .data.publicUrl;
-    }) || [];
+  const mediaUrls = question?.question_metadata?.media || [];
 
   const headerStyle: StyleProp<ViewStyle> = {
     paddingVertical: 0,

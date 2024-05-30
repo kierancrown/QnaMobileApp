@@ -18,7 +18,7 @@ interface PostingFabProps {
 const PostingFab: FC<PostingFabProps> = ({isVisible}) => {
   const theme = useAppTheme();
   const {scrollDirection} = useTabBar();
-  const bottomPadding = useBottomPadding(theme.spacing.xsY);
+  const bottomPadding = useBottomPadding(theme.spacing.mY);
 
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(theme.spacing.mY);
@@ -36,15 +36,23 @@ const PostingFab: FC<PostingFabProps> = ({isVisible}) => {
     translateY.value = withSpring(
       isVisible
         ? scrollDirection === 'down'
-          ? ESTIMATED_TABBAR_HEIGHT
+          ? ESTIMATED_TABBAR_HEIGHT + theme.spacing.mY
           : 0
         : theme.spacing.mY,
       {
-        damping: 10,
+        damping: 15,
         stiffness: 100,
       },
     );
-  }, [isVisible, opacity, theme.spacing.mY, translateY, scrollDirection]);
+  }, [
+    isVisible,
+    opacity,
+    theme.spacing.mY,
+    translateY,
+    scrollDirection,
+    theme.spacing.xsY,
+    bottomPadding,
+  ]);
 
   return (
     <Animated.View style={animatedStyles} pointerEvents="none">

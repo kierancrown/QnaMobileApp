@@ -1,5 +1,5 @@
 import {useAppTheme} from 'app/styles/theme';
-import React, {FC, useCallback, useRef, useState} from 'react';
+import React, {FC, useCallback, useMemo, useRef, useState} from 'react';
 import {StyleProp, ViewStyle, LayoutChangeEvent} from 'react-native';
 import Animated, {
   Extrapolation,
@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {ScrollView} from 'react-native-gesture-handler';
 import HStack from '../HStack';
 import TabItem from '../TabItem';
+import Color from 'color';
 
 interface HeaderBarProps {
   tabItems: string[];
@@ -32,6 +33,11 @@ const HeaderBar: FC<HeaderBarProps> = ({
   // @ts-ignore
   const scrollViewRef = useRef<ScrollView>(null);
   const [tabWidths, setTabWidths] = useState<number[]>([]);
+  const isScrollable = useMemo(() => {
+    return scrollContentSize.value > scrollViewWidth.value;
+  }, [scrollContentSize, scrollViewWidth]);
+
+  const darkGradientStop = Color(theme.colors.mainBackground).alpha(0.9).hexa();
 
   const linearGradientStyle = useCallback(
     (direction: 'left' | 'right') => {
@@ -64,7 +70,9 @@ const HeaderBar: FC<HeaderBarProps> = ({
     return {
       opacity: withTiming(
         scrollX.value <= 0
-          ? 1
+          ? isScrollable
+            ? 1
+            : 0
           : scrollX.value >=
             scrollContentSize.value -
               scrollViewWidth.value -
@@ -115,7 +123,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
         style={[linearGradientStyle('left'), startListGradientAnimatedStyle]}
         pointerEvents="none">
         <LinearGradient
-          colors={[theme.colors.mainBackground, 'transparent']}
+          colors={[darkGradientStop, 'transparent']}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 0}}
           style={linearGradientStyle('left')}
@@ -157,7 +165,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
         style={[linearGradientStyle('right'), endListGradientAnimatedStyle]}
         pointerEvents="none">
         <LinearGradient
-          colors={['transparent', theme.colors.mainBackground]}
+          colors={['transparent', darkGradientStop]}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 0}}
           style={linearGradientStyle('right')}
