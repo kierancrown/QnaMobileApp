@@ -1,9 +1,11 @@
-import React from 'react';
-import {Text, VStack} from 'ui';
+import React, {FC} from 'react';
+import {Box, Text, VStack} from 'ui';
 import {supabase} from 'app/lib/supabase';
 import {Alert, Platform} from 'react-native';
 
-import Header from '../components/Header';
+import Header from './QuestionDetails/components/Header';
+import Skeleton from 'react-native-reanimated-skeleton';
+import {useAppTheme} from 'app/styles/theme';
 
 interface ResponseItemProps {
   userId: string;
@@ -21,7 +23,9 @@ interface ResponseItemProps {
   onDelete?: (id: string) => void;
 }
 
-const ResponseItem: React.FC<ResponseItemProps> = ({
+export const ESTIMATED_RESPONSE_ITEM_HEIGHT = 80;
+
+const ResponseItem: FC<ResponseItemProps> = ({
   userId,
   username,
   verified,
@@ -67,6 +71,39 @@ const ResponseItem: React.FC<ResponseItemProps> = ({
       />
       <Text variant="smallBody">{response}</Text>
     </VStack>
+  );
+};
+
+export const ResponseItemSkeleton: FC = () => {
+  const theme = useAppTheme();
+
+  return (
+    <Box
+      borderRadius="l"
+      overflow="hidden"
+      my="xxsY"
+      mx={Platform.select({
+        ios: 'xs',
+        android: 's',
+      })}
+      bg="cardBackground"
+      height={ESTIMATED_RESPONSE_ITEM_HEIGHT}>
+      <Skeleton
+        containerStyle={{
+          padding: theme.spacing.none,
+        }}
+        isLoading
+        boneColor={theme.colors.skeletonBackground}
+        highlightColor={theme.colors.skeleton}
+        layout={[
+          {
+            key: 'card',
+            width: '100%',
+            height: '100%',
+          },
+        ]}
+      />
+    </Box>
   );
 };
 

@@ -81,7 +81,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
           : 1,
       ),
     };
-  }, [theme.spacing.l]);
+  }, [theme.spacing.l, isScrollable]);
 
   const handleTabPress = useCallback(
     (tab: string, index: number) => {

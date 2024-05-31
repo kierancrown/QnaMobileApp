@@ -4,13 +4,14 @@ import {supabase} from 'app/lib/supabase';
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import {useState} from 'react';
 import {Alert} from 'react-native';
+import {ESTIMATED_RESPONSE_ITEM_HEIGHT} from '../components/ResponseItem';
 
 interface useResponsesProps {
   questionId: number;
 }
 
-const ESTIMATED_PAGE_SIZE = parseInt(
-  ((SCREEN_HEIGHT * 2) / 100).toFixed(0),
+export const ESTIMATED_RESPONSES_PAGE_SIZE = parseInt(
+  ((SCREEN_HEIGHT * 2) / ESTIMATED_RESPONSE_ITEM_HEIGHT).toFixed(0),
   10,
 );
 
@@ -40,13 +41,13 @@ const useResponses = ({questionId}: useResponsesProps) => {
       )
       .eq('question_id', questionId)
       .order('created_at', {ascending: false})
-      .range(0, ESTIMATED_PAGE_SIZE);
+      .range(0, ESTIMATED_RESPONSES_PAGE_SIZE);
     if (error) {
       Alert.alert('Error', error.message);
     } else {
       setResponses(data || []);
     }
-    // setLoading(false);
+    setResponsesLoading(false);
   };
 
   useMount(refreshResponses);
@@ -71,7 +72,7 @@ const useResponses = ({questionId}: useResponsesProps) => {
       )
       .eq('question_id', questionId)
       .order('created_at', {ascending: false})
-      .range(prevOffset, prevOffset + ESTIMATED_PAGE_SIZE);
+      .range(prevOffset, prevOffset + ESTIMATED_RESPONSES_PAGE_SIZE);
 
     setLoadingMoreResponses(false);
 

@@ -12,7 +12,10 @@ import {RouteProp, useFocusEffect, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {useTabBar, useTabBarAnimation} from 'app/context/tabBarContext';
-import ResponseItem from './components/QuestionDetails/ResponseItem';
+import ResponseItem, {
+  ESTIMATED_RESPONSE_ITEM_HEIGHT,
+  ResponseItemSkeleton,
+} from './components/ResponseItem';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import HeaderComponent from './components/Header';
 import {FlashList} from '@shopify/flash-list';
@@ -148,8 +151,11 @@ const QuestionDetailScreen: FC = () => {
         }}
         ListEmptyComponent={
           responsesLoading ? (
-            // TODO: Insert skeleton loader here
-            <></>
+            <Flex>
+              <ResponseItemSkeleton />
+              <ResponseItemSkeleton />
+              <ResponseItemSkeleton />
+            </Flex>
           ) : (
             <Center flex={1}>
               <Text variant="medium" my="xlY" color="cardText">
@@ -162,7 +168,7 @@ const QuestionDetailScreen: FC = () => {
         refreshing={responsesLoading}
         onRefresh={refreshResponses}
         ListFooterComponent={
-          loadingMoreResponses ? (
+          loadingMoreResponses && !responsesLoading ? (
             <HStack
               my="xlY"
               alignItems="center"
@@ -188,7 +194,7 @@ const QuestionDetailScreen: FC = () => {
           paddingTop: theme.spacing.sY + headerHeight,
           paddingBottom: bottomListPadding,
         }}
-        estimatedItemSize={100}
+        estimatedItemSize={ESTIMATED_RESPONSE_ITEM_HEIGHT}
         onEndReachedThreshold={0.5}
         onEndReached={fetchNextPage}
         renderItem={({item}) => (
