@@ -2,7 +2,9 @@ import React, {FC, useState} from 'react';
 import {Box, Center, Flex, HStack, Text, VStack} from 'app/components/common';
 import {useAppTheme} from 'app/styles/theme';
 import MediaViewer from './components/MediaViewer';
-import QuestionItemHeader from './components/Header';
+import QuestionItemHeader, {
+  QuestionItemHeaderSkeleton,
+} from './components/Header';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {SCREEN_WIDTH, WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 import MediaPreview from 'app/components/QuestionItem/components/MediaPreview';
@@ -19,6 +21,11 @@ interface QuestionDetailsProps {
   question?: QuestionsDetailData;
   hasUpvoted: boolean;
   upvoteQuestion: () => Promise<boolean>;
+  skeletonLayout?: {
+    hasMedia?: boolean;
+    hasBody?: boolean;
+    hasLocation?: boolean;
+  };
 }
 
 const QuestionDetails: FC<QuestionDetailsProps> = ({
@@ -26,6 +33,7 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
   question,
   hasUpvoted,
   upvoteQuestion,
+  skeletonLayout,
 }) => {
   const theme = useAppTheme();
   const [bookmarked, setBookmarked] = useState(false);
@@ -34,7 +42,7 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
   const ICON_SIZE = theme.iconSizes.m;
   const mediaUrls = question?.question_metadata?.media || [];
 
-  return question ? (
+  return question && !loading ? (
     <VStack>
       <MediaViewer
         mediaUrls={mediaUrls}
@@ -61,11 +69,120 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
             />
           )}
           <VStack rowGap="xxsY">
+            <Text variant="medium">
+              {question?.question}
+              {question?.nsfw && (
+                <HStack alignItems="center">
+                  <Box px="xxs" />
+                  <Center
+                    backgroundColor="destructiveAction"
+                    borderRadius="s"
+                    px="xxs"
+                    py="xxxs">
+                    <Text variant="tag" color="foreground">
+                      NSFW
+                    </Text>
+                  </Center>
+                </HStack>
+              )}
+            </Text>
+
+            {question?.body && <Text variant="smallBody">{question.body}</Text>}
+
+            {mediaUrls.length > 0 && (
+              <MediaPreview
+                media={mediaUrls}
+                isTouchEnabled
+                onImageTouch={index => {
+                  setIsVisible(true);
+                  setViewerIndex(index);
+                }}
+              />
+            )}
+          </VStack>
+        </VStack>
+        <VStack rowGap="sY">
+          <HStack alignItems="center" columnGap="s">
+            <HStack alignItems="center" columnGap="xxs">
+              <HeartOutlineIcon
+                fill={theme.colors.cardText}
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+              />
+              <Text color="cardText" variant="small">
+                {formatNumber(question?.question_metadata?.upvote_count || 0)}
+              </Text>
+            </HStack>
+            <HStack alignItems="center" columnGap="xxs">
+              <AnswersIcon
+                fill={theme.colors.cardText}
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+              />
+              <Text color="cardText" variant="small">
+                {formatNumber(question?.question_metadata?.response_count || 0)}
+              </Text>
+            </HStack>
+            <Flex />
+            {question?.question_metadata?.location && (
+              <HStack alignItems="center" columnGap="xxs">
+                <LocationIcon
+                  fill={theme.colors.cardText}
+                  width={ICON_SIZE}
+                  height={ICON_SIZE}
+                />
+                <Text color="cardText" variant="small">
+                  {question.question_metadata.location.name}
+                </Text>
+              </HStack>
+            )}
+          </HStack>
+          <ActionBar
+            isLiked={hasUpvoted}
+            isBookmarked={bookmarked}
+            onLike={async () => {
+              await upvoteQuestion();
+            }}
+            onBookmark={() => {
+              setBookmarked(!bookmarked);
+            }}
+          />
+        </VStack>
+      </VStack>
+    </VStack>
+  ) : (
+    <QuestionDetailsSkeleton
+      hasMedia={skeletonLayout?.hasMedia}
+      hasBody={skeletonLayout?.hasBody}
+      hasLocation={skeletonLayout?.hasLocation}
+    />
+  );
+};
+
+interface QuestionDetailsSkeletonProps {
+  hasMedia?: boolean;
+  hasBody?: boolean;
+  hasLocation?: boolean;
+}
+
+const QuestionDetailsSkeleton: FC<QuestionDetailsSkeletonProps> = ({
+  hasMedia,
+  hasBody,
+  hasLocation,
+}) => {
+  const theme = useAppTheme();
+
+  return (
+    <VStack minWidth="100%">
+      <VStack rowGap="sY" px="m">
+        <VStack rowGap="sY">
+          <QuestionItemHeaderSkeleton />
+          <VStack rowGap="xxsY">
             <Skeleton
               containerStyle={{
                 padding: theme.spacing.none,
               }}
-              isLoading={loading}
+              isLoading
               boneColor={theme.colors.skeletonBackground}
               highlightColor={theme.colors.skeleton}
               layout={[
@@ -75,32 +192,14 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
                   borderRadius: theme.borderRadii.s,
                   marginBottom: theme.spacing.xsY,
                 },
-              ]}>
-              <Text variant="medium">
-                {question?.question}
-                {question?.nsfw && (
-                  <HStack alignItems="center">
-                    <Box px="xxs" />
-                    <Center
-                      backgroundColor="destructiveAction"
-                      borderRadius="s"
-                      px="xxs"
-                      py="xxxs">
-                      <Text variant="tag" color="foreground">
-                        NSFW
-                      </Text>
-                    </Center>
-                  </HStack>
-                )}
-              </Text>
-            </Skeleton>
-
-            {question?.body && (
+              ]}
+            />
+            {hasBody && (
               <Skeleton
                 containerStyle={{
                   padding: theme.spacing.none,
                 }}
-                isLoading={loading}
+                isLoading
                 boneColor={theme.colors.skeletonBackground}
                 highlightColor={theme.colors.skeleton}
                 layout={[
@@ -128,17 +227,15 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
                     borderRadius: theme.borderRadii.s,
                     marginBottom: theme.spacing.xxsY,
                   },
-                ]}>
-                <Text variant="smallBody">{question.body}</Text>
-              </Skeleton>
+                ]}
+              />
             )}
-
-            {mediaUrls.length > 0 && (
+            {hasMedia && (
               <Skeleton
                 containerStyle={{
                   padding: theme.spacing.none,
                 }}
-                isLoading={loading}
+                isLoading
                 boneColor={theme.colors.skeletonBackground}
                 highlightColor={theme.colors.skeleton}
                 layout={[
@@ -148,85 +245,47 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
                     borderRadius: theme.borderRadii.m,
                     marginBottom: theme.spacing.xxsY,
                   },
-                ]}>
-                <MediaPreview
-                  media={mediaUrls}
-                  isTouchEnabled
-                  onImageTouch={index => {
-                    setIsVisible(true);
-                    setViewerIndex(index);
-                  }}
-                />
-              </Skeleton>
+                ]}
+              />
             )}
           </VStack>
         </VStack>
         <VStack rowGap="sY">
-          <Skeleton
-            isLoading={loading}
-            containerStyle={{}}
-            boneColor={theme.colors.skeletonBackground}
-            highlightColor={theme.colors.skeleton}
-            layout={[
-              {
-                key: 'line1',
-                height:
-                  theme.textVariants.username.fontSize + theme.spacing.xxsY,
-                width: '42%',
-              },
-            ]}>
-            <HStack alignItems="center" columnGap="s">
-              <HStack alignItems="center" columnGap="xxs">
-                <HeartOutlineIcon
-                  fill={theme.colors.cardText}
-                  width={ICON_SIZE}
-                  height={ICON_SIZE}
-                />
-                <Text color="cardText" variant="small">
-                  {formatNumber(question?.question_metadata?.upvote_count || 0)}
-                </Text>
-              </HStack>
-              <HStack alignItems="center" columnGap="xxs">
-                <AnswersIcon
-                  fill={theme.colors.cardText}
-                  width={ICON_SIZE}
-                  height={ICON_SIZE}
-                />
-                <Text color="cardText" variant="small">
-                  {formatNumber(
-                    question?.question_metadata?.response_count || 0,
-                  )}
-                </Text>
-              </HStack>
-              <Flex />
-              {question?.question_metadata?.location && (
-                <HStack alignItems="center" columnGap="xxs">
-                  <LocationIcon
-                    fill={theme.colors.cardText}
-                    width={ICON_SIZE}
-                    height={ICON_SIZE}
-                  />
-                  <Text color="cardText" variant="small">
-                    {question.question_metadata.location.name}
-                  </Text>
-                </HStack>
-              )}
-            </HStack>
-          </Skeleton>
-          <ActionBar
-            isLiked={hasUpvoted}
-            isBookmarked={bookmarked}
-            onLike={async () => {
-              await upvoteQuestion();
-            }}
-            onBookmark={() => {
-              setBookmarked(!bookmarked);
-            }}
-          />
+          <HStack>
+            <Skeleton
+              isLoading
+              boneColor={theme.colors.skeletonBackground}
+              highlightColor={theme.colors.skeleton}
+              layout={[
+                {
+                  key: 'line1',
+                  height:
+                    theme.textVariants.username.fontSize + theme.spacing.xxsY,
+                  width: '100%',
+                },
+              ]}
+            />
+            <Flex />
+            {hasLocation && (
+              <Skeleton
+                isLoading
+                boneColor={theme.colors.skeletonBackground}
+                highlightColor={theme.colors.skeleton}
+                layout={[
+                  {
+                    key: 'line2',
+                    height:
+                      theme.textVariants.username.fontSize + theme.spacing.xxsY,
+                    width: '100%',
+                  },
+                ]}
+              />
+            )}
+          </HStack>
         </VStack>
       </VStack>
     </VStack>
-  ) : null;
+  );
 };
 
 export default QuestionDetails;

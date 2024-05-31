@@ -18,6 +18,11 @@ export type HomeStackParamList = {
     questionId: number;
     responseCount?: number;
     isOwner?: boolean;
+    skeletonLayout?: {
+      hasMedia: boolean;
+      hasBody: boolean;
+      hasLocation: boolean;
+    };
   };
   Profile: ProfileScreenParams;
 };

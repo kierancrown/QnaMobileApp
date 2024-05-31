@@ -43,7 +43,7 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
     navigate('Profile', {userId, displayBackButton: true});
   };
 
-  return (
+  return !loading ? (
     <HStack columnGap="xs" width="100%">
       <Skeleton
         containerStyle={{
@@ -128,6 +128,66 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
             {dayjs(timestamp).fromNow(false)}
           </Text>
         </Skeleton>
+      </VStack>
+    </HStack>
+  ) : (
+    <QuestionItemHeaderSkeleton />
+  );
+};
+
+export const QuestionItemHeaderSkeleton: FC = () => {
+  const theme = useAppTheme();
+
+  return (
+    <HStack columnGap="xs" width="100%">
+      <Skeleton
+        containerStyle={{
+          padding: theme.spacing.none,
+        }}
+        isLoading
+        boneColor={theme.colors.skeletonBackground}
+        highlightColor={theme.colors.skeleton}
+        layout={[
+          {
+            width: theme.iconSizes.commentAvatar,
+            height: theme.iconSizes.commentAvatar,
+            borderRadius: theme.borderRadii.pill,
+          },
+        ]}
+      />
+      <VStack rowGap="none" flex={1}>
+        <HStack alignItems="center" flex={1} justifyContent="space-between">
+          <Skeleton
+            containerStyle={{
+              padding: theme.spacing.none,
+            }}
+            isLoading
+            boneColor={theme.colors.skeletonBackground}
+            highlightColor={theme.colors.skeleton}
+            layout={[
+              {
+                width: 100,
+                height: theme.textVariants.smaller.fontSize,
+                borderRadius: theme.borderRadii.s,
+              },
+            ]}
+          />
+        </HStack>
+        <Skeleton
+          containerStyle={{
+            padding: theme.spacing.none,
+          }}
+          isLoading
+          boneColor={theme.colors.skeletonBackground}
+          highlightColor={theme.colors.skeleton}
+          layout={[
+            {
+              width: 96,
+              height: theme.textVariants.tiny.fontSize,
+              borderRadius: theme.borderRadii.s,
+            },
+          ]}
+        />
       </VStack>
     </HStack>
   );

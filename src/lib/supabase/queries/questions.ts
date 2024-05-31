@@ -20,7 +20,8 @@ export const questionsWithCountQuery = supabase
     view_count,
     visible,
     topics,
-    media
+    media,
+    location
   )
 `,
   )

@@ -25,7 +25,7 @@ import {useQuestionDetail} from './hooks/useQuestionDetail';
 
 const QuestionDetailScreen: FC = () => {
   const {
-    params: {questionId},
+    params: {questionId, skeletonLayout},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
 
   const dispatch = useAppDispatch();
@@ -49,6 +49,8 @@ const QuestionDetailScreen: FC = () => {
     refreshResponses,
     fetchNextPage,
   } = useResponses({questionId});
+
+  const isOwner = question?.user_id === user?.id;
 
   const {scrollHandlerWorklet} = useTabBarAnimation({
     scrollToTop: () => {
@@ -119,7 +121,7 @@ const QuestionDetailScreen: FC = () => {
         onSize={({height}) => {
           setHeaderHeight(height);
         }}
-        isOwner={false}
+        isOwner={isOwner}
         responseCount={question?.question_metadata?.response_count ?? 0}
       />
       <FlashList
@@ -144,6 +146,7 @@ const QuestionDetailScreen: FC = () => {
             question={question ?? undefined}
             hasUpvoted={hasUpvoted}
             upvoteQuestion={upvoteQuestion}
+            skeletonLayout={skeletonLayout}
           />
         }
         ListHeaderComponentStyle={{

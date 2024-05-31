@@ -118,6 +118,14 @@ const Questions: FC = () => {
                   questionId: item.id,
                   responseCount: item.question_metadata?.response_count || 0,
                   isOwner: item.user_id === user?.id,
+                  skeletonLayout: {
+                    hasMedia:
+                      (item.question_metadata?.media &&
+                        item.question_metadata?.media.length > 0) ||
+                      false,
+                    hasBody: !!item.body,
+                    hasLocation: !!item.question_metadata?.location,
+                  },
                 });
               }}
               username={item.user_metadata?.username || 'Anonymous'}
