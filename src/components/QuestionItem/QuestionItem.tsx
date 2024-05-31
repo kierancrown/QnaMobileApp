@@ -18,6 +18,7 @@ import {Platform, Pressable} from 'react-native';
 
 import Header from 'app/screens/QuestionDetail/components/QuestionDetails/components/Header';
 import MediaPreview from './components/MediaPreview';
+import TabItem from '../common/TabItem';
 
 interface QuestionItemProps {
   onPress: () => void;
@@ -142,11 +143,18 @@ const QuestionItem: FC<QuestionItemProps> = ({
             {mediaUrls.length > 0 && <MediaPreview media={mediaUrls} />}
 
             {/* Topics */}
-            <HStack columnGap="xxs">
+            <HStack columnGap="xxs" py="xxsY" flexWrap="wrap" rowGap="xxsY">
               {topics?.map(topic => (
-                <Text key={topic} variant="tag" color="cardText">
-                  #{topic}
-                </Text>
+                <TabItem
+                  key={topic}
+                  title={topic}
+                  count={0}
+                  small
+                  selected={false}
+                  onPress={() => {
+                    console.log('TODO: Navigate to topic feed');
+                  }}
+                />
               ))}
             </HStack>
           </VStack>

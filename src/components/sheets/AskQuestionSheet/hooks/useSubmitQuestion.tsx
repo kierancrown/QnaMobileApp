@@ -104,6 +104,9 @@ export const useSubmitQuestion = () => {
             ? askData.selectedLocation.id
             : null,
           media: mediaUploads.length > 0 ? mediaUploads : null,
+          topics: askData.selectedTopics.length
+            ? askData.selectedTopics.map(topic => topic.name)
+            : null,
         })
         .eq('question_id', insertedId);
 

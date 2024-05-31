@@ -26,14 +26,16 @@ import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import {useDebounceValue} from 'usehooks-ts';
 import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 import {supabase} from 'app/lib/supabase';
+import {Topic} from 'app/lib/supabase/types';
+import {TOPIC_LIMIT} from 'app/constants';
 
-const ManageTagsScreen: FC = () => {
+const TopicsScreen: FC = () => {
   const dispatch = useAppDispatch();
   const selectedTopics = useSelector(
     (state: RootState) => state.nonPersistent.askSheet.selectedTopics,
   );
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<Topic[]>([]);
   const searchInput = useRef<TextInput>(null);
   const theme = useAppTheme();
 
@@ -56,7 +58,7 @@ const ManageTagsScreen: FC = () => {
     try {
       supabase
         .from('topics')
-        .select('name')
+        .select('id, name')
         .limit(20)
         .then(({data, error}) => {
           if (error) {
@@ -64,7 +66,7 @@ const ManageTagsScreen: FC = () => {
             return;
           }
           if (data) {
-            setResults(data.map(topic => topic.name));
+            setResults(data);
           }
           setInitialLoad(false);
         });
@@ -91,7 +93,7 @@ const ManageTagsScreen: FC = () => {
         try {
           const {error, data} = await supabase
             .from('topics')
-            .select('name')
+            .select('id, name')
             .ilike('name', `%${debouncedSearchTerm.trim()}%`)
             .limit(20);
 
@@ -105,7 +107,7 @@ const ManageTagsScreen: FC = () => {
             return;
           }
 
-          setResults(data?.map(topic => topic.name) || []);
+          setResults(data || []);
         } catch (error) {
           setResults([]);
           Alert.alert(
@@ -187,7 +189,7 @@ const ManageTagsScreen: FC = () => {
         ) : (
           <BottomSheetFlatList
             data={results}
-            keyExtractor={item => item}
+            keyExtractor={item => item.id.toString()}
             keyboardShouldPersistTaps="always"
             contentContainerStyle={{
               paddingVertical: theme.spacing.mY,
@@ -197,20 +199,31 @@ const ManageTagsScreen: FC = () => {
                 <Text>No results found</Text>
               </Center>
             }
-            renderItem={({item}) => (
-              <SelectionItem
-                title={item}
-                highlight={false}
-                selected={selectedTopics.includes(item)}
-                onSelected={() => {
-                  if (selectedTopics.includes(item)) {
-                    dispatch(removeTopic(item));
-                    return;
-                  }
-                  dispatch(addTopic(item));
-                }}
-              />
-            )}
+            renderItem={({item}) => {
+              const selected = !!selectedTopics.find(i => i.id === item.id);
+              return (
+                <SelectionItem
+                  title={item.name}
+                  highlight={false}
+                  disabled={selectedTopics.length >= TOPIC_LIMIT && !selected}
+                  config={{disablesTouch: false}}
+                  selected={selected}
+                  onSelected={() => {
+                    if (selected) {
+                      dispatch(removeTopic(item.id));
+                      return;
+                    } else if (selectedTopics.length >= TOPIC_LIMIT) {
+                      Alert.alert(
+                        'Maximum topics reached',
+                        `You can only select up to ${TOPIC_LIMIT} topics`,
+                      );
+                      return;
+                    }
+                    dispatch(addTopic(item));
+                  }}
+                />
+              );
+            }}
           />
         )}
       </Flex>
@@ -218,4 +231,4 @@ const ManageTagsScreen: FC = () => {
   );
 };
 
-export default ManageTagsScreen;
+export default TopicsScreen;

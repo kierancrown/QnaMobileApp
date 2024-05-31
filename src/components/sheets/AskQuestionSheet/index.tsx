@@ -34,7 +34,7 @@ import useAndroidBack from 'app/hooks/useAndroidBack';
 
 import Screen from './screens/AskScreen';
 import LocationsScreen from './screens/LocationScreen';
-import ManageTagsScreen from './screens/ManageTagsScreen';
+import TopicsScreen from './screens/TopicsScreen';
 
 interface AskQuestionSheetProps {
   open?: boolean;
@@ -115,7 +115,7 @@ const Navigator: FC = () => {
       <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="AskScreen" component={Screen} />
         <Stack.Screen name="LocationScreen" component={LocationsScreen} />
-        <Stack.Screen name="ManageTagsScreen" component={ManageTagsScreen} />
+        <Stack.Screen name="ManageTagsScreen" component={TopicsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

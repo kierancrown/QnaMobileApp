@@ -33,7 +33,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from 'app/redux/store';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 import PostingFab from 'app/components/PostingFab';
-import {useSubmitQuestion} from 'app/hooks/useSubmitQuestion';
+import {useSubmitQuestion} from 'app/components/sheets/AskQuestionSheet/hooks/useSubmitQuestion';
 
 export type TabStackParamList = {
   HomeTab: undefined;

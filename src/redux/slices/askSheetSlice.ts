@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {PollOptionType} from 'app/components/sheets/AskQuestionSheet/components/Poll';
 import {NearGeoLocation} from 'app/hooks/useGeoLocationSearch';
+import {Topic} from 'app/lib/supabase/types';
 import {Asset} from 'react-native-image-picker';
 import {SharedValue} from 'react-native-reanimated';
 
@@ -11,7 +12,7 @@ export interface AskSheetState {
   sheetState: 'closing' | 'closed' | 'open' | 'submitting';
   actionButton: 'close' | 'back';
   selectedLocation?: NearGeoLocation;
-  selectedTopics: string[];
+  selectedTopics: Topic[];
   preventSwipeDown?: boolean;
 
   question: string;
@@ -76,12 +77,12 @@ export const askSheetSlice = createSlice({
     setPreventSwipeDown: (state, action: {payload: boolean}) => {
       state.preventSwipeDown = action.payload;
     },
-    addTopic: (state, action: {payload: string}) => {
+    addTopic: (state, action: {payload: Topic}) => {
       state.selectedTopics.push(action.payload);
     },
-    removeTopic: (state, action: {payload: string}) => {
+    removeTopic: (state, action: {payload: number}) => {
       state.selectedTopics = state.selectedTopics.filter(
-        topic => topic !== action.payload,
+        topic => topic.id !== action.payload,
       );
     },
     resetTopics: state => {

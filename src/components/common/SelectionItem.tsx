@@ -18,6 +18,10 @@ interface SelectionItemProps {
   onSelected?: () => void;
   selected?: boolean;
   highlight?: boolean;
+  disabled?: boolean;
+  config?: {
+    disablesTouch?: boolean;
+  };
 }
 
 const SelectionItem: FC<SelectionItemProps> = ({
@@ -27,6 +31,10 @@ const SelectionItem: FC<SelectionItemProps> = ({
   onSelected,
   selected,
   highlight = true,
+  disabled,
+  config = {
+    disablesTouch: true,
+  },
 }) => {
   const theme = useAppTheme();
   const bgAnimation = useSharedValue(selected && highlight ? 1 : 0);
@@ -86,10 +94,15 @@ const SelectionItem: FC<SelectionItemProps> = ({
   };
 
   return (
-    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
+    <Pressable
+      onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      disabled={disabled && config.disablesTouch}>
       <Animated.View style={[animatedStyle]}>
         <HStack
           justifyContent="space-between"
+          opacity={disabled ? 0.66 : 1}
           columnGap="s"
           alignItems="center"
           paddingVertical={subtitle ? 'xsY' : 'mY'}

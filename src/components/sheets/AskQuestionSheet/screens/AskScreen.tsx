@@ -62,9 +62,11 @@ import {
   setQuestionPoll,
 } from 'app/redux/slices/askSheetSlice';
 import TabItem from 'app/components/common/TabItem';
-
-const charLimit = 120;
-const extraInfoLimit = 1000;
+import {
+  MAX_QUESTION_DETAIL_LENGTH,
+  MAX_QUESTION_LENGTH,
+  MEDIA_LIMIT,
+} from 'app/constants';
 
 const AskSheetContent: FC = () => {
   const {
@@ -85,8 +87,8 @@ const AskSheetContent: FC = () => {
   const charsRemaining = useMemo(
     () =>
       selectedInput !== 'extraInfo'
-        ? charLimit - question.length
-        : extraInfoLimit - questionDetail.length,
+        ? MAX_QUESTION_LENGTH - question.length
+        : MAX_QUESTION_DETAIL_LENGTH - questionDetail.length,
     [question, selectedInput, questionDetail],
   );
 
@@ -139,7 +141,7 @@ const AskSheetContent: FC = () => {
   });
 
   const openPhotoLibrary = () => {
-    if (questionMedia.length >= 4) {
+    if (questionMedia.length >= MEDIA_LIMIT) {
       Alert.alert('Maximum photos reached', 'You can only add 4 photos');
       mediaPopover.current?.closePopover();
       return;
@@ -149,7 +151,7 @@ const AskSheetContent: FC = () => {
         mediaType: 'photo',
         includeBase64: true,
         quality: 0.5,
-        selectionLimit: 4 - questionMedia.length,
+        selectionLimit: MEDIA_LIMIT - questionMedia.length,
       },
       response => {
         dispatch(
@@ -161,7 +163,7 @@ const AskSheetContent: FC = () => {
   };
 
   const openCamera = () => {
-    if (questionMedia.length >= 4) {
+    if (questionMedia.length >= MEDIA_LIMIT) {
       Alert.alert('Maximum photos reached', 'You can only add 4 photos');
       mediaPopover.current?.closePopover();
       return;
@@ -183,7 +185,7 @@ const AskSheetContent: FC = () => {
     );
   };
 
-  const locationPicker = () => {
+  const openLocationManager = () => {
     if (Platform.OS !== 'ios' && Platform.OS !== 'android') {
       return;
     }
@@ -215,7 +217,7 @@ const AskSheetContent: FC = () => {
     });
   };
 
-  const openTagManager = () => {
+  const openTopicsManager = () => {
     navigate('ManageTagsScreen');
   };
 
@@ -314,8 +316,8 @@ const AskSheetContent: FC = () => {
                 py="sY">
                 {selectedTopics.map(topic => (
                   <TabItem
-                    key={topic}
-                    title={topic}
+                    key={topic.id}
+                    title={topic.name}
                     count={0}
                     layoutAnimation
                     small
@@ -333,7 +335,7 @@ const AskSheetContent: FC = () => {
                             text: 'Remove',
                             style: 'destructive',
                             onPress: () => {
-                              dispatch(removeTopic(topic));
+                              dispatch(removeTopic(topic.id));
                             },
                           },
                         ],
@@ -348,12 +350,12 @@ const AskSheetContent: FC = () => {
                       height={theme.iconSizes.s}
                     />
                   }
-                  title="Add tags"
+                  title="Add topics"
                   layoutAnimation
                   count={0}
                   small
                   selected={false}
-                  onPress={openTagManager}
+                  onPress={openTopicsManager}
                 />
               </HStack>
 
@@ -474,7 +476,7 @@ const AskSheetContent: FC = () => {
                 )}
               </TouchableOpacity>
             </Badge>
-            <TouchableOpacity onPress={locationPicker}>
+            <TouchableOpacity onPress={openLocationManager}>
               <HStack
                 alignItems="center"
                 columnGap="xxxs"
