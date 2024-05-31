@@ -7,9 +7,14 @@ import QuestionsScreen from '../screens/Questions';
 import QuestionDetailScreen from '../screens/QuestionDetail';
 import {ProfileScreenParams} from './ProfileStack';
 import ProfileScreen from 'app/screens/Profile/Profile';
+import TopicsFeedScreen from 'app/screens/TopicsFeed/Screen';
 
 export type HomeStackNavigationProp =
   NativeStackNavigationProp<HomeStackParamList>;
+
+export type TopicsFeedScreenParams = {
+  topic: string;
+};
 
 export type HomeStackParamList = {
   Auth: undefined;
@@ -25,6 +30,7 @@ export type HomeStackParamList = {
     };
   };
   Profile: ProfileScreenParams;
+  TopicsFeed: TopicsFeedScreenParams;
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -37,6 +43,7 @@ const HomeStack = () => {
       <Stack.Screen name="Questions" component={QuestionsScreen} />
       <Stack.Screen name="QuestionDetail" component={QuestionDetailScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="TopicsFeed" component={TopicsFeedScreen} />
     </Stack.Navigator>
   );
 };

@@ -22,6 +22,7 @@ import TabItem from '../common/TabItem';
 
 interface QuestionItemProps {
   onPress: () => void;
+  onTopicPress: (topic: string) => void;
   id: number;
   userId: string;
   username: string;
@@ -45,6 +46,7 @@ interface QuestionItemProps {
 
 const QuestionItem: FC<QuestionItemProps> = ({
   onPress,
+  onTopicPress,
   id,
   userId,
   username,
@@ -151,9 +153,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
                   count={0}
                   small
                   selected={false}
-                  onPress={() => {
-                    console.log('TODO: Navigate to topic feed');
-                  }}
+                  onPress={() => onTopicPress(topic)}
                 />
               ))}
             </HStack>

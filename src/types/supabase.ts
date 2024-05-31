@@ -568,6 +568,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      getquestionsfortopic: {
+        Args: {
+          topic: string
+        }
+        Returns: {
+          question_id: number
+          question: string
+          body: string
+          nsfw: boolean
+          user_id: number
+          question_created_at: string
+          upvote_count: number
+          response_count: number
+          location: string
+          topics: string[]
+          media: Json
+          verified: boolean
+          username: string
+          profile_picture: Json
+        }[]
+      }
       nearby_geolocations: {
         Args: {
           lat: number

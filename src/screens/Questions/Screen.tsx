@@ -128,6 +128,9 @@ const Questions: FC = () => {
                   },
                 });
               }}
+              onTopicPress={topic => {
+                navigate('TopicsFeed', {topic});
+              }}
               username={item.user_metadata?.username || 'Anonymous'}
               userId={item.user_id}
               question={item.question}
