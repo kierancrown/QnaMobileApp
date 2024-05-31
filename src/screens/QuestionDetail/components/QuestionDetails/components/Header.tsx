@@ -1,19 +1,14 @@
-import React from 'react';
+import React, {FC} from 'react';
 import {HStack, Text, VStack} from 'ui';
-import {FC} from 'react';
 import Username from 'app/components/Username';
 import dayjs from 'dayjs';
-
-import PopoverMenu from 'app/components/common/PopoverMenu';
-
-import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
-import {menuItems} from 'app/screens/QuestionDetail/components/Header';
 import {useAppTheme} from 'app/styles/theme';
 import {Pressable} from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 import Skeleton from 'react-native-reanimated-skeleton';
-import OfflineAvatar from '../../OfflineAvatar';
+import OfflineAvatar from 'app/components/common/OfflineAvatar';
+import DefaultMenu from '../../Header/components/DefaultMenu';
 
 interface QuestionItemHeaderProps {
   userId: string;
@@ -107,18 +102,7 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
             </Pressable>
           </Skeleton>
           {!hideActions && size !== 'small' && (
-            <PopoverMenu
-              accessibilityLabel="Open Question Options"
-              accessibilityRole="button"
-              accessibilityHint="Report or hide this question"
-              triggerComponent={
-                <ElipsisIcon
-                  width={theme.iconSizes.m}
-                  height={theme.iconSizes.m}
-                />
-              }
-              items={menuItems(isOwner ?? false, theme)}
-            />
+            <DefaultMenu iconSize="m" isOwner={isOwner ?? false} />
           )}
         </HStack>
         <Skeleton

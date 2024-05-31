@@ -1,6 +1,6 @@
 import {useUser} from 'app/lib/supabase/context/auth';
 import {useCallback, useMemo, useState} from 'react';
-import useMount from './useMount';
+import useMount from '../../../hooks/useMount';
 import {supabase} from 'app/lib/supabase';
 import {QuestionsDetailData} from 'app/lib/supabase/queries/questionDetail';
 

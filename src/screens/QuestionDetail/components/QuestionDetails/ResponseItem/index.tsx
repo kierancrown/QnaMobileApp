@@ -3,7 +3,7 @@ import {Text, VStack} from 'ui';
 import {supabase} from 'app/lib/supabase';
 import {Alert, Platform} from 'react-native';
 
-import Header from 'app/components/common/QuestionItem/components/Header';
+import Header from '../components/Header';
 
 interface ResponseItemProps {
   userId: string;

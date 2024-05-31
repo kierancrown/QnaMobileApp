@@ -15,6 +15,7 @@ import authSlice from './slices/authSlice';
 import globalSheetsSlice from './slices/globalSheetsSlice';
 import globalNotificationsSlice from './slices/notificationSlice';
 import askSheetSlice from './slices/askSheetSlice';
+import {useDispatch} from 'react-redux';
 
 const persistConfig = {
   key: 'persisted',
@@ -49,5 +50,6 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 export const persistor = persistStore(store);

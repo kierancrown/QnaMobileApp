@@ -16,7 +16,7 @@ import Animated, {
 import {Alert, Platform, Pressable} from 'react-native';
 import {supabase} from 'app/lib/supabase';
 
-import Header from 'app/components/common/QuestionItem/components/Header';
+import Header from 'app/screens/QuestionDetail/components/QuestionDetails/components/Header';
 import MediaPreview from './components/MediaPreview';
 
 interface QuestionItemProps {
