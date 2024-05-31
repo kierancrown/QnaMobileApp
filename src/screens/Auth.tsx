@@ -2,8 +2,7 @@ import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
 import React, {FC, useMemo, useState} from 'react';
 import {Center, SafeAreaView, VStack, Button} from 'ui';
 import {supabase} from 'app/lib/supabase';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from 'app/redux/store';
+import {useAppDispatch} from 'app/redux/store';
 import {skipAuth} from 'app/redux/slices/authSlice';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -24,7 +23,7 @@ const Auth: FC = () => {
 
   const theme = useTheme<Theme>();
 
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const skipLogin = () => {
     dispatch(skipAuth());

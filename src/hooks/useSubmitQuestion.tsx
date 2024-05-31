@@ -1,14 +1,14 @@
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {resetSheet, setLoading} from 'app/redux/slices/askSheetSlice';
-import {AppDispatch, RootState} from 'app/redux/store';
+import {RootState, useAppDispatch} from 'app/redux/store';
 import {decode} from 'base64-arraybuffer';
 import {Alert} from 'react-native';
 import {Asset} from 'react-native-image-picker';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 export const useSubmitQuestion = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const {user} = useUser();
   const askSheetData = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,

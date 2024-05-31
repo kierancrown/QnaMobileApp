@@ -1,31 +1,23 @@
 import React, {FC} from 'react';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from 'app/redux/store';
+import {useAppDispatch} from 'app/redux/store';
 import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
-import {Center, Flex, Text, VStack, Button, HStack, SafeAreaView} from 'ui';
+import {Center, Text, VStack, Button, HStack, SafeAreaView} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {supabase} from 'app/lib/supabase';
-import {useUsername} from 'app/hooks/useUsername';
 
 import EyesIcon from 'app/assets/icons/Eyes.svg';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
-import Avatar from 'app/components/common/Avatar';
-import Username from 'app/components/Username';
-import {useNotification} from 'app/context/PushNotificationContext';
-import {Alert} from 'react-native';
 import Profile from './Profile/Profile';
 
 const ProfileScreen: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const theme = useTheme<Theme>();
 
-  const {requestPermission} = useNotification();
-  const {user, logout, sessionId, deleteUser} = useUser();
-  const {username} = useUsername();
+  const {user} = useUser();
 
   const bottomListPadding = useBottomPadding();
 
@@ -37,43 +29,43 @@ const ProfileScreen: FC = () => {
     }
   };
 
-  const deleteAccountPrompt = () => {
-    Alert.alert(
-      'Delete Account',
-      'Are you sure you want to delete your account?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            Alert.alert(
-              'Heads up',
-              'Deleting your account is permanent. All of your questions and responses will be deleted. Are you sure you want to continue?',
-              [
-                {
-                  text: 'Cancel',
-                  style: 'cancel',
-                },
-                {
-                  text: 'Delete',
-                  style: 'destructive',
-                  onPress: () => {
-                    if (user) {
-                      deleteUser().then();
-                    }
-                  },
-                },
-              ],
-            );
-          },
-        },
-      ],
-    );
-  };
+  // const deleteAccountPrompt = () => {
+  //   Alert.alert(
+  //     'Delete Account',
+  //     'Are you sure you want to delete your account?',
+  //     [
+  //       {
+  //         text: 'Cancel',
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'Delete',
+  //         style: 'destructive',
+  //         onPress: () => {
+  //           Alert.alert(
+  //             'Heads up',
+  //             'Deleting your account is permanent. All of your questions and responses will be deleted. Are you sure you want to continue?',
+  //             [
+  //               {
+  //                 text: 'Cancel',
+  //                 style: 'cancel',
+  //               },
+  //               {
+  //                 text: 'Delete',
+  //                 style: 'destructive',
+  //                 onPress: () => {
+  //                   if (user) {
+  //                     deleteUser().then();
+  //                   }
+  //                 },
+  //               },
+  //             ],
+  //           );
+  //         },
+  //       },
+  //     ],
+  //   );
+  // };
 
   return !user ? (
     <SafeAreaView>

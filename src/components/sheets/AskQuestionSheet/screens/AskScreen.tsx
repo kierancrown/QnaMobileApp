@@ -50,8 +50,8 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import {AskQuestionStackParamList} from '..';
-import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from 'app/redux/store';
+import {useSelector} from 'react-redux';
+import {RootState, useAppDispatch} from 'app/redux/store';
 import {
   removeTopic,
   setActionButton,
@@ -98,7 +98,7 @@ const AskSheetContent: FC = () => {
   const theme = useAppTheme();
   const {navigate} = useNavigation<NavigationProp<AskQuestionStackParamList>>();
   const {keyboardOpen} = useKeyboardStatus();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const mediaPopover = useRef<PopoverRef>(null);
 
   useEffect(() => {

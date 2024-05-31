@@ -2,12 +2,12 @@ import {useCallback, useEffect} from 'react';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {setUsernameCache} from 'app/redux/slices/authSlice';
-import {AppDispatch, RootState} from 'app/redux/store';
-import {useDispatch, useSelector} from 'react-redux';
+import {RootState, useAppDispatch} from 'app/redux/store';
+import {useSelector} from 'react-redux';
 
 export const useUsername = () => {
   const {user} = useUser();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const username = useSelector(
     (state: RootState) => state.persistent.auth.username,

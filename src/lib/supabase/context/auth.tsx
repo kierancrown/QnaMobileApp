@@ -3,8 +3,7 @@ import {Session, User} from '@supabase/supabase-js';
 import {supabase} from '../';
 import useMount from 'app/hooks/useMount';
 import {Alert, Linking} from 'react-native';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from 'app/redux/store';
+import {useAppDispatch} from 'app/redux/store';
 import {
   completeOnboarding,
   deletedAccount,
@@ -16,7 +15,6 @@ import {
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
 import {useOnboarding} from 'app/hooks/useOnboarding';
-import {useProfilePicture} from 'app/hooks/useProfilePicture';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -43,10 +41,10 @@ export const AuthContextProvider = (props: any) => {
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [userSession, setUserSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const {hasOnboarded} = useOnboarding();
 
-  const {deleteProfilePicture} = useProfilePicture();
+  // const {deleteProfilePicture} = useProfilePicture();
 
   const {silentTokenRegistration} = useNotification();
 
@@ -127,19 +125,19 @@ export const AuthContextProvider = (props: any) => {
     }
     console.log('Deleting user');
     // First delete profile picture
-    try {
-      console.log('Deleting profile picture');
-      const profilePictureDeletionSuccess = await deleteProfilePicture();
-      if (!profilePictureDeletionSuccess) {
-        // TODO: Log this on a backend DB to remove later on
-        console.log('Error deleting profile picture');
-      } else {
-        console.log('Profile picture deleted');
-      }
-    } catch {
-      // TODO: Log this on a backend DB to remove later on
-      console.log('Error deleting profile picture');
-    }
+    // try {
+    //   console.log('Deleting profile picture');
+    //   const profilePictureDeletionSuccess = await deleteProfilePicture();
+    //   if (!profilePictureDeletionSuccess) {
+    //     // TODO: Log this on a backend DB to remove later on
+    //     console.log('Error deleting profile picture');
+    //   } else {
+    //     console.log('Profile picture deleted');
+    //   }
+    // } catch {
+    //   // TODO: Log this on a backend DB to remove later on
+    //   console.log('Error deleting profile picture');
+    // }
 
     // Logout from other devices
     await logout({allDevices: false, otherDevices: true});

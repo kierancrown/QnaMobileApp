@@ -43,7 +43,9 @@ export const HeaderComponent: FC<HeaderComponentProps> = ({
         <Center py="xxsY">
           <Text variant="medium">
             {responseCount
-              ? `${formatNumber(responseCount)} answers`
+              ? `${formatNumber(responseCount)} answer${
+                  responseCount > 1 ? 's' : ''
+                }`
               : 'Question'}
           </Text>
         </Center>

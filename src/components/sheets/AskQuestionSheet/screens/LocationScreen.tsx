@@ -17,9 +17,9 @@ import {
   setActionButton,
   setSelectedLocation,
 } from 'app/redux/slices/askSheetSlice';
-import {AppDispatch, RootState} from 'app/redux/store';
+import {RootState, useAppDispatch} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
 import {Alert, StyleProp, TextInput, ViewStyle} from 'react-native';
 import {
@@ -36,7 +36,7 @@ import {useDebounceValue} from 'usehooks-ts';
 import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 
 const LocationsScreen: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const selectedLocation = useSelector(
     (state: RootState) => state.nonPersistent.askSheet.selectedLocation,
   );

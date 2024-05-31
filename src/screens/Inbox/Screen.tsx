@@ -12,8 +12,7 @@ import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
 import {Alert, RefreshControl} from 'react-native';
 import useMount from 'app/hooks/useMount';
 import NotificationItem from 'app/components/NotificationItem';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from 'app/redux/store';
+import {useAppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 import {FlashList} from '@shopify/flash-list';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -26,7 +25,7 @@ const InboxScreen: FC = () => {
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
   const {user} = useUser();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const [notifications, setNotifications] = useState<(string | Notification)[]>(
     [],

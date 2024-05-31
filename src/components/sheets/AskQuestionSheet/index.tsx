@@ -26,8 +26,8 @@ import {
   StackCardStyleInterpolator,
   StackNavigationOptions,
 } from '@react-navigation/stack';
-import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from 'app/redux/store';
+import {useSelector} from 'react-redux';
+import {RootState, useAppDispatch} from 'app/redux/store';
 import {setSheetState} from 'app/redux/slices/askSheetSlice';
 
 import useAndroidBack from 'app/hooks/useAndroidBack';
@@ -129,7 +129,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const topSafeAreaInset = useSafeAreaInsets().top;
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const {canSubmit, actionButton} = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,
   );

@@ -1,12 +1,11 @@
-import {useDispatch} from 'react-redux';
 import {supabase} from 'app/lib/supabase';
-import {AppDispatch} from 'app/redux/store';
+import {useAppDispatch} from 'app/redux/store';
 import {completeOnboarding as dispatchCompleted} from 'app/redux/slices/authSlice';
 import {User} from '@supabase/supabase-js';
 import {useCallback} from 'react';
 
 export const useOnboarding = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const hasOnboarded = async (user?: User) => {
     if (!user?.id) {

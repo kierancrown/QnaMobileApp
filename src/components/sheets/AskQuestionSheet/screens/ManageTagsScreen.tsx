@@ -14,9 +14,9 @@ import {
   removeTopic,
   setActionButton,
 } from 'app/redux/slices/askSheetSlice';
-import {AppDispatch, RootState} from 'app/redux/store';
+import {RootState, useAppDispatch} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Alert, StyleProp, TextInput, ViewStyle} from 'react-native';
 import useMount from 'app/hooks/useMount';
 import SelectionItem from 'app/components/common/SelectionItem';
@@ -28,7 +28,7 @@ import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 import {supabase} from 'app/lib/supabase';
 
 const ManageTagsScreen: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const selectedTopics = useSelector(
     (state: RootState) => state.nonPersistent.askSheet.selectedTopics,
   );

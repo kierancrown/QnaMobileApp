@@ -21,24 +21,17 @@ import useResponses from './hooks/useResponses';
 import {useQuestionDetail} from './hooks/useQuestionDetail';
 
 const QuestionDetailScreen: FC = () => {
+  const {
+    params: {questionId},
+  } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
+
   const dispatch = useAppDispatch();
   const theme = useTheme<Theme>();
   const {user} = useUser();
   const {fabEventEmitter} = useTabBar();
-
   const scrollRef = useRef(null);
-  const {scrollHandlerWorklet} = useTabBarAnimation({
-    scrollToTop: () => {
-      if (scrollRef.current) {
-        // @ts-ignore
-        scrollRef.current.scrollToOffset({offset: 0, animated: true});
-      }
-    },
-  });
-
-  const {
-    params: {questionId},
-  } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
+  const bottomListPadding = useBottomPadding(theme.spacing.mY);
+  const [refreshing] = useState(false);
 
   // Question detail hook
   const {loading, question, hasUpvoted, upvoteQuestion} = useQuestionDetail({
@@ -53,9 +46,15 @@ const QuestionDetailScreen: FC = () => {
     refreshResponses,
     fetchNextPage,
   } = useResponses({questionId});
-  const bottomListPadding = useBottomPadding(theme.spacing.mY);
-  // const [loading, setLoading] = useState(true);
-  const [refreshing] = useState(false);
+
+  const {scrollHandlerWorklet} = useTabBarAnimation({
+    scrollToTop: () => {
+      if (scrollRef.current) {
+        // @ts-ignore
+        scrollRef.current.scrollToOffset({offset: 0, animated: true});
+      }
+    },
+  });
 
   const [headerHeight, setHeaderHeight] = useState(0);
   const topInset = useSafeAreaInsets().top;
@@ -148,12 +147,17 @@ const QuestionDetailScreen: FC = () => {
           paddingBottom: theme.spacing.xlY,
         }}
         ListEmptyComponent={
-          <Center flex={1}>
-            <Text variant="medium" my="xlY" color="cardText">
-              No responses yet
-            </Text>
-            <Button onPress={showAnswer} variant="primary" title="Answer" />
-          </Center>
+          responsesLoading ? (
+            // TODO: Insert skeleton loader here
+            <></>
+          ) : (
+            <Center flex={1}>
+              <Text variant="medium" my="xlY" color="cardText">
+                No responses yet
+              </Text>
+              <Button onPress={showAnswer} variant="primary" title="Answer" />
+            </Center>
+          )
         }
         refreshing={responsesLoading}
         onRefresh={refreshResponses}

@@ -5,8 +5,7 @@ import messaging from '@react-native-firebase/messaging';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from 'app/redux/store';
+import {useAppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 import {getUserId} from 'app/lib/supabase/helpers/userId';
 
@@ -43,7 +42,7 @@ interface NotificationProviderProps {
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const {user} = useUser();
 
   const getUnreadCount = useCallback(async () => {
