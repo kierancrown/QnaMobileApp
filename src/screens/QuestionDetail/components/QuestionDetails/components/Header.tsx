@@ -23,6 +23,7 @@ interface QuestionItemHeaderProps {
   hideActions?: boolean;
   loading?: boolean;
   size?: 'small' | 'large';
+  questionId: number;
 }
 
 const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
@@ -35,6 +36,7 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
   hideActions,
   loading = false,
   size,
+  questionId,
 }) => {
   const theme = useAppTheme();
   const {navigate} = useNavigation<NavigationProp<HomeStackParamList>>();
@@ -102,7 +104,11 @@ const QuestionItemHeader: FC<QuestionItemHeaderProps> = ({
             </Pressable>
           </Skeleton>
           {!hideActions && size !== 'small' && (
-            <DefaultMenu iconSize="m" isOwner={isOwner ?? false} />
+            <DefaultMenu
+              iconSize="m"
+              isOwner={isOwner ?? false}
+              questionId={questionId}
+            />
           )}
         </HStack>
         <Skeleton

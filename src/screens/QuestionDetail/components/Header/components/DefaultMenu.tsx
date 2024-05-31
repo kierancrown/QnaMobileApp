@@ -1,4 +1,4 @@
-import React, {FC, useMemo} from 'react';
+import React, {FC, useCallback, useMemo} from 'react';
 
 import PopoverMenu, {
   PopoverMenuItemsProps,
@@ -10,15 +10,49 @@ import HideIcon from 'app/assets/icons/actions/Hide.svg';
 import ReportIcon from 'app/assets/icons/actions/ReportAlt.svg';
 import TrashIcon from 'app/assets/icons/actions/Trash.svg';
 import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
+import {Alert} from 'react-native';
+import {supabase} from 'app/lib/supabase';
 
 interface DefaultMenuProps {
   isOwner: boolean;
   iconSize?: keyof Theme['iconSizes'];
+  questionId: number;
 }
 
-const DefaultMenu: FC<DefaultMenuProps> = ({isOwner, iconSize}) => {
+const DefaultMenu: FC<DefaultMenuProps> = ({isOwner, iconSize, questionId}) => {
   const theme = useAppTheme();
   const ellipsisIconSize = iconSize || 'l';
+
+  const deleteSelf = useCallback(() => {
+    if (isOwner) {
+      Alert.alert(
+        'Delete Question',
+        'Are you sure you want to delete this question?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              const {error} = await supabase
+                .from('questions')
+                .delete()
+                .eq('id', questionId);
+              if (error) {
+                console.error(error);
+                Alert.alert('Error', error.message);
+              } else {
+                Alert.alert('Success', 'Question deleted');
+              }
+            },
+          },
+        ],
+      );
+    }
+  }, [isOwner, questionId]);
 
   const menuItems = useMemo(() => {
     return isOwner
@@ -33,7 +67,7 @@ const DefaultMenu: FC<DefaultMenuProps> = ({isOwner, iconSize}) => {
                 height={theme.iconSizes.popover}
               />
             ),
-            onPress: () => {},
+            onPress: deleteSelf,
           },
         ] as PopoverMenuItemsProps)
       : ([
@@ -61,7 +95,13 @@ const DefaultMenu: FC<DefaultMenuProps> = ({isOwner, iconSize}) => {
             onPress: () => {},
           },
         ] as PopoverMenuItemsProps);
-  }, [isOwner, theme]);
+  }, [
+    isOwner,
+    deleteSelf,
+    theme.colors.cardText,
+    theme.colors.destructiveAction,
+    theme.iconSizes.popover,
+  ]);
 
   return (
     <PopoverMenu

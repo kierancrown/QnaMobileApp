@@ -15,12 +15,14 @@ interface HeaderComponentProps {
   onSize?: (size: {width: number; height: number}) => void;
   responseCount: number;
   isOwner: boolean;
+  questionId: number;
 }
 
 export const HeaderComponent: FC<HeaderComponentProps> = ({
   onSize,
   responseCount,
   isOwner,
+  questionId,
 }) => {
   const theme = useAppTheme();
   const {goBack} = useNavigation();
@@ -52,7 +54,7 @@ export const HeaderComponent: FC<HeaderComponentProps> = ({
         <Flex alignItems="flex-end">
           <HStack alignItems="center">
             <SortByMenu onSortByChange={console.log} />
-            <DefaultMenu isOwner={isOwner} />
+            <DefaultMenu isOwner={isOwner} questionId={questionId} />
           </HStack>
         </Flex>
       </HStack>

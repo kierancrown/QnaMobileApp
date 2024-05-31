@@ -13,8 +13,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {Alert, Platform, Pressable} from 'react-native';
-import {supabase} from 'app/lib/supabase';
+import {Platform, Pressable} from 'react-native';
 
 import Header from 'app/screens/QuestionDetail/components/QuestionDetails/components/Header';
 import MediaPreview from './components/MediaPreview';
@@ -83,43 +82,8 @@ const QuestionItem: FC<QuestionItemProps> = ({
     opacity.value = 1;
   };
 
-  const deleteSelf = () => {
-    if (isOwner) {
-      Alert.alert(
-        'Delete Question',
-        'Are you sure you want to delete this question?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: async () => {
-              const {error} = await supabase
-                .from('questions')
-                .delete()
-                .eq('id', id);
-              if (error) {
-                console.error(error);
-                Alert.alert('Error', error.message);
-              } else {
-                Alert.alert('Success', 'Question deleted');
-              }
-            },
-          },
-        ],
-      );
-    }
-  };
-
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={onPressIn}
-      onPressOut={onPressOut}
-      onLongPress={deleteSelf}>
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[animatedStyle]}>
         <VStack
           rowGap="sY"
@@ -139,6 +103,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
             avatarImage={avatarImage}
             timestamp={timestamp}
             isOwner={isOwner}
+            questionId={id}
           />
 
           {/* Main question body */}

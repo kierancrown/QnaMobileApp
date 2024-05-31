@@ -123,6 +123,7 @@ const QuestionDetailScreen: FC = () => {
         }}
         isOwner={isOwner}
         responseCount={question?.question_metadata?.response_count ?? 0}
+        questionId={questionId}
       />
       <FlashList
         indicatorStyle="white"

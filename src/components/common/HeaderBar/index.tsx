@@ -1,5 +1,5 @@
 import {useAppTheme} from 'app/styles/theme';
-import React, {FC, useCallback, useMemo, useRef, useState} from 'react';
+import React, {FC, useCallback, useRef, useState} from 'react';
 import {StyleProp, ViewStyle, LayoutChangeEvent} from 'react-native';
 import Animated, {
   Extrapolation,
@@ -33,9 +33,9 @@ const HeaderBar: FC<HeaderBarProps> = ({
   // @ts-ignore
   const scrollViewRef = useRef<ScrollView>(null);
   const [tabWidths, setTabWidths] = useState<number[]>([]);
-  const isScrollable = useMemo(() => {
-    return scrollContentSize.value > scrollViewWidth.value;
-  }, [scrollContentSize, scrollViewWidth]);
+  // const isScrollable = useMemo(() => {
+  //   return scrollContentSize.value > scrollViewWidth.value;
+  // }, [scrollContentSize, scrollViewWidth]);
 
   const darkGradientStop = Color(theme.colors.mainBackground).alpha(0.9).hexa();
 
@@ -70,9 +70,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
     return {
       opacity: withTiming(
         scrollX.value <= 0
-          ? isScrollable
-            ? 1
-            : 0
+          ? 1
           : scrollX.value >=
             scrollContentSize.value -
               scrollViewWidth.value -
@@ -81,7 +79,7 @@ const HeaderBar: FC<HeaderBarProps> = ({
           : 1,
       ),
     };
-  }, [theme.spacing.l, isScrollable]);
+  }, [theme.spacing.l]);
 
   const handleTabPress = useCallback(
     (tab: string, index: number) => {
