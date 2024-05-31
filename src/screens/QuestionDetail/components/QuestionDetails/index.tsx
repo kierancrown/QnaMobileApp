@@ -65,6 +65,7 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
                   undefined,
               }}
               timestamp={question.created_at}
+              questionId={question.id}
               hideActions
             />
           )}

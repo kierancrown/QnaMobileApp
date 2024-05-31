@@ -138,6 +138,12 @@ const Questions: FC = () => {
               timestamp={item.created_at}
               liked={false}
               media={item.question_metadata?.media || null}
+              location={
+                item.question_metadata?.location
+                  ? // @ts-ignore
+                    item.question_metadata?.location.name
+                  : undefined
+              }
               nsfw={item.nsfw}
               userVerified={item.user_metadata?.verified || false}
               isOwner={item.user_id === user?.id}

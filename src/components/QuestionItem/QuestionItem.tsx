@@ -1,9 +1,10 @@
 import React, {FC} from 'react';
-import {Box, Center, HStack, Text, VStack} from '../common';
+import {Box, Center, Flex, HStack, Text, VStack} from '../common';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartIcon from 'app/assets/icons/actions/Heart.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
+import LocationIcon from 'app/assets/icons/LocationPin.svg';
 
 import {formatNumber} from 'app/utils/numberFormatter';
 import {Theme} from 'app/styles/theme';
@@ -31,6 +32,7 @@ interface QuestionItemProps {
   voteCount: number;
   timestamp: string;
   nsfw?: boolean;
+  location?: string;
   topics?: string[];
   userVerified?: boolean;
   media: string[] | null;
@@ -54,6 +56,7 @@ const QuestionItem: FC<QuestionItemProps> = ({
   timestamp,
   liked,
   nsfw,
+  location,
   media,
   isOwner,
   avatarImage,
@@ -179,6 +182,19 @@ const QuestionItem: FC<QuestionItemProps> = ({
                   {answers}
                 </Text>
               </HStack>
+              <Flex />
+              {location && (
+                <HStack alignItems="center" columnGap="xxs">
+                  <LocationIcon
+                    fill={theme.colors.cardText}
+                    width={ICON_SIZE}
+                    height={ICON_SIZE}
+                  />
+                  <Text color="cardText" variant="small">
+                    {location}
+                  </Text>
+                </HStack>
+              )}
             </HStack>
           </VStack>
         </VStack>

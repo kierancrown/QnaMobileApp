@@ -21,7 +21,9 @@ export const questionsWithCountQuery = supabase
     visible,
     topics,
     media,
-    location
+    location (
+      name
+    )
   )
 `,
   )
