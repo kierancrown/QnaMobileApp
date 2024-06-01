@@ -7,7 +7,7 @@ import {skipAuth} from 'app/redux/slices/authSlice';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 
-import Logo from 'app/assets/Logo.svg';
+import Logo from 'app/assets/logo_new.svg';
 import Input from 'app/components/common/TextInput';
 import {verifyEmail} from 'app/utils/emailVerification';
 import MagicLinkSentSheet from 'app/components/sheets/MagicLinkSentSheet';
