@@ -83,6 +83,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "qna"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

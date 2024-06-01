@@ -7,7 +7,7 @@ import {skipAuth} from 'app/redux/slices/authSlice';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 
-import Logo from 'app/assets/logo_new.svg';
+import Logo from 'app/assets/logo_new_text.svg';
 import Input from 'app/components/common/TextInput';
 import {verifyEmail} from 'app/utils/emailVerification';
 import MagicLinkSentSheet from 'app/components/sheets/MagicLinkSentSheet';
@@ -60,7 +60,7 @@ const Auth: FC = () => {
             <VStack flex={1} rowGap="xxlY">
               <Center>
                 <Logo
-                  width={theme.iconSizes.logo}
+                  width={theme.iconSizes.logo * 3}
                   height={theme.iconSizes.logo}
                 />
               </Center>
