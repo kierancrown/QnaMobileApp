@@ -20,7 +20,6 @@ import useAndroidBack from 'app/hooks/useAndroidBack';
 
 import Screen from './screens/ReplyScreen';
 import useSheetHeight from './utils/useSheetHeight';
-import CustomBackdrop from './components/Backdrop';
 
 interface ReplySheetProps {
   open?: boolean;
@@ -167,7 +166,7 @@ const ReplySheet: FC<ReplySheetProps> = ({
       animatedIndex={animatedPosition}
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
-      backdropComponent={CustomBackdrop}
+      backdropComponent={null}
       backgroundComponent={CustomBackground}
       maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}>
       <Navigator

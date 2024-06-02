@@ -1,32 +1,28 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 export interface ReplyState {
-  sheetState: 'closed' | 'open' | 'loading';
-  questionId: number | null;
+  showBackdrop: boolean;
 }
 
 const initialState: ReplyState = {
-  sheetState: 'closed',
-  questionId: null,
+  showBackdrop: false,
 };
 
 export const replySlice = createSlice({
   name: 'reply',
   initialState,
   reducers: {
-    setSheetState: (state, action) => {
-      state.sheetState = action.payload;
-    },
-    setQuestionId: (state, action) => {
-      state.questionId = action.payload;
-    },
-    clearQuestionId: state => {
-      state.questionId = null;
+    setShowBackdrop: (
+      state,
+      action: {
+        payload: boolean;
+      },
+    ) => {
+      state.showBackdrop = action.payload;
     },
   },
 });
 
-export const {setSheetState, setQuestionId, clearQuestionId} =
-  replySlice.actions;
+export const {setShowBackdrop} = replySlice.actions;
 
 export default replySlice.reducer;

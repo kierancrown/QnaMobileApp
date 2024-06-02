@@ -1,6 +1,6 @@
-import {RefreshControl} from 'react-native';
+import {Keyboard, Pressable, RefreshControl, StyleSheet} from 'react-native';
 import React, {FC, useRef, useState} from 'react';
-import {ActivityLoader, Flex, HStack, Text, VStack} from 'ui';
+import {ActivityLoader, Box, Flex, HStack, Text, VStack} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -20,12 +20,16 @@ import useResponses from './hooks/useResponses';
 import {useQuestionDetail} from './hooks/useQuestionDetail';
 import ReplySheet from 'app/components/sheets/ReplySheet';
 import useSheetHeight from 'app/components/sheets/ReplySheet/utils/useSheetHeight';
+import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
+import {useAppSelector} from 'app/redux/store';
 
 const QuestionDetailScreen: FC = () => {
   const {
     params: {questionId, skeletonLayout},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
-
+  const showBackdrop = useAppSelector(
+    state => state.nonPersistent.reply.showBackdrop,
+  );
   const theme = useTheme<Theme>();
   const {user} = useUser();
   useHiddenTabBar();
@@ -113,6 +117,12 @@ const QuestionDetailScreen: FC = () => {
     };
   });
 
+  const backdropStyles = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(showBackdrop ? 1 : 0),
+    };
+  }, [showBackdrop]);
+
   return (
     <>
       <Flex>
@@ -155,15 +165,15 @@ const QuestionDetailScreen: FC = () => {
           ListHeaderComponentStyle={{
             paddingBottom: theme.spacing.xlY,
           }}
-          ListEmptyComponent={
-            responsesLoading ? (
-              <Flex>
-                <ResponseItemSkeleton />
-                <ResponseItemSkeleton />
-                <ResponseItemSkeleton />
-              </Flex>
-            ) : null
-          }
+          // ListEmptyComponent={
+          //   responsesLoading ? (
+          //     <Flex>
+          //       <ResponseItemSkeleton />
+          //       <ResponseItemSkeleton />
+          //       <ResponseItemSkeleton />
+          //     </Flex>
+          //   ) : null
+          // }
           refreshing={responsesLoading}
           onRefresh={refreshResponses}
           ListFooterComponent={
@@ -216,6 +226,25 @@ const QuestionDetailScreen: FC = () => {
           )}
         />
       </Flex>
+
+      <Pressable
+        pointerEvents={showBackdrop ? 'auto' : 'none'}
+        onPress={() => {
+          Keyboard.dismiss();
+        }}
+        style={StyleSheet.absoluteFillObject}>
+        <Animated.View style={[backdropStyles, StyleSheet.absoluteFillObject]}>
+          <Box
+            position="absolute"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="mainBackgroundHalf"
+          />
+        </Animated.View>
+      </Pressable>
+
       <ReplySheet
         open={showReplySheet}
         onClose={() => {}}

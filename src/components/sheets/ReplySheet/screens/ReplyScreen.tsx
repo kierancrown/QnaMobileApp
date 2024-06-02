@@ -14,6 +14,8 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ReplyStackParamList} from '..';
 import {MAX_REPLY_LENGTH} from 'app/constants';
+import {useAppDispatch} from 'app/redux/store';
+import {setShowBackdrop} from 'app/redux/slices/replySlice';
 
 const ReplyScreen: FC = () => {
   const {
@@ -24,7 +26,7 @@ const ReplyScreen: FC = () => {
   const [inputFocused, setInputFocused] = useState(false);
   const bottomInset = useSafeAreaInsets().bottom;
   const theme = useAppTheme();
-
+  const dispatch = useAppDispatch();
   const [reply, setReply] = useState<string>('');
 
   const bottomViewOpacity = useSharedValue(0);
@@ -78,8 +80,14 @@ const ReplyScreen: FC = () => {
           }}
           value={reply}
           onChangeText={setReply}
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
+          onFocus={() => {
+            setInputFocused(true);
+            dispatch(setShowBackdrop(true));
+          }}
+          onBlur={() => {
+            setInputFocused(false);
+            dispatch(setShowBackdrop(false));
+          }}
           variant="composeInput"
           borderRadius="pill"
           bg="cardBackground"
