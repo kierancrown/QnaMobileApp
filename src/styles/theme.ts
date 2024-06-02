@@ -177,6 +177,8 @@ const theme = createTheme({
     // Skeleton
     skeletonBackground: palette.cardBackgroundDark,
     skeleton: '#52525b',
+    // Reply sheet
+    replySheetBackground: palette.darkSecondaryBackground2,
     // Common
     white: palette.white,
     black: palette.black,
@@ -319,6 +321,11 @@ const theme = createTheme({
     smallInput: {
       fontSize: mvs(14),
       lineHeight: mvs(16),
+      fontFamily: fonts.semiBold,
+    },
+    composeInput: {
+      fontSize: mvs(16),
+      lineHeight: mvs(20),
       fontFamily: fonts.semiBold,
     },
     largeInput: {

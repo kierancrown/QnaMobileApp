@@ -90,17 +90,19 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
             {props.insideBottomSheet ? (
               <BottomSheetTextInput
                 ref={inputRef}
-                onFocus={() => {
-                  setFocused(true);
-                }}
-                onBlur={() => {
-                  setFocused(false);
-                }}
                 placeholderTextColor={theme.colors.inputPlaceholder}
-                {...textInputProps}
                 selectionColor={theme.colors.brand}
                 cursorColor={theme.colors.brand}
                 selectionHandleColor={theme.colors.brand}
+                {...textInputProps}
+                onFocus={e => {
+                  setFocused(true);
+                  textInputProps.onFocus?.(e);
+                }}
+                onBlur={e => {
+                  setFocused(false);
+                  textInputProps.onBlur?.(e);
+                }}
                 style={[
                   inputStyle,
                   textVariant,
@@ -113,17 +115,19 @@ const Input = forwardRef<InputRef, InputProps>((props, ref) => {
             ) : (
               <TextInput
                 ref={inputRef}
-                onFocus={() => {
-                  setFocused(true);
-                }}
-                onBlur={() => {
-                  setFocused(false);
-                }}
                 placeholderTextColor={theme.colors.inputPlaceholder}
-                {...textInputProps}
                 selectionColor={theme.colors.brand}
                 cursorColor={theme.colors.brand}
                 selectionHandleColor={theme.colors.brand}
+                {...textInputProps}
+                onFocus={e => {
+                  setFocused(true);
+                  textInputProps.onFocus?.(e);
+                }}
+                onBlur={e => {
+                  setFocused(false);
+                  textInputProps.onBlur?.(e);
+                }}
                 style={[
                   inputStyle,
                   textVariant,

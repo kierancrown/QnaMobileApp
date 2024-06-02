@@ -24,7 +24,7 @@ import {FabAction, useTabBar} from 'app/context/tabBarContext';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 
 import PlusIcon from 'app/assets/icons/actions/Plus.svg';
-import ReplyIcon from 'app/assets/icons/actions/Comment.svg';
+import ReplyIcon from 'app/assets/icons/compose/reply.svg';
 import Badge from '../Badge';
 import {useHaptics, HapticFeedbackTypes} from 'app/hooks/useHaptics';
 

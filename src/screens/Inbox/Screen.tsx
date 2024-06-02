@@ -202,15 +202,18 @@ const InboxScreen: FC = () => {
           refreshing={refreshing}
           onRefresh={refreshNotifications}
           contentContainerStyle={{
-            paddingTop: theme.spacing.sY + headerHeight,
+            paddingTop: theme.spacing.sY + headerHeight - topInset,
             paddingBottom: bottomListPadding,
           }}
           estimatedItemSize={100}
           renderItem={({item}) => {
             if (typeof item === 'string') {
-              // Rendering header
               return (
-                <HStack bg="mainBackground" py="sY" px="m">
+                <HStack
+                  bg="mainBackground"
+                  pb="sY"
+                  px="m"
+                  style={{marginTop: topInset}}>
                   <Text variant="medium">{item}</Text>
                 </HStack>
               );

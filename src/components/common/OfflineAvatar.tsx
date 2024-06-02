@@ -5,6 +5,7 @@ import {useTheme} from '@shopify/restyle';
 import {ImageStyle, StyleProp} from 'react-native';
 
 import {FasterImageView} from '@candlefinance/faster-image';
+import {DEFAULT_AVATAR} from 'app/constants';
 
 interface AvatarProps {
   uri?: string;
@@ -21,9 +22,6 @@ const styles: StyleProp<ImageStyle> = {
   width: '100%',
   height: '100%',
 };
-
-const DEFAULT_AVATAR =
-  'https://api.askthat.co/storage/v1/object/public/user_profile_pictures/default.jpg';
 
 const OfflineAvatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
   const {uri, blurhash, size, defaultAvatar} = props;

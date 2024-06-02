@@ -12,9 +12,16 @@ import {formatNumber} from 'app/utils/numberFormatter';
 
 import AnswersIcon from 'app/assets/icons/Answers.svg';
 import HeartOutlineIcon from 'app/assets/icons/actions/Heart-Outline.svg';
+import HeartIcon from 'app/assets/icons/actions/Heart.svg';
 import LocationIcon from 'app/assets/icons/LocationPin.svg';
-import ActionBar from './components/ActionBar';
 import {QuestionsDetailData} from 'app/lib/supabase/queries/questionDetail';
+import {Pressable} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 
 interface QuestionDetailsProps {
   loading: boolean;
@@ -36,11 +43,22 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
   skeletonLayout,
 }) => {
   const theme = useAppTheme();
-  const [bookmarked, setBookmarked] = useState(false);
   const [viewerVisible, setIsVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
-  const ICON_SIZE = theme.iconSizes.m;
+  const ICON_SIZE = theme.iconSizes.intermediate;
   const mediaUrls = question?.question_metadata?.media || [];
+  const {triggerHaptic} = useHaptics();
+
+  const heartScale = useSharedValue(1);
+  const heartAnimatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: heartScale.value,
+        },
+      ],
+    };
+  }, []);
 
   return question && !loading ? (
     <VStack>
@@ -91,36 +109,65 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
             {question?.body && <Text variant="smallBody">{question.body}</Text>}
 
             {mediaUrls.length > 0 && (
-              <MediaPreview
-                media={mediaUrls}
-                isTouchEnabled
-                onImageTouch={index => {
-                  setIsVisible(true);
-                  setViewerIndex(index);
-                }}
-              />
+              <VStack py="xsY">
+                <MediaPreview
+                  media={mediaUrls}
+                  isTouchEnabled
+                  onImageTouch={index => {
+                    setIsVisible(true);
+                    setViewerIndex(index);
+                  }}
+                />
+              </VStack>
             )}
           </VStack>
         </VStack>
         <VStack rowGap="sY">
           <HStack alignItems="center" columnGap="s">
-            <HStack alignItems="center" columnGap="xxs">
-              <HeartOutlineIcon
-                fill={theme.colors.cardText}
-                width={ICON_SIZE}
-                height={ICON_SIZE}
-              />
-              <Text color="cardText" variant="small">
-                {formatNumber(question?.question_metadata?.upvote_count || 0)}
-              </Text>
-            </HStack>
+            <Pressable
+              hitSlop={16}
+              onPressIn={() => {
+                heartScale.value = withTiming(0.9, {duration: 88});
+              }}
+              onPressOut={() => {
+                heartScale.value = withTiming(1, {duration: 88});
+              }}
+              onPress={async () => {
+                await triggerHaptic({
+                  iOS: HapticFeedbackTypes.selection,
+                  android: HapticFeedbackTypes.effectClick,
+                });
+                await upvoteQuestion();
+              }}>
+              <HStack alignItems="center" columnGap="xxs">
+                <Animated.View style={heartAnimatedStyles}>
+                  {hasUpvoted ? (
+                    <HeartIcon
+                      fill={theme.colors.heartAction}
+                      width={ICON_SIZE}
+                      height={ICON_SIZE}
+                    />
+                  ) : (
+                    <HeartOutlineIcon
+                      fill={theme.colors.cardText}
+                      width={ICON_SIZE}
+                      height={ICON_SIZE}
+                    />
+                  )}
+                </Animated.View>
+                <Text color="cardText" variant="bodyBold">
+                  {formatNumber(question?.question_metadata?.upvote_count || 0)}
+                </Text>
+              </HStack>
+            </Pressable>
+
             <HStack alignItems="center" columnGap="xxs">
               <AnswersIcon
                 fill={theme.colors.cardText}
                 width={ICON_SIZE}
                 height={ICON_SIZE}
               />
-              <Text color="cardText" variant="small">
+              <Text color="cardText" variant="bodyBold">
                 {formatNumber(question?.question_metadata?.response_count || 0)}
               </Text>
             </HStack>
@@ -132,22 +179,12 @@ const QuestionDetails: FC<QuestionDetailsProps> = ({
                   width={ICON_SIZE}
                   height={ICON_SIZE}
                 />
-                <Text color="cardText" variant="small">
+                <Text color="cardText" variant="bodyBold">
                   {question.question_metadata.location.name}
                 </Text>
               </HStack>
             )}
           </HStack>
-          <ActionBar
-            isLiked={hasUpvoted}
-            isBookmarked={bookmarked}
-            onLike={async () => {
-              await upvoteQuestion();
-            }}
-            onBookmark={() => {
-              setBookmarked(!bookmarked);
-            }}
-          />
         </VStack>
       </VStack>
     </VStack>
