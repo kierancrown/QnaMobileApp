@@ -4,6 +4,7 @@ export interface AuthState {
   showOnboarding: boolean;
   skippedAuth: boolean;
   username: string | undefined;
+  avatarImageUrl: string | undefined;
   isVerified: boolean;
   deletedAccount: boolean;
 }
@@ -12,6 +13,7 @@ const initialState: AuthState = {
   showOnboarding: false,
   skippedAuth: false,
   username: undefined,
+  avatarImageUrl: undefined,
   isVerified: false,
   deletedAccount: false,
 };
@@ -44,6 +46,9 @@ export const authSlice = createSlice({
     resetDeletedAccount: state => {
       state.deletedAccount = false;
     },
+    setAvatarImageUrl: (state, action) => {
+      state.avatarImageUrl = action.payload;
+    },
     setUsernameCache: (
       state,
       action: {
@@ -66,6 +71,7 @@ export const {
   skipAuth,
   resetCache,
   setUsernameCache,
+  setAvatarImageUrl,
   showOnboarding,
   completeOnboarding,
   deletedAccount,

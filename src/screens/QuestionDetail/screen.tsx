@@ -24,7 +24,7 @@ import {setReplyData} from 'app/redux/slices/replySlice';
 
 const QuestionDetailScreen: FC = () => {
   const {
-    params: {questionId, skeletonLayout},
+    params: {questionId, skeletonLayout, ownerUsername, ownerVerified},
   } = useRoute<RouteProp<HomeStackParamList, 'QuestionDetail'>>();
   const showBackdrop = useAppSelector(
     state => state.nonPersistent.reply.showBackdrop,
@@ -40,8 +40,6 @@ const QuestionDetailScreen: FC = () => {
   });
 
   useReplyTabBar({
-    avatarImageUrl:
-      'https://api.getqna.app/storage/v1/object/public/user_profile_pictures/public/e956b359-25f2-429c-8d3b-77cbcb9479e.jpg',
     username: 'KieranCrown',
     verified: true,
   });
@@ -74,13 +72,11 @@ const QuestionDetailScreen: FC = () => {
   useEffect(() => {
     dispatch(
       setReplyData({
-        username: question?.user_metadata?.username ?? 'Anonymous',
-        verified: question?.user_metadata?.verified ?? false,
-        avatarImageUrl:
-          'https://api.getqna.app/storage/v1/object/public/user_profile_pictures/public/e956b359-25f2-429c-8d3b-77cbcb9479e.jpg',
+        username: ownerUsername,
+        verified: ownerVerified,
       }),
     );
-  }, [question, questionId, dispatch]);
+  }, [ownerUsername, ownerVerified, dispatch]);
 
   // const showAnswer = useCallback(() => {
   //   if (!user) {

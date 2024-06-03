@@ -118,6 +118,8 @@ const Questions: FC = () => {
                   questionId: item.id,
                   responseCount: item.question_metadata?.response_count || 0,
                   isOwner: item.user_id === user?.id,
+                  ownerUsername: item.user_metadata?.username || 'Anonymous',
+                  ownerVerified: item.user_metadata?.verified || false,
                   skeletonLayout: {
                     hasMedia:
                       (item.question_metadata?.media &&

@@ -1,7 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 export interface ReplyData {
-  avatarImageUrl: string;
   username: string;
   verified: boolean;
 }
@@ -37,7 +36,6 @@ export const replySlice = createSlice({
         payload: ReplyData;
       },
     ) => {
-      state.userAvatarImageUrl = action.payload.avatarImageUrl;
       state.replyToUsername = action.payload.username;
       state.replyToVerified = action.payload.verified;
     },

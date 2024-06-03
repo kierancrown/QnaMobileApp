@@ -23,6 +23,8 @@ export type HomeStackParamList = {
     questionId: number;
     responseCount?: number;
     isOwner?: boolean;
+    ownerUsername: string;
+    ownerVerified: boolean;
     skeletonLayout?: {
       hasMedia: boolean;
       hasBody: boolean;

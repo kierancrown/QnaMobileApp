@@ -1,7 +1,7 @@
 import {useCallback, useEffect} from 'react';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
-import {setUsernameCache} from 'app/redux/slices/authSlice';
+import {setAvatarImageUrl, setUsernameCache} from 'app/redux/slices/authSlice';
 import {RootState, useAppDispatch} from 'app/redux/store';
 import {useSelector} from 'react-redux';
 
@@ -40,21 +40,24 @@ export const useUsername = () => {
     }
     supabase
       .from('user_metadata')
-      .select('username, verified')
+      .select('username, verified, profile_picture')
       .eq('user_id', user.id!)
       .then(({data, error}) => {
         if (error) {
           console.error('Error getting username', error);
           return;
         }
-        if (data.length && data[0].username) {
-          setUsername({
-            username: data[0].username,
-            isVerified: data[0].verified,
-          });
+        if (data.length) {
+          if (data[0].username) {
+            setUsername({
+              username: data[0].username,
+              isVerified: data[0].verified,
+            });
+          }
         }
       });
-  }, [setUsername, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const updateUsername = async (newUsername: string) => {
     if (!user) {

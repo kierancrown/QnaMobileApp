@@ -57,8 +57,11 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
   const theme = useTheme<Theme>();
   const activeColor = theme.colors.tabBarIconActive;
   const inactiveColor = theme.colors.tabBarIconInactive;
-  const {replyToUsername, replyToVerified, userAvatarImageUrl} = useAppSelector(
+  const {replyToUsername, replyToVerified} = useAppSelector(
     appState => appState.nonPersistent.reply,
+  );
+  const avatarUrl = useAppSelector(
+    appState => appState.persistent.auth.avatarImageUrl,
   );
   const {triggerHaptic} = useHaptics();
 
@@ -283,7 +286,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
                 borderRadius="pill"
                 px="s"
                 columnGap="xs">
-                <OfflineAvatar size="l" uri={userAvatarImageUrl} />
+                <OfflineAvatar size="l" uri={avatarUrl} />
                 <HStack alignItems="center">
                   <Text variant="bodySemiBold" color="inputPlaceholder">
                     Reply to{' '}

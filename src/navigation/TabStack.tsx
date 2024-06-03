@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   BottomTabBarProps,
   createBottomTabNavigator,
@@ -36,6 +36,9 @@ import PostingFab from 'app/components/PostingFab';
 import {useSubmitQuestion} from 'app/components/sheets/AskQuestionSheet/hooks/useSubmitQuestion';
 import ReplySheet from 'app/components/sheets/ReplySheet';
 import {closeReplySheet} from 'app/redux/slices/replySlice';
+import {supabase} from 'app/lib/supabase';
+import {useUser} from 'app/lib/supabase/context/auth';
+import {setAvatarImageUrl} from 'app/redux/slices/authSlice';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -102,6 +105,24 @@ export default function TabStack() {
   );
   const {submit} = useSubmitQuestion();
   const dispatch = useAppDispatch();
+  const {user} = useUser();
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('user_metadata')
+        .select('profile_picture')
+        .eq('user_id', user.id!)
+        .single()
+        .then(({data}) => {
+          console.log(data);
+          if (data?.profile_picture) {
+            dispatch(setAvatarImageUrl(data?.profile_picture));
+          }
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <TabBarProvider>

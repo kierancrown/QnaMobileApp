@@ -29,6 +29,7 @@ interface TabBarContextData {
   fabEventEmitter: EventEmitter;
   setHidden: (value: boolean) => void;
   setScrollY: (value: number) => void;
+  setScrollDirection: (value: 'up' | 'down') => void;
   setHideThreshold: (value: number) => void;
   setFabAction: (value: FabAction) => void;
 }
@@ -84,6 +85,7 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
         fabEventEmitter,
         setHideThreshold,
         setScrollY,
+        setScrollDirection,
         setFabAction,
         hidden,
         setHidden,
@@ -176,17 +178,17 @@ export const useHiddenTabBar = () => {
 };
 
 export const useReplyTabBar = (data: ReplyData) => {
-  const {setFabAction} = useTabBar();
+  const {setFabAction, setScrollDirection} = useTabBar();
   const dispatch = useAppDispatch();
 
   useFocusEffect(
     useCallback(() => {
-      console.log('mount');
       setFabAction(FabAction.REPLY);
+      setScrollDirection('up');
       dispatch(setReplyData(data));
       return () => {
-        console.log('called');
         setFabAction(FabAction.ADD);
+        setScrollDirection('up');
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
