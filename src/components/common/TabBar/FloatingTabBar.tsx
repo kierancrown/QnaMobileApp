@@ -269,7 +269,13 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
             style={replyBarStyle}
             pointerEvents={fabAction === FabAction.REPLY ? 'auto' : 'none'}>
             <Pressable
-              onPress={() => dispatch(openReplySheet())}
+              onPress={async () => {
+                await triggerHaptic({
+                  iOS: HapticFeedbackTypes.impactMedium,
+                  android: HapticFeedbackTypes.effectHeavyClick,
+                });
+                dispatch(openReplySheet());
+              }}
               style={replyPressableStyle}>
               <HStack
                 alignItems="center"

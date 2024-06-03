@@ -1,5 +1,5 @@
 import {Keyboard, Pressable, RefreshControl, StyleSheet} from 'react-native';
-import React, {FC, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {ActivityLoader, Box, Flex, HStack, Text, VStack} from 'ui';
 
 import {Theme} from 'app/styles/theme';
@@ -19,7 +19,8 @@ import useResponses from './hooks/useResponses';
 import {useQuestionDetail} from './hooks/useQuestionDetail';
 import useSheetHeight from 'app/components/sheets/ReplySheet/utils/useSheetHeight';
 import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
-import {useAppSelector} from 'app/redux/store';
+import {useAppDispatch, useAppSelector} from 'app/redux/store';
+import {setReplyData} from 'app/redux/slices/replySlice';
 
 const QuestionDetailScreen: FC = () => {
   const {
@@ -28,6 +29,7 @@ const QuestionDetailScreen: FC = () => {
   const showBackdrop = useAppSelector(
     state => state.nonPersistent.reply.showBackdrop,
   );
+  const dispatch = useAppDispatch();
   const theme = useTheme<Theme>();
   const {user} = useUser();
   const scrollRef = useRef(null);
@@ -68,6 +70,17 @@ const QuestionDetailScreen: FC = () => {
   const replySheetHeight = useSheetHeight();
   const [headerHeight, setHeaderHeight] = useState(0);
   const topInset = useSafeAreaInsets().top;
+
+  useEffect(() => {
+    dispatch(
+      setReplyData({
+        username: question?.user_metadata?.username ?? 'Anonymous',
+        verified: question?.user_metadata?.verified ?? false,
+        avatarImageUrl:
+          'https://api.getqna.app/storage/v1/object/public/user_profile_pictures/public/e956b359-25f2-429c-8d3b-77cbcb9479e.jpg',
+      }),
+    );
+  }, [question, questionId, dispatch]);
 
   // const showAnswer = useCallback(() => {
   //   if (!user) {

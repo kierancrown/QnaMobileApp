@@ -19,7 +19,6 @@ import {
 import useAndroidBack from 'app/hooks/useAndroidBack';
 
 import Screen from './screens/ReplyScreen';
-import useSheetHeight from './utils/useSheetHeight';
 
 interface ReplySheetProps {
   open?: boolean;
@@ -137,8 +136,7 @@ const ReplySheet: FC<ReplySheetProps> = ({
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const {top: topSafeAreaInset} = useSafeAreaInsets();
-  const sheetHeight = useSheetHeight();
-  const snapPoints = useMemo(() => [sheetHeight], [sheetHeight]);
+  const snapPoints = useMemo(() => ['50%'], []);
 
   const onDismiss = useCallback(() => {
     sheetRef.current?.close();
