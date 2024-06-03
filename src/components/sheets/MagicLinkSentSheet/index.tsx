@@ -14,6 +14,7 @@ interface MagicLinkSentSheetProps {
   sentTimestamp: number;
   onResend: () => void;
   resending?: boolean;
+  email?: string;
 }
 
 const MagicLinkSentSheet: FC<MagicLinkSentSheetProps> = ({
@@ -21,6 +22,7 @@ const MagicLinkSentSheet: FC<MagicLinkSentSheetProps> = ({
   onClose,
   sentTimestamp,
   onResend,
+  email,
   resending = false,
 }) => {
   const theme = useAppTheme();
@@ -67,6 +69,7 @@ const MagicLinkSentSheet: FC<MagicLinkSentSheetProps> = ({
         sentTimestamp={sentTimestamp}
         onResend={onResend}
         resending={resending}
+        email={email}
       />
     </BottomSheet>
   );

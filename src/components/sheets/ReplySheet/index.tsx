@@ -167,6 +167,7 @@ const ReplySheet: FC<ReplySheetProps> = ({
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
       backdropComponent={null}
+      enablePanDownToClose
       backgroundComponent={CustomBackground}
       maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}>
       <Navigator

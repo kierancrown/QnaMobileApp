@@ -5,12 +5,11 @@ import {ActivityLoader, Box, Flex, HStack, Text, VStack} from 'ui';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
-import {RouteProp, useFocusEffect, useRoute} from '@react-navigation/native';
+import {RouteProp, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
-import {useHiddenTabBar, useTabBarAnimation} from 'app/context/tabBarContext';
+import {useReplyTabBar, useTabBarAnimation} from 'app/context/tabBarContext';
 import ResponseItem, {
   ESTIMATED_RESPONSE_ITEM_HEIGHT,
-  ResponseItemSkeleton,
 } from './components/ResponseItem';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import HeaderComponent from './components/Header';
@@ -18,7 +17,6 @@ import {FlashList} from '@shopify/flash-list';
 import QuestionDetails from './components/QuestionDetails';
 import useResponses from './hooks/useResponses';
 import {useQuestionDetail} from './hooks/useQuestionDetail';
-import ReplySheet from 'app/components/sheets/ReplySheet';
 import useSheetHeight from 'app/components/sheets/ReplySheet/utils/useSheetHeight';
 import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 import {useAppSelector} from 'app/redux/store';
@@ -32,14 +30,20 @@ const QuestionDetailScreen: FC = () => {
   );
   const theme = useTheme<Theme>();
   const {user} = useUser();
-  useHiddenTabBar();
   const scrollRef = useRef(null);
   const [refreshing] = useState(false);
-  const [showReplySheet, setShowReplySheet] = useState(false);
   // Question detail hook
   const {loading, question, hasUpvoted, upvoteQuestion} = useQuestionDetail({
     questionId,
   });
+
+  useReplyTabBar({
+    avatarImageUrl:
+      'https://api.getqna.app/storage/v1/object/public/user_profile_pictures/public/e956b359-25f2-429c-8d3b-77cbcb9479e.jpg',
+    username: 'KieranCrown',
+    verified: true,
+  });
+
   // Responses hook
   const {
     responses,
@@ -109,14 +113,6 @@ const QuestionDetailScreen: FC = () => {
   //   });
   // }, [dispatch, questionId, responses, user]);
 
-  useFocusEffect(() => {
-    setShowReplySheet(true);
-
-    return () => {
-      setShowReplySheet(false);
-    };
-  });
-
   const backdropStyles = useAnimatedStyle(() => {
     return {
       opacity: withTiming(showBackdrop ? 1 : 0),
@@ -165,15 +161,6 @@ const QuestionDetailScreen: FC = () => {
           ListHeaderComponentStyle={{
             paddingBottom: theme.spacing.xlY,
           }}
-          // ListEmptyComponent={
-          //   responsesLoading ? (
-          //     <Flex>
-          //       <ResponseItemSkeleton />
-          //       <ResponseItemSkeleton />
-          //       <ResponseItemSkeleton />
-          //     </Flex>
-          //   ) : null
-          // }
           refreshing={responsesLoading}
           onRefresh={refreshResponses}
           ListFooterComponent={
@@ -244,15 +231,6 @@ const QuestionDetailScreen: FC = () => {
           />
         </Animated.View>
       </Pressable>
-
-      <ReplySheet
-        open={showReplySheet}
-        onClose={() => {}}
-        onSubmit={() => {}}
-        avatarImageUrl={user?.user_metadata?.profile_picture?.path}
-        replyingToUsername={question?.user_metadata?.username ?? 'Anonymous'}
-        replyingToVerified={question?.user_metadata?.verified ?? false}
-      />
     </>
   );
 };

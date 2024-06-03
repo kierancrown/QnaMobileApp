@@ -104,6 +104,7 @@ const Auth: FC = () => {
         sentTimestamp={magicLinkSentTimestamp}
         onResend={sendMagicLink}
         resending={loading}
+        email={email}
       />
     </>
   );

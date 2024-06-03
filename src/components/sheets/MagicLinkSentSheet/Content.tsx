@@ -6,15 +6,22 @@ import {openInbox, getEmailClients} from 'react-native-email-link';
 import {isEmulatorSync} from 'react-native-device-info';
 import useMount from 'app/hooks/useMount';
 import dayjs from 'dayjs';
+import {Linking} from 'react-native';
 
 interface IContentProps {
   onDismiss: () => void;
   sentTimestamp: number;
   onResend: () => void;
   resending: boolean;
+  email?: string;
 }
 
-const Content: FC<IContentProps> = ({sentTimestamp, onResend, resending}) => {
+const Content: FC<IContentProps> = ({
+  sentTimestamp,
+  onResend,
+  resending,
+  email,
+}) => {
   const [openEmailAvailable, setOpenEmailAvailable] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(60);
   const resendTimestamp = dayjs(sentTimestamp).add(60, 'second').valueOf();
@@ -49,6 +56,13 @@ const Content: FC<IContentProps> = ({sentTimestamp, onResend, resending}) => {
     };
   }, [resendTimestamp]);
 
+  const openWebView = () => {
+    // Extract the domain from the email
+    const domain = email?.split('@')[1];
+    const url = `https://${domain}`;
+    Linking.openURL(url);
+  };
+
   return (
     <BottomSheetView style={{minHeight: percentHeight(40)}}>
       <VStack flex={1} px="l" py="mY" alignItems="center">
@@ -62,9 +76,11 @@ const Content: FC<IContentProps> = ({sentTimestamp, onResend, resending}) => {
           </Text>
           <Flex />
           <VStack rowGap="mY" alignItems="center">
-            {openEmailAvailable && (
+            {openEmailAvailable ? (
               <Button title="Open Email App" onPress={openInbox} />
-            )}
+            ) : email ? (
+              <Button title="Open Email Website" onPress={openWebView} />
+            ) : null}
             <Button
               title={
                 resending

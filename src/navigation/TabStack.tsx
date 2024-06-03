@@ -30,10 +30,12 @@ import AskQuestionSheet from 'app/components/sheets/AskQuestionSheet';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {TabBarProvider} from 'app/context/tabBarContext';
 import {useSelector} from 'react-redux';
-import {RootState} from 'app/redux/store';
+import {RootState, useAppDispatch, useAppSelector} from 'app/redux/store';
 import {WINDOW_WIDTH} from '@gorhom/bottom-sheet';
 import PostingFab from 'app/components/PostingFab';
 import {useSubmitQuestion} from 'app/components/sheets/AskQuestionSheet/hooks/useSubmitQuestion';
+import ReplySheet from 'app/components/sheets/ReplySheet';
+import {closeReplySheet} from 'app/redux/slices/replySlice';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -93,10 +95,13 @@ const TabBarContainer = (props: TabBarContainerProps) => {
 export default function TabStack() {
   const {triggerHaptic} = useHaptics();
   const [questionSheetOpen, setQuestionSheetOpen] = useState(false);
-  const {submit} = useSubmitQuestion();
+  const {replySheetOpen, replyToUsername, replyToVerified, userAvatarImageUrl} =
+    useAppSelector(state => state.nonPersistent.reply);
   const unreadNotificationCount = useSelector(
     (state: RootState) => state.persistent.notifications.unreadCount,
   );
+  const {submit} = useSubmitQuestion();
+  const dispatch = useAppDispatch();
 
   return (
     <TabBarProvider>
@@ -167,6 +172,17 @@ export default function TabStack() {
         onClose={() => {
           setQuestionSheetOpen(false);
         }}
+      />
+
+      <ReplySheet
+        open={replySheetOpen}
+        onClose={() => {
+          dispatch(closeReplySheet());
+        }}
+        onSubmit={() => {}}
+        avatarImageUrl={userAvatarImageUrl ?? ''}
+        replyingToUsername={replyToUsername ?? 'Anonymous'}
+        replyingToVerified={replyToVerified ?? false}
       />
     </TabBarProvider>
   );

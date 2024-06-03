@@ -1,8 +1,11 @@
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {TabStackParamList} from 'app/navigation/TabStack';
+import {ReplyData, setReplyData} from 'app/redux/slices/replySlice';
+import {useAppDispatch} from 'app/redux/store';
 import React, {
   FC,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -16,20 +19,17 @@ export enum FabAction {
   ADD,
   REPLY,
 }
-
 interface TabBarContextData {
   lastScrollY: number;
   scrollY: SharedValue<number>;
-  // scrollContentSize: number;
   scrollDirection: 'up' | 'down';
   hideThreshold: number;
   fabAction: FabAction;
   hidden: boolean;
-  setHidden: (value: boolean) => void;
   fabEventEmitter: EventEmitter;
+  setHidden: (value: boolean) => void;
   setScrollY: (value: number) => void;
   setHideThreshold: (value: number) => void;
-  // setContentSize: (value: number) => void;
   setFabAction: (value: FabAction) => void;
 }
 
@@ -42,17 +42,12 @@ const TabBarContext = createContext<TabBarContextData>({} as TabBarContextData);
 export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
   const lastScrollY = useRef(0);
   const scrollY = useSharedValue(0);
-  // const [scrollContentSize, setContentSize] = useState<number>(0);
   const [fabAction, setFabAction] = useState<FabAction>(FabAction.ADD);
-
   const [hidden, setHidden] = useState<boolean>(false);
-
   const [hideThreshold, setHideThreshold] = useState<number>(40);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
 
   const setScrollY = (value: number) => {
-    // Calculate the direction of the scroll
-    // || value >= scrollContentSize - hideThreshold / 2
     let direction: 'up' | 'down' = 'up';
     if (value <= 0) {
       setScrollDirection(direction);
@@ -83,13 +78,11 @@ export const TabBarProvider: FC<TabBarProviderProps> = ({children}) => {
       value={{
         scrollY,
         lastScrollY: lastScrollY.current,
-        // scrollContentSize,
         scrollDirection,
         hideThreshold,
         fabAction,
         fabEventEmitter,
         setHideThreshold,
-        // setContentSize,
         setScrollY,
         setFabAction,
         hidden,
@@ -180,4 +173,22 @@ export const useHiddenTabBar = () => {
       setHidden(false);
     };
   });
+};
+
+export const useReplyTabBar = (data: ReplyData) => {
+  const {setFabAction} = useTabBar();
+  const dispatch = useAppDispatch();
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('mount');
+      setFabAction(FabAction.REPLY);
+      dispatch(setReplyData(data));
+      return () => {
+        console.log('called');
+        setFabAction(FabAction.ADD);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  );
 };
