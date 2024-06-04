@@ -17,6 +17,7 @@ import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 import {FlashList} from '@shopify/flash-list';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import HeaderComponent from './components/Header';
+import notifee from '@notifee/react-native';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 
@@ -108,9 +109,13 @@ const InboxScreen: FC = () => {
           Alert.alert('Error', updateError.message);
         } else {
           dispatch(setUnreadCount(0));
+          notifee
+            .setBadgeCount(0)
+            .then(() => console.log('Badge count reset!'));
         }
       } else {
         dispatch(setUnreadCount(0));
+        notifee.setBadgeCount(0).then(() => console.log('Badge count reset!'));
       }
     }
     setRefreshing(false);
