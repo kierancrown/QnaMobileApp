@@ -10,7 +10,7 @@ import {Theme} from 'app/styles/theme';
 
 import HomeTabStack from './HomeStack';
 import SearchTabStack from './SearchStack';
-import InboxTabStack from './InboxStack';
+import InboxTabStack, {InboxStackParamList} from './InboxStack';
 import ProfileTabStack from './ProfileStack';
 
 import HomeTabBarIcon from 'app/components/common/TabBar/Icons/HomeTabBarIcon';
@@ -39,6 +39,8 @@ import {closeReplySheet} from 'app/redux/slices/replySlice';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {setAvatarImageUrl} from 'app/redux/slices/authSlice';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import notifee, {EventType} from '@notifee/react-native';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -105,6 +107,7 @@ export default function TabStack() {
   );
   const {submit} = useSubmitQuestion();
   const dispatch = useAppDispatch();
+  const {navigate} = useNavigation<NavigationProp<InboxStackParamList>>();
   const {user} = useUser();
 
   useEffect(() => {
@@ -122,6 +125,78 @@ export default function TabStack() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  useEffect(() => {
+    return notifee.onForegroundEvent(({type, detail}) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('User pressed notification', detail.notification);
+          // TODO: Navigate to question detail
+          const openQuestionDetail = async (questionId: number) => {
+            const {data, error} = await supabase
+              .from('questions')
+              .select(
+                `
+              *,
+              user_metadata (
+                verified,
+                profile_picture (
+                  path,
+                  thumbhash
+                ),
+                username
+              ),
+              question_metadata (
+                upvote_count,
+                response_count,
+                view_count,
+                visible,
+                topics,
+                media,
+                location (
+                  name
+                )
+              )
+            `,
+              )
+              .eq('id', questionId)
+              .single();
+
+            if (data && !error) {
+              const item = data;
+              navigate('QuestionDetail', {
+                questionId: item.id,
+                responseCount: item.question_metadata?.response_count || 0,
+                isOwner: item.user_id === user?.id,
+                ownerUsername: item.user_metadata?.username || 'Anonymous',
+                ownerVerified: item.user_metadata?.verified || false,
+                skeletonLayout: {
+                  hasMedia:
+                    (item.question_metadata?.media &&
+                      item.question_metadata?.media.length > 0) ||
+                    false,
+                  hasBody: !!item.body,
+                  hasLocation: !!item.question_metadata?.location,
+                },
+              });
+            }
+          };
+          if (
+            typeof detail.notification?.data === 'object' &&
+            typeof detail.notification?.data?.questionId === 'string'
+          ) {
+            openQuestionDetail(
+              parseInt(detail.notification.data.questionId, 10),
+            );
+          }
+
+          break;
+      }
+    });
+  }, [user?.id, navigate]);
 
   return (
     <TabBarProvider>

@@ -577,16 +577,15 @@ export type Database = {
           question: string
           body: string
           nsfw: boolean
-          user_id: number
-          question_created_at: string
+          user_id: string
           upvote_count: number
           response_count: number
-          location: string
+          location: number
           topics: string[]
-          media: Json
+          media: string[]
           verified: boolean
           username: string
-          profile_picture: Json
+          profile_picture: string
         }[]
       }
       nearby_geolocations: {

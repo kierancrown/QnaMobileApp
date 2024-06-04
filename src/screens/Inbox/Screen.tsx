@@ -18,6 +18,8 @@ import {FlashList} from '@shopify/flash-list';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import HeaderComponent from './components/Header';
 import notifee from '@notifee/react-native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {InboxStackParamList} from 'app/navigation/InboxStack';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 
@@ -27,7 +29,7 @@ const InboxScreen: FC = () => {
   const {triggerHaptic} = useHaptics();
   const {user} = useUser();
   const dispatch = useAppDispatch();
-
+  const {navigate} = useNavigation<NavigationProp<InboxStackParamList>>();
   const [notifications, setNotifications] = useState<(string | Notification)[]>(
     [],
   );
@@ -175,6 +177,55 @@ const InboxScreen: FC = () => {
     refreshNotifications(true);
   });
 
+  const openQuestionDetail = async (questionId: number) => {
+    const {data, error} = await supabase
+      .from('questions')
+      .select(
+        `
+      *,
+      user_metadata (
+        verified,
+        profile_picture (
+          path,
+          thumbhash
+        ),
+        username
+      ),
+      question_metadata (
+        upvote_count,
+        response_count,
+        view_count,
+        visible,
+        topics,
+        media,
+        location (
+          name
+        )
+      )
+    `,
+      )
+      .eq('id', questionId)
+      .single();
+
+    if (data && !error) {
+      const item = data;
+      navigate('QuestionDetail', {
+        questionId: item.id,
+        responseCount: item.question_metadata?.response_count || 0,
+        isOwner: item.user_id === user?.id,
+        ownerUsername: item.user_metadata?.username || 'Anonymous',
+        ownerVerified: item.user_metadata?.verified || false,
+        skeletonLayout: {
+          hasMedia:
+            (item.question_metadata?.media &&
+              item.question_metadata?.media.length > 0) ||
+            false,
+          hasBody: !!item.body,
+          hasLocation: !!item.question_metadata?.location,
+        },
+      });
+    }
+  };
   return (
     <Flex>
       <HeaderComponent
@@ -231,10 +282,19 @@ const InboxScreen: FC = () => {
                       iOS: HapticFeedbackTypes.selection,
                       android: HapticFeedbackTypes.effectClick,
                     }).then();
-                    // TODO: Decide based on notification type
+                    switch (item.type) {
+                      case 'question_like':
+                        openQuestionDetail(
+                          // @ts-ignore
+                          (item.data.question_id as number) ?? -1,
+                        ).then();
+                        break;
+                    }
                   }}
                   id={item.id}
-                  title={item.type}
+                  type={item.type}
+                  // @ts-ignore
+                  title={item.data?.title ?? undefined}
                   body={item.body || ''}
                   timestamp={item.delivered_at || item.created_at}
                   read={item.read_at !== null}

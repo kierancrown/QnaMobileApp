@@ -16,21 +16,23 @@ export type TopicsFeedScreenParams = {
   topic: string;
 };
 
+export type QuestionDetailScreenParams = {
+  questionId: number;
+  responseCount?: number;
+  isOwner?: boolean;
+  ownerUsername: string;
+  ownerVerified: boolean;
+  skeletonLayout?: {
+    hasMedia: boolean;
+    hasBody: boolean;
+    hasLocation: boolean;
+  };
+};
+
 export type HomeStackParamList = {
   Auth: undefined;
   Questions: undefined;
-  QuestionDetail: {
-    questionId: number;
-    responseCount?: number;
-    isOwner?: boolean;
-    ownerUsername: string;
-    ownerVerified: boolean;
-    skeletonLayout?: {
-      hasMedia: boolean;
-      hasBody: boolean;
-      hasLocation: boolean;
-    };
-  };
+  QuestionDetail: QuestionDetailScreenParams;
   Profile: ProfileScreenParams;
   TopicsFeed: TopicsFeedScreenParams;
 };

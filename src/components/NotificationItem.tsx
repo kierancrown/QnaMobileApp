@@ -19,7 +19,8 @@ import OfflineAvatar from './common/OfflineAvatar';
 interface NotificationItemProps {
   onPress: () => void;
   id: number;
-  title: NotificationType;
+  type: NotificationType;
+  title?: string;
   body: string;
   timestamp: string;
   read?: boolean;
@@ -39,7 +40,7 @@ const getTitleFromType = (type: NotificationType) => {
     case 'question_response':
       return 'Somebody responded to your question';
     default:
-      return 'New notification';
+      return type;
   }
 };
 
@@ -90,6 +91,7 @@ const renderIcon = (
 const NotificationItem: FC<NotificationItemProps> = ({
   onPress,
   title,
+  type,
   body,
   timestamp,
   read = false,
@@ -128,9 +130,9 @@ const NotificationItem: FC<NotificationItemProps> = ({
           borderRadius="l"
           backgroundColor="cardBackground">
           <HStack alignItems="center" columnGap="s">
-            {renderIcon(title, theme, read === false)}
+            {renderIcon(type, theme, read === false)}
             <VStack rowGap="xxsY" flex={1}>
-              <Text variant="smaller">{getTitleFromType(title)}</Text>
+              <Text variant="smaller">{title ?? getTitleFromType(type)}</Text>
               <Text variant={'tiny'} color="cardText">
                 {dayjs(timestamp).fromNow()}
               </Text>
