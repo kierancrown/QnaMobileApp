@@ -115,7 +115,6 @@ export default function TabStack() {
         .eq('user_id', user.id!)
         .single()
         .then(({data}) => {
-          console.log(data);
           if (data?.profile_picture) {
             dispatch(setAvatarImageUrl(data?.profile_picture));
           }

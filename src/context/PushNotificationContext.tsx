@@ -1,13 +1,14 @@
 import React, {createContext, useCallback, useContext, useEffect} from 'react';
 import {Platform, PermissionsAndroid, Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-// import notifee from '@notifee/react-native';
+import notifee from '@notifee/react-native';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
 import {useAppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 import {getUserId} from 'app/lib/supabase/helpers/userId';
+import theme from 'app/styles/theme';
 
 // Define the context
 interface NotificationContextType {
@@ -181,10 +182,19 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       const unreadCount = await getUnreadCount();
       dispatch(setUnreadCount(unreadCount));
       console.log('Message received:', message);
-      // await notifee.displayNotification({
-      //   ...message.notification,
-      //   android: {channelId: 'default'},
-      // });
+
+      await notifee.displayNotification({
+        ...message.notification,
+        ios: {
+          badgeCount: unreadCount,
+        },
+        android: {
+          channelId: 'default',
+          badgeCount: unreadCount,
+          smallIcon: 'ic_stat_qna',
+          color: theme.colors.brand,
+        },
+      });
     };
 
     messaging().onMessage(onMessageReceived);

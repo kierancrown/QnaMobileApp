@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#97D700</color>
+    <color name="brand">#84CC16</color>
     <color name="splash_background">#0B0B0B</color>
 </resources>
