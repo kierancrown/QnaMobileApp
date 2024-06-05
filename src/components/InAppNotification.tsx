@@ -14,11 +14,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Box, Center, Flex, HStack, Text, VStack} from './common';
 import {SCREEN_WIDTH} from '@gorhom/bottom-sheet';
 import OfflineAvatar from './common/OfflineAvatar';
-import {BlurView} from '@react-native-community/blur';
-import {StyleSheet} from 'react-native';
 import Username from './Username';
 import {useAppTheme} from 'app/styles/theme';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
+import {Platform} from 'react-native';
+import BlurBackground from './BlurBackground';
 
 interface InAppNotificationProps {
   notification: NotificationItemProps;
@@ -131,7 +131,18 @@ const InAppNotification: FC<InAppNotificationProps> = ({
             style={{paddingTop: topInset}}
             overflow="hidden"
             justifyContent="center">
-            <BlurView style={StyleSheet.absoluteFillObject} blurType="dark" />
+            {Platform.OS === 'android' ? (
+              <Box
+                position="absolute"
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                bg="mainBackground"
+              />
+            ) : (
+              <BlurBackground />
+            )}
 
             <Flex flexWrap="wrap" p="xs">
               <HStack alignItems="flex-start" columnGap="xs">
