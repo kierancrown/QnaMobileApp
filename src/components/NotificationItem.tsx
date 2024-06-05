@@ -16,7 +16,7 @@ import Badge from './common/Badge';
 import LinearGradient from 'react-native-linear-gradient';
 import OfflineAvatar from './common/OfflineAvatar';
 
-interface NotificationItemProps {
+export interface NotificationItemProps {
   onPress: () => void;
   id: number;
   type: NotificationType;

@@ -1,4 +1,10 @@
-import React, {createContext, useCallback, useContext, useEffect} from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {Platform, PermissionsAndroid, Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
@@ -9,6 +15,9 @@ import {useAppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
 import {getUserId} from 'app/lib/supabase/helpers/userId';
 import theme from 'app/styles/theme';
+import {Notification} from 'app/screens/Inbox/Screen';
+import {Flex} from 'app/components/common';
+import InAppNotification from 'app/components/InAppNotification';
 
 // Define the context
 interface NotificationContextType {
@@ -18,6 +27,8 @@ interface NotificationContextType {
   registerOnDatabase: (sessionId: string, token: string) => Promise<void>;
   unRegisterNotifications: () => Promise<boolean>;
   silentTokenRegistration: (sessionId: string, skipUserCheck?: boolean) => void;
+  currentNotification?: Notification;
+  clearCurrentNotification: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -45,6 +56,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const {user} = useUser();
+  const [currentNotification, setCurrentNotification] =
+    useState<Notification>();
 
   const getUnreadCount = useCallback(async () => {
     const userId = await getUserId();
@@ -177,16 +190,23 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       });
   };
 
+  const clearCurrentNotification = () => {
+    setCurrentNotification(undefined);
+  };
+
   useEffect(() => {
     const onMessageReceived = async (message: any) => {
       const unreadCount = await getUnreadCount();
       dispatch(setUnreadCount(unreadCount));
-      console.log('Message received:', JSON.stringify(message, null, 2));
+      // console.log('Message received:', JSON.stringify(message, null, 2));
 
       await notifee.displayNotification({
         ...message.notification,
         ios: {
           badgeCount: unreadCount,
+        },
+        data: {
+          ...message.data,
         },
         android: {
           channelId: 'default',
@@ -199,14 +219,39 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       });
     };
 
-    messaging().onMessage(onMessageReceived);
+    const onForegroundMessage = async (detail: any) => {
+      const unreadCount = await getUnreadCount();
+      dispatch(setUnreadCount(unreadCount));
+      await notifee.setBadgeCount(unreadCount);
+
+      const currentNotificationId =
+        typeof detail.data.id === 'string'
+          ? parseInt(detail.data.id, 10)
+          : undefined;
+
+      if (!currentNotificationId) {
+        return;
+      }
+
+      const {data, error} = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('id', currentNotificationId)
+        .single();
+      if (error) {
+        console.error(error);
+      }
+      setCurrentNotification((data as Notification) || undefined);
+    };
+
+    messaging().onMessage(onForegroundMessage);
     messaging().setBackgroundMessageHandler(onMessageReceived);
 
     return () => {
-      messaging().onMessage(onMessageReceived);
+      messaging().onMessage(onForegroundMessage);
       messaging().setBackgroundMessageHandler(onMessageReceived);
     };
-  }, [dispatch, getUnreadCount]);
+  }, [dispatch, getUnreadCount, user]);
 
   useEffect(() => {
     (async () => {
@@ -229,8 +274,24 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         registerOnDatabase,
         unRegisterNotifications,
         silentTokenRegistration,
+        currentNotification,
+        clearCurrentNotification,
       }}>
-      {children}
+      <Flex>
+        {currentNotification && (
+          <InAppNotification
+            // @ts-ignore
+            notification={currentNotification}
+            removeSelf={clearCurrentNotification}
+          />
+        )}
+        {children}
+      </Flex>
     </NotificationContext.Provider>
   );
+};
+
+export const useCurrentNotification = () => {
+  const {currentNotification, clearCurrentNotification} = useNotification();
+  return {currentNotification, clearCurrentNotification};
 };
