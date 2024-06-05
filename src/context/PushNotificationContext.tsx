@@ -181,7 +181,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     const onMessageReceived = async (message: any) => {
       const unreadCount = await getUnreadCount();
       dispatch(setUnreadCount(unreadCount));
-      console.log('Message received:', message);
+      console.log('Message received:', JSON.stringify(message, null, 2));
 
       await notifee.displayNotification({
         ...message.notification,
@@ -192,6 +192,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
           channelId: 'default',
           badgeCount: unreadCount,
           smallIcon: 'ic_stat_qna',
+          largeIcon:
+            message.data && message.data.image ? message.data.image : undefined,
           color: theme.colors.brand,
         },
       });

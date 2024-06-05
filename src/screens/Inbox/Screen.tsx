@@ -20,6 +20,7 @@ import HeaderComponent from './components/Header';
 import notifee from '@notifee/react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {InboxStackParamList} from 'app/navigation/InboxStack';
+import Username from 'app/components/Username';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 
@@ -293,11 +294,31 @@ const InboxScreen: FC = () => {
                   }}
                   id={item.id}
                   type={item.type}
-                  // @ts-ignore
-                  title={item.data?.title ?? undefined}
+                  title={
+                    item.type === 'question_like' &&
+                    // @ts-ignore
+                    typeof item.data?.username === 'string' ? (
+                      <HStack alignItems="center">
+                        <Username
+                          // @ts-ignore
+                          username={item.data?.username}
+                          // @ts-ignore
+                          isVerified={item.data?.verified ?? false}
+                          noHighlight
+                          variant="small"
+                        />
+                        <Text variant="smaller"> liked your question</Text>
+                      </HStack>
+                    ) : (
+                      // @ts-ignore
+                      item.data?.title ?? undefined
+                    )
+                  }
                   body={item.body || ''}
                   timestamp={item.delivered_at || item.created_at}
                   read={item.read_at !== null}
+                  // @ts-ignore
+                  image={item.data?.avatarUrl ?? undefined}
                 />
               );
             }

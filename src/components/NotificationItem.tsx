@@ -20,7 +20,7 @@ interface NotificationItemProps {
   onPress: () => void;
   id: number;
   type: NotificationType;
-  title?: string;
+  title?: string | React.ReactNode;
   body: string;
   timestamp: string;
   read?: boolean;
@@ -48,6 +48,7 @@ const renderIcon = (
   type: NotificationType,
   theme: Theme,
   unread: boolean = false,
+  avatarUrl?: string,
 ) => {
   switch (type) {
     case 'login':
@@ -82,7 +83,7 @@ const renderIcon = (
           hidden={!unread}
           color={theme.colors.bookmarkAction}
           animateOnMount={false}>
-          <OfflineAvatar size="xl" defaultAvatar />
+          <OfflineAvatar size="xl" defaultAvatar={!avatarUrl} uri={avatarUrl} />
         </Badge>
       );
   }
@@ -95,6 +96,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
   body,
   timestamp,
   read = false,
+  image,
 }) => {
   const theme = useTheme<Theme>();
   const opacity = useSharedValue(1);
@@ -130,9 +132,13 @@ const NotificationItem: FC<NotificationItemProps> = ({
           borderRadius="l"
           backgroundColor="cardBackground">
           <HStack alignItems="center" columnGap="s">
-            {renderIcon(type, theme, read === false)}
+            {renderIcon(type, theme, read === false, image)}
             <VStack rowGap="xxsY" flex={1}>
-              <Text variant="smaller">{title ?? getTitleFromType(type)}</Text>
+              {!title || typeof title === 'string' ? (
+                <Text variant="smaller">{title ?? getTitleFromType(type)}</Text>
+              ) : (
+                title
+              )}
               <Text variant={'tiny'} color="cardText">
                 {dayjs(timestamp).fromNow()}
               </Text>

@@ -40,7 +40,7 @@ const OfflineAvatar = forwardRef<AvatarRef, AvatarProps>((props, ref) => {
       height={size ? theme.iconSizes[size] : theme.iconSizes.xl}>
       <FasterImageView
         style={styles}
-        onError={event => console.warn(event.nativeEvent.error)}
+        onError={() => {}}
         source={{
           transitionDuration: 0.3,
           cachePolicy: 'discWithCacheControl',
