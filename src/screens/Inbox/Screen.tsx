@@ -227,6 +227,7 @@ const InboxScreen: FC = () => {
       });
     }
   };
+
   return (
     <Flex>
       <HeaderComponent
