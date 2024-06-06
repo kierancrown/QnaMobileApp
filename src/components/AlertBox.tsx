@@ -16,6 +16,7 @@ export interface AlertBoxProps {
   id: number;
   title: string;
   message?: string;
+  noButtonBehavior?: 'default' | 'none';
   buttons?: {
     text: string;
     variant?: 'primary' | 'secondary' | 'destructive' | 'success';
@@ -24,7 +25,13 @@ export interface AlertBoxProps {
   }[];
 }
 
-const AlertBox: FC<AlertBoxProps> = ({id, title, message, buttons}) => {
+const AlertBox: FC<AlertBoxProps> = ({
+  id,
+  title,
+  message,
+  buttons,
+  noButtonBehavior = 'default',
+}) => {
   const theme = useAppTheme();
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(theme.spacing.sY);
@@ -67,7 +74,12 @@ const AlertBox: FC<AlertBoxProps> = ({id, title, message, buttons}) => {
           </Text>
         </VStack>
         <VStack borderTopWidth={1} borderColor="divider">
-          {buttons?.length === 1 ? (
+          {(!buttons || buttons.length === 0) &&
+          noButtonBehavior === 'default' ? (
+            <HStack>
+              <AlertButton text="Dismiss" onPress={close} />
+            </HStack>
+          ) : buttons?.length === 1 ? (
             <HStack>
               <AlertButton
                 {...buttons[0]}
