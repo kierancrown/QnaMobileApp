@@ -1,5 +1,12 @@
 import React, {FC, useRef} from 'react';
-import {Box, Center, Flex, Text, ActivityLoader} from 'app/components/common';
+import {
+  Box,
+  Center,
+  Flex,
+  Text,
+  ActivityLoader,
+  Button,
+} from 'app/components/common';
 import {FlashListWithHeaders} from '@codeherence/react-native-header';
 import {RefreshControl} from 'react-native-gesture-handler';
 import {useTabBarAnimation} from 'app/context/tabBarContext';
@@ -10,12 +17,14 @@ import HeaderComponent from './components/Header';
 import {LargeProfileHeaderComponent} from './components/LargeHeader';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const Profile: FC = () => {
   const {params} = useRoute<RouteProp<ProfileStackParamList>>();
 
   const theme = useAppTheme();
   const scrollRef = useRef(null);
+  const {openAlert} = useAlert();
   const {scrollHandlerWorklet} = useTabBarAnimation({
     scrollToTop: () => {
       if (scrollRef.current) {
@@ -38,6 +47,37 @@ const Profile: FC = () => {
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
           <Center flex={1} my="xxxlY" py="xxxlY">
+            <Button
+              title="Open test alert"
+              onPress={() => {
+                openAlert({
+                  title: 'Test alert',
+                  message:
+                    'This is a test alert. It has some super long text to show how the alert looks like.',
+                  buttons: [
+                    {
+                      text: 'Cancel',
+                      variant: 'destructive',
+                      onPress: () => {},
+                    },
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        openAlert({
+                          title: 'All done',
+                          message: 'You have successfully dismissed the alert.',
+                          buttons: [
+                            {
+                              text: 'Dismiss',
+                            },
+                          ],
+                        });
+                      },
+                    },
+                  ],
+                });
+              }}
+            />
             <ActivityLoader size="xl" />
             <Text
               variant="medium"

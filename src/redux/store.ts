@@ -18,6 +18,7 @@ import globalNotificationsSlice from './slices/notificationSlice';
 import askSheetSlice from './slices/askSheetSlice';
 import searchSlice from './slices/searchSlice';
 import replySlice from './slices/replySlice';
+import alertSlice from './slices/alertSlice';
 
 const persistConfig = {
   key: 'persisted',
@@ -30,6 +31,7 @@ const reducers = combineReducers({
 });
 
 const nonPersistedReducers = combineReducers({
+  alerts: alertSlice,
   sheets: globalSheetsSlice,
   askSheet: askSheetSlice,
   search: searchSlice,

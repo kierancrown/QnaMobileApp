@@ -17,6 +17,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import SplashScreen from './screens/SplashScreen';
 import {SystemBars} from 'react-native-bars';
 import theme from './styles/theme';
+import {CombinedAlert} from './components/AlertsWrapper';
 
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
@@ -52,13 +53,17 @@ const App: FC = () => {
             <PersistGate loading={null} persistor={persistor}>
               <ThemeProvider>
                 <NotificationProvider>
-                  <AuthContextProvider>
-                    <RootStack />
+                  <CombinedAlert>
+                    <AuthContextProvider>
+                      <RootStack />
 
-                    {displaySplash && (
-                      <SplashScreen onDismiss={() => setDisplaySplash(false)} />
-                    )}
-                  </AuthContextProvider>
+                      {displaySplash && (
+                        <SplashScreen
+                          onDismiss={() => setDisplaySplash(false)}
+                        />
+                      )}
+                    </AuthContextProvider>
+                  </CombinedAlert>
                 </NotificationProvider>
               </ThemeProvider>
             </PersistGate>
