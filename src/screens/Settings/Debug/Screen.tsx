@@ -14,8 +14,8 @@ import {
   getFreeDiskStorageSync,
   getTotalDiskCapacitySync,
 } from 'react-native-device-info';
-import {Alert} from 'react-native';
 import RNReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const convertBytesToMB = (bytes: number) => {
   return Math.round(bytes / 1024 / 1024);
@@ -23,6 +23,7 @@ const convertBytesToMB = (bytes: number) => {
 
 const SettingsDebugScreen = () => {
   const theme = useAppTheme();
+  const {openAlert} = useAlert();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const [fcmToken, setFcmToken] = React.useState<string | null>(null);
   const {getToken} = useNotification();
@@ -37,7 +38,10 @@ const SettingsDebugScreen = () => {
   const clearCacheHandler = async () => {
     const result = await clearCache();
     if (result === true) {
-      Alert.alert('Cache Cleared', 'The cache has been cleared successfully');
+      openAlert({
+        title: 'Cache Cleared',
+        message: 'The cache has been cleared successfully',
+      });
     }
   };
 

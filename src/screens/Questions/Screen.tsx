@@ -1,4 +1,4 @@
-import {Alert, RefreshControl} from 'react-native';
+import {RefreshControl} from 'react-native';
 import React, {FC, useRef, useState} from 'react';
 import {ActivityLoader, Center, Flex} from 'ui';
 
@@ -20,6 +20,7 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {FlashList} from '@shopify/flash-list';
 import HeaderComponent from './components/header';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
@@ -27,7 +28,7 @@ const Questions: FC = () => {
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
   const {user} = useUser();
-
+  const {openAlert} = useAlert();
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,7 +64,10 @@ const Questions: FC = () => {
 
     if (error) {
       console.error(error);
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
     } else {
       const questionsWithCount: QuestionsWithCount = data;
       setQuestions(questionsWithCount || []);

@@ -19,7 +19,6 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {decode} from 'base64-arraybuffer';
 import {useDebounceValue} from 'usehooks-ts';
 import Input from 'app/components/common/TextInput';
-import {Alert} from 'react-native';
 import {useUsername} from 'app/hooks/useUsername';
 import {useOnboarding} from 'app/hooks/useOnboarding';
 
@@ -33,13 +32,14 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const ProfileDetails = () => {
   const {user} = useUser();
   const avatarRef = useRef<AvatarRef>(null);
   const {updateUsername} = useUsername();
   const {completeOnboarding} = useOnboarding();
-
+  const {openAlert} = useAlert();
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingUsername, setLoadingUsername] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('');
@@ -242,18 +242,20 @@ const ProfileDetails = () => {
       if (success && user) {
         await completeOnboarding(user);
       } else {
-        Alert.alert(
-          'Something went wrong',
-          'We seem to be having trouble connecting. Check your connection and try again later.',
-        );
+        openAlert({
+          title: 'Something went wrong',
+          message:
+            'We seem to be having trouble connecting. Check your connection and try again later.',
+        });
       }
     } catch (error) {
       const err = error as Error;
       console.error(err);
-      Alert.alert(
-        'Something went wrong',
-        'We seem to be having trouble connecting. Check your connection and try again later.',
-      );
+      openAlert({
+        title: 'Something went wrong',
+        message:
+          'We seem to be having trouble connecting. Check your connection and try again later.',
+      });
     } finally {
       setLoading(false);
     }

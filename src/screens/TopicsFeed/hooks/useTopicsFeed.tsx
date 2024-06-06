@@ -1,7 +1,7 @@
 import {QueryData} from '@supabase/supabase-js';
+import {useAlert} from 'app/components/AlertsWrapper';
 import {supabase} from 'app/lib/supabase';
 import {useCallback, useState} from 'react';
-import {Alert} from 'react-native';
 
 export const useTopicsFeed = ({topic}: {topic?: string}) => {
   const [results, setResults] = useState<QuestionsForTopic>([]);
@@ -9,6 +9,7 @@ export const useTopicsFeed = ({topic}: {topic?: string}) => {
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
   const [noMoreResults, setNoMoreResults] = useState(false);
+  const {openAlert} = useAlert();
 
   const questionsForTopic = supabase
     .from('questions')
@@ -47,12 +48,15 @@ export const useTopicsFeed = ({topic}: {topic?: string}) => {
     const {data, error} = await questionsForTopic.range(0, 20); // TODO: Replace 20 for estimated page size
     if (error) {
       console.error(error);
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
     } else {
       setResults(data || []);
     }
     setLoading(false);
-  }, [questionsForTopic]);
+  }, [openAlert, questionsForTopic]);
 
   const fetchNextPage = async () => {
     setFetching(true);
@@ -64,7 +68,10 @@ export const useTopicsFeed = ({topic}: {topic?: string}) => {
     setFetching(false);
 
     if (error) {
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
       return;
     } else if (data) {
       // Filter out duplicates

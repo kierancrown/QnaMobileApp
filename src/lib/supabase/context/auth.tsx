@@ -2,7 +2,7 @@ import React, {createContext, useContext, useEffect, useState} from 'react';
 import {Session, User} from '@supabase/supabase-js';
 import {supabase} from '../';
 import useMount from 'app/hooks/useMount';
-import {Alert, Linking} from 'react-native';
+import {Linking} from 'react-native';
 import {useAppDispatch} from 'app/redux/store';
 import {
   completeOnboarding,
@@ -15,6 +15,7 @@ import {
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
 import {useOnboarding} from 'app/hooks/useOnboarding';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -43,6 +44,7 @@ export const AuthContextProvider = (props: any) => {
   const [user, setUser] = useState<User | null>(null);
   const dispatch = useAppDispatch();
   const {hasOnboarded} = useOnboarding();
+  const {openAlert} = useAlert();
 
   // const {deleteProfilePicture} = useProfilePicture();
 
@@ -149,13 +151,17 @@ export const AuthContextProvider = (props: any) => {
 
     if (error) {
       console.log('Error deleting user', error);
-      Alert.alert('Error deleting user', error.message, [{text: 'OK'}]);
+      openAlert({
+        title: 'Error deleting user',
+        message: error.message,
+      });
       return false;
     }
 
-    Alert.alert('User deleted', 'Your account has been deleted', [
-      {text: 'OK'},
-    ]);
+    openAlert({
+      title: 'User deleted',
+      message: 'Your account has been deleted',
+    });
     setUser(null);
     setUserSession(null);
     dispatch(deletedAccount());
@@ -184,8 +190,9 @@ export const AuthContextProvider = (props: any) => {
           .get('error_description')
           ?.replace(/\+/g, ' ');
 
-        Alert.alert(`Error ${errorCode}`, errorDescription, [{text: 'OK'}], {
-          cancelable: false,
+        openAlert({
+          title: `Error ${errorCode}`,
+          message: errorDescription,
         });
 
         console.log({error, errorCode, errorDescription});

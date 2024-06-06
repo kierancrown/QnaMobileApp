@@ -3,8 +3,8 @@ import useMount from 'app/hooks/useMount';
 import {supabase} from 'app/lib/supabase';
 import {Responses} from 'app/lib/supabase/queries/questionResponses';
 import {useState} from 'react';
-import {Alert} from 'react-native';
 import {ESTIMATED_RESPONSE_ITEM_HEIGHT} from '../components/ResponseItem';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 interface useResponsesProps {
   questionId: number;
@@ -21,7 +21,7 @@ const useResponses = ({questionId}: useResponsesProps) => {
   const [responsesLoading, setResponsesLoading] = useState(true);
   const [loadingMoreResponses, setLoadingMoreResponses] = useState(false);
   const [noMoreResponses, setNoMoreResponses] = useState(false);
-
+  const {openAlert} = useAlert();
   const refreshResponses = async () => {
     setResponsesLoading(true);
     const {data, error} = await supabase
@@ -43,7 +43,10 @@ const useResponses = ({questionId}: useResponsesProps) => {
       .order('created_at', {ascending: false})
       .range(0, ESTIMATED_RESPONSES_PAGE_SIZE);
     if (error) {
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
     } else {
       setResponses(data || []);
     }
@@ -77,7 +80,10 @@ const useResponses = ({questionId}: useResponsesProps) => {
     setLoadingMoreResponses(false);
 
     if (error) {
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
       return;
     }
 

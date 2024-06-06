@@ -1,14 +1,15 @@
+import {useAlert} from 'app/components/AlertsWrapper';
 import {supabase} from 'app/lib/supabase';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {resetSheet, setLoading} from 'app/redux/slices/askSheetSlice';
 import {RootState, useAppDispatch} from 'app/redux/store';
 import {decode} from 'base64-arraybuffer';
-import {Alert} from 'react-native';
 import {Asset} from 'react-native-image-picker';
 import {useSelector} from 'react-redux';
 
 export const useSubmitQuestion = () => {
   const dispatch = useAppDispatch();
+  const {openAlert} = useAlert();
   const {user} = useUser();
   const askSheetData = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,
@@ -63,7 +64,10 @@ export const useSubmitQuestion = () => {
 
     if (!userMetaId.data) {
       // Error
-      Alert.alert('Error posting', 'Cannot post');
+      openAlert({
+        title: 'Error posting',
+        message: 'Cannot post',
+      });
       return;
     }
 
@@ -75,7 +79,10 @@ export const useSubmitQuestion = () => {
       );
     } catch (error) {
       console.error('Error uploading media:', error);
-      Alert.alert('Error uploading media', 'Cannot post');
+      openAlert({
+        title: 'Error uploading media',
+        message: 'Cannot post',
+      });
       dispatch(setLoading(false));
       return;
     }

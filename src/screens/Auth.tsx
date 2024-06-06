@@ -1,4 +1,4 @@
-import {Alert, KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
+import {KeyboardAvoidingView, Platform, StyleSheet} from 'react-native';
 import React, {FC, useMemo, useState} from 'react';
 import {Center, SafeAreaView, VStack, Button} from 'ui';
 import {supabase} from 'app/lib/supabase';
@@ -11,6 +11,7 @@ import Logo from 'app/assets/logo_new_text.svg';
 import Input from 'app/components/common/TextInput';
 import {verifyEmail} from 'app/utils/emailVerification';
 import MagicLinkSentSheet from 'app/components/sheets/MagicLinkSentSheet';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const Auth: FC = () => {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -20,7 +21,7 @@ const Auth: FC = () => {
     return verifyEmail(email);
   }, [email]);
   const [loading, setLoading] = useState(false);
-
+  const {openAlert} = useAlert();
   const theme = useTheme<Theme>();
 
   const dispatch = useAppDispatch();
@@ -39,7 +40,10 @@ const Auth: FC = () => {
     });
     setLoading(false);
     if (error) {
-      Alert.alert('Login Error', error.message);
+      openAlert({
+        title: 'Login Error',
+        message: error.message,
+      });
       return;
     } else {
       setMagicLinkSentTimestamp(Date.now());

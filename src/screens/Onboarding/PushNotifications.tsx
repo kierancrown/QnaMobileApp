@@ -4,19 +4,21 @@ import LottieView from 'lottie-react-native';
 
 import Animation from 'app/assets/animations/push-notifications.json';
 import {percentWidth} from 'app/utils/size';
-import {Alert, Linking, StyleSheet} from 'react-native';
+import {Linking, StyleSheet} from 'react-native';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {useNavigation} from '@react-navigation/native';
 import {OnboardingStackNavigationProp} from 'app/navigation/OnboardingStack';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
 import useMount from 'app/hooks/useMount';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const PushNotifications = () => {
   const {sessionId} = useUser();
   const animation = useRef<LottieView>(null);
   const {requestPermission, checkPermission} = useNotification();
   const {navigate} = useNavigation<OnboardingStackNavigationProp>();
+  const {openAlert} = useAlert();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -41,16 +43,19 @@ const PushNotifications = () => {
     }
     const granted = await requestPermission(sessionId);
     if (!granted && !(await isEmulator())) {
-      Alert.alert('Permission Denied', 'You can enable it in settings', [
-        {
-          text: 'Open Settings',
-          style: 'default',
-          onPress: () => {
-            Linking.openSettings();
+      openAlert({
+        title: 'Permission Denied',
+        message: 'You can enable it in settings',
+        buttons: [
+          {
+            text: 'Open Settings',
+            onPress: () => {
+              Linking.openSettings();
+            },
           },
-        },
-        {text: 'OK'},
-      ]);
+          {text: 'OK'},
+        ],
+      });
     }
     nextStep();
   };

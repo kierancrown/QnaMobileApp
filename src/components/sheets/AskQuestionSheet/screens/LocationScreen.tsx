@@ -21,7 +21,7 @@ import {RootState, useAppDispatch} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import Geolocation from '@react-native-community/geolocation';
-import {Alert, StyleProp, TextInput, ViewStyle} from 'react-native';
+import {StyleProp, TextInput, ViewStyle} from 'react-native';
 import {
   NearGeoLocation,
   useGeoLocationSearch,
@@ -34,9 +34,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import {useDebounceValue} from 'usehooks-ts';
 import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const LocationsScreen: FC = () => {
   const dispatch = useAppDispatch();
+  const {openAlert} = useAlert();
   const selectedLocation = useSelector(
     (state: RootState) => state.nonPersistent.askSheet.selectedLocation,
   );
@@ -113,10 +115,10 @@ const LocationsScreen: FC = () => {
           }
         } catch (error) {
           setResults([]);
-          Alert.alert(
-            'Error',
-            'An error occurred while searching for locations',
-          );
+          openAlert({
+            title: 'Error',
+            message: 'An error occurred while searching for locations',
+          });
         } finally {
           setLoadingResults(false);
         }

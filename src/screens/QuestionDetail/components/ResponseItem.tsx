@@ -1,11 +1,12 @@
 import React, {FC} from 'react';
 import {Box, Text, VStack} from 'ui';
 import {supabase} from 'app/lib/supabase';
-import {Alert, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
 import Header from './QuestionDetails/components/Header';
 import Skeleton from 'react-native-reanimated-skeleton';
 import {useAppTheme} from 'app/styles/theme';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 interface ResponseItemProps {
   userId: string;
@@ -35,6 +36,7 @@ const ResponseItem: FC<ResponseItemProps> = ({
   isOwner,
   onDelete,
 }) => {
+  const {openAlert} = useAlert();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteAnswer = async (responseId: number) => {
     const {error} = await supabase
@@ -42,7 +44,10 @@ const ResponseItem: FC<ResponseItemProps> = ({
       .delete()
       .eq('id', responseId);
     if (error) {
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
     } else {
       onDelete?.(responseId.toString());
     }

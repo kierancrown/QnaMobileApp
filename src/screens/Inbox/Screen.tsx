@@ -9,7 +9,7 @@ import {useTheme} from '@shopify/restyle';
 import dayjs from 'dayjs';
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
-import {Alert, RefreshControl} from 'react-native';
+import {RefreshControl} from 'react-native';
 import useMount from 'app/hooks/useMount';
 import NotificationItem from 'app/components/NotificationItem';
 import {useAppDispatch} from 'app/redux/store';
@@ -21,6 +21,7 @@ import notifee from '@notifee/react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {InboxStackParamList} from 'app/navigation/InboxStack';
 import Username from 'app/components/Username';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 
@@ -29,6 +30,7 @@ const InboxScreen: FC = () => {
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
   const {user} = useUser();
+  const {openAlert} = useAlert();
   const dispatch = useAppDispatch();
   const {navigate} = useNavigation<NavigationProp<InboxStackParamList>>();
   const [notifications, setNotifications] = useState<(string | Notification)[]>(
@@ -90,7 +92,10 @@ const InboxScreen: FC = () => {
 
     if (error) {
       console.error(error);
-      Alert.alert('Error', error.message);
+      openAlert({
+        title: 'Error',
+        message: error.message,
+      });
     } else {
       // Group notifications by date
       const groupedNotifications = groupNotificationsByDate(data);
@@ -109,7 +114,10 @@ const InboxScreen: FC = () => {
           );
         if (updateError) {
           console.error(updateError);
-          Alert.alert('Error', updateError.message);
+          openAlert({
+            title: 'Error',
+            message: updateError.message,
+          });
         } else {
           dispatch(setUnreadCount(0));
           notifee

@@ -17,7 +17,7 @@ import {
 import {RootState, useAppDispatch} from 'app/redux/store';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Alert, StyleProp, TextInput, ViewStyle} from 'react-native';
+import {StyleProp, TextInput, ViewStyle} from 'react-native';
 import useMount from 'app/hooks/useMount';
 import SelectionItem from 'app/components/common/SelectionItem';
 import {useAppTheme} from 'app/styles/theme';
@@ -28,8 +28,10 @@ import SearchIcon from 'app/assets/icons/tabbar/Search.svg';
 import {supabase} from 'app/lib/supabase';
 import {Topic} from 'app/lib/supabase/types';
 import {TOPIC_LIMIT} from 'app/constants';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const TopicsScreen: FC = () => {
+  const {openAlert} = useAlert();
   const dispatch = useAppDispatch();
   const selectedTopics = useSelector(
     (state: RootState) => state.nonPersistent.askSheet.selectedTopics,
@@ -62,7 +64,10 @@ const TopicsScreen: FC = () => {
         .limit(20)
         .then(({data, error}) => {
           if (error) {
-            Alert.alert('Error', 'An error occurred while fetching topics');
+            openAlert({
+              title: 'Error',
+              message: 'An error occurred while fetching topics',
+            });
             return;
           }
           if (data) {
@@ -98,10 +103,10 @@ const TopicsScreen: FC = () => {
             .limit(20);
 
           if (error) {
-            Alert.alert(
-              'Error',
-              'An error occurred while searching for locations',
-            );
+            openAlert({
+              title: 'Error',
+              message: 'An error occurred while searching for locations',
+            });
           } else if (data == null) {
             setResults([]);
             return;
@@ -110,10 +115,10 @@ const TopicsScreen: FC = () => {
           setResults(data || []);
         } catch (error) {
           setResults([]);
-          Alert.alert(
-            'Error',
-            'An error occurred while searching for locations',
-          );
+          openAlert({
+            title: 'Error',
+            message: 'An error occurred while searching for locations',
+          });
         } finally {
           setLoadingResults(false);
         }
@@ -121,6 +126,7 @@ const TopicsScreen: FC = () => {
     } else {
       getPopularTopics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm]);
 
   return (
@@ -213,10 +219,10 @@ const TopicsScreen: FC = () => {
                       dispatch(removeTopic(item.id));
                       return;
                     } else if (selectedTopics.length >= TOPIC_LIMIT) {
-                      Alert.alert(
-                        'Maximum topics reached',
-                        `You can only select up to ${TOPIC_LIMIT} topics`,
-                      );
+                      openAlert({
+                        title: 'Maximum topics reached',
+                        message: `You can only select up to ${TOPIC_LIMIT} topics`,
+                      });
                       return;
                     }
                     dispatch(addTopic(item));

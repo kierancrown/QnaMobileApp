@@ -3,14 +3,7 @@ import Text from 'app/components/common/Text';
 import VStack from 'app/components/common/VStack';
 import {useAppTheme} from 'app/styles/theme';
 import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Alert,
-  Linking,
-  Platform,
-  Keyboard,
-} from 'react-native';
+import {Pressable, StyleSheet, Linking, Platform, Keyboard} from 'react-native';
 import {
   NativeViewGestureHandler,
   ScrollView,
@@ -67,6 +60,7 @@ import {
   MAX_QUESTION_LENGTH,
   MEDIA_LIMIT,
 } from 'app/constants';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 const AskSheetContent: FC = () => {
   const {
@@ -79,7 +73,7 @@ const AskSheetContent: FC = () => {
     questionPoll,
     selectedTopics,
   } = useSelector((state: RootState) => state.nonPersistent.askSheet);
-
+  const {openAlert} = useAlert();
   const [showPoll, setShowPoll] = useState(false);
   const [selectedInput, setSelectedInput] = useState<
     'question' | 'extraInfo' | null
@@ -142,7 +136,10 @@ const AskSheetContent: FC = () => {
 
   const openPhotoLibrary = () => {
     if (questionMedia.length >= MEDIA_LIMIT) {
-      Alert.alert('Maximum photos reached', 'You can only add 4 photos');
+      openAlert({
+        title: 'Maximum photos reached',
+        message: 'You can only add 4 photos',
+      });
       mediaPopover.current?.closePopover();
       return;
     }
@@ -164,7 +161,10 @@ const AskSheetContent: FC = () => {
 
   const openCamera = () => {
     if (questionMedia.length >= MEDIA_LIMIT) {
-      Alert.alert('Maximum photos reached', 'You can only add 4 photos');
+      openAlert({
+        title: 'Maximum photos reached',
+        message: 'You can only add 4 photos',
+      });
       mediaPopover.current?.closePopover();
       return;
     }
@@ -199,20 +199,22 @@ const AskSheetContent: FC = () => {
       if (result === 'granted') {
         navigate('LocationScreen');
       } else {
-        Alert.alert(
-          'Location permission required',
-          'Please allow location access to use this feature',
-          [
-            {text: 'Cancel', style: 'cancel'},
+        openAlert({
+          title: 'Location permission required',
+          message: 'Please allow location access to use this feature',
+          buttons: [
             {
-              style: 'default',
+              text: 'Cancel',
+              variant: 'destructive',
+            },
+            {
               text: 'Open settings',
               onPress: () => {
                 Linking.openSettings();
               },
             },
           ],
-        );
+        });
       }
     });
   };
@@ -323,23 +325,22 @@ const AskSheetContent: FC = () => {
                     small
                     selected={false}
                     onPress={() => {
-                      Alert.alert(
-                        'Remove tag',
-                        'Are you sure you want to remove?',
-                        [
+                      openAlert({
+                        title: 'Remove tag',
+                        message: 'Are you sure you want to remove?',
+                        buttons: [
                           {
                             text: 'Cancel',
-                            style: 'cancel',
                           },
                           {
                             text: 'Remove',
-                            style: 'destructive',
+                            variant: 'destructive',
                             onPress: () => {
                               dispatch(removeTopic(topic.id));
                             },
                           },
                         ],
-                      );
+                      });
                     }}
                   />
                 ))}

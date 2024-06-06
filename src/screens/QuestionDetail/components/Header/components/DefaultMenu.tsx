@@ -10,8 +10,8 @@ import HideIcon from 'app/assets/icons/actions/Hide.svg';
 import ReportIcon from 'app/assets/icons/actions/ReportAlt.svg';
 import TrashIcon from 'app/assets/icons/actions/Trash.svg';
 import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
-import {Alert} from 'react-native';
 import {supabase} from 'app/lib/supabase';
+import {useAlert} from 'app/components/AlertsWrapper';
 
 interface DefaultMenuProps {
   isOwner: boolean;
@@ -21,21 +21,21 @@ interface DefaultMenuProps {
 
 const DefaultMenu: FC<DefaultMenuProps> = ({isOwner, iconSize, questionId}) => {
   const theme = useAppTheme();
+  const {openAlert} = useAlert();
   const ellipsisIconSize = iconSize || 'l';
 
   const deleteSelf = useCallback(() => {
     if (isOwner) {
-      Alert.alert(
-        'Delete Question',
-        'Are you sure you want to delete this question?',
-        [
+      openAlert({
+        title: 'Delete Question',
+        message: 'Are you sure you want to delete this question?',
+        buttons: [
           {
             text: 'Cancel',
-            style: 'cancel',
           },
           {
             text: 'Delete',
-            style: 'destructive',
+            variant: 'destructive',
             onPress: async () => {
               const {error} = await supabase
                 .from('questions')
@@ -43,16 +43,22 @@ const DefaultMenu: FC<DefaultMenuProps> = ({isOwner, iconSize, questionId}) => {
                 .eq('id', questionId);
               if (error) {
                 console.error(error);
-                Alert.alert('Error', error.message);
+                openAlert({
+                  title: 'Error',
+                  message: error.message,
+                });
               } else {
-                Alert.alert('Success', 'Question deleted');
+                openAlert({
+                  title: 'Success',
+                  message: 'Question deleted',
+                });
               }
             },
           },
         ],
-      );
+      });
     }
-  }, [isOwner, questionId]);
+  }, [isOwner, openAlert, questionId]);
 
   const menuItems = useMemo(() => {
     return isOwner
