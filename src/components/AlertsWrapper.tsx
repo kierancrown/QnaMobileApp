@@ -4,12 +4,15 @@ import React, {
   useReducer,
   ReactNode,
   FC,
+  useState,
+  useEffect,
 } from 'react';
 import {AlertBoxProps} from 'app/components/AlertBox';
 import {Center, Flex} from './common';
 import AlertBox from './AlertBox';
 import {StyleSheet} from 'react-native';
 import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
+import {setShowBackdrop} from 'app/redux/slices/replySlice';
 
 // Define the types
 interface GlobalAlertState {
@@ -75,6 +78,13 @@ const useAlert = () => {
 // Combined provider and wrapper component
 const CombinedAlert: FC<CombinedAlertProps> = ({children}) => {
   const [state, dispatch] = useReducer(alertReducer, initialState);
+  const [backdropVisible, setBackdropVisible] = useState(false);
+
+  useEffect(() => {
+    if (state.openAlerts.length > 0) {
+      setBackdropVisible(true);
+    }
+  }, [state.openAlerts]);
 
   const openAlert = (alert: Omit<AlertBoxProps, 'id'>) => {
     dispatch({type: 'OPEN_ALERT', payload: alert});
@@ -86,22 +96,30 @@ const CombinedAlert: FC<CombinedAlertProps> = ({children}) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(state.openAlerts.length > 0 ? 1 : 0, {
-        duration: 200,
+      opacity: withTiming(backdropVisible ? 1 : 0, {
+        duration: 300,
       }),
     };
-  }, [state.openAlerts]);
+  }, [backdropVisible]);
 
   return (
     <AlertContext.Provider value={{state, openAlert, closeAlert}}>
       <Flex>
         {children}
         <Animated.View
-          pointerEvents={state.openAlerts.length > 0 ? 'auto' : 'none'}
+          pointerEvents={backdropVisible ? 'auto' : 'none'}
           style={[StyleSheet.absoluteFillObject, animatedStyle]}>
           <Center flex={1} bg="mainBackgroundHalf" px="m" py="mY">
             {state.openAlerts.map(alert => (
-              <AlertBox key={alert.id} {...alert} />
+              <AlertBox
+                key={alert.id}
+                {...alert}
+                onDismissing={() => {
+                  if (state.openAlerts.length < 2) {
+                    setBackdropVisible(false);
+                  }
+                }}
+              />
             ))}
           </Center>
         </Animated.View>

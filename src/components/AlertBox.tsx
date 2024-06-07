@@ -23,6 +23,7 @@ export interface AlertBoxProps {
     onPress?: () => void;
     preventDefault?: boolean;
   }[];
+  onDismissing?: () => void;
 }
 
 const AlertBox: FC<AlertBoxProps> = ({
@@ -31,6 +32,7 @@ const AlertBox: FC<AlertBoxProps> = ({
   message,
   buttons,
   noButtonBehavior = 'default',
+  onDismissing,
 }) => {
   const theme = useAppTheme();
   const opacity = useSharedValue(0);
@@ -43,6 +45,7 @@ const AlertBox: FC<AlertBoxProps> = ({
   });
 
   const close = () => {
+    onDismissing?.();
     opacity.value = withTiming(0, {duration: 300});
     translateY.value = withTiming(theme.spacing.sY, {duration: 300}, () => {
       runOnJS(closeAlert)(id);
