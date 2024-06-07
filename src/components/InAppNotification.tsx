@@ -39,7 +39,6 @@ const InAppNotification: FC<InAppNotificationProps> = ({
   const {triggerHaptic} = useHaptics();
 
   useMount(() => {
-    console.log(JSON.stringify(notification, null, 2));
     translateY.value = withTiming(0, {
       duration: 220,
       easing: Easing.in(Easing.sin),
@@ -89,7 +88,6 @@ const InAppNotification: FC<InAppNotificationProps> = ({
       transform: [{translateY: translateY.value}],
       opacity: opacity.value,
       height: ESTIMATED_HEIGHT + topInset,
-      width: SCREEN_WIDTH,
     };
   }, [SCREEN_WIDTH, topInset]);
 
@@ -124,7 +122,7 @@ const InAppNotification: FC<InAppNotificationProps> = ({
     });
 
   return (
-    <Box position="absolute" zIndex={99999} top={0} width={SCREEN_WIDTH}>
+    <Box position="absolute" zIndex={99999} width={SCREEN_WIDTH}>
       <GestureDetector gesture={pan}>
         <Animated.View style={animatedStyle}>
           <HStack
@@ -181,17 +179,16 @@ const InAppNotification: FC<InAppNotificationProps> = ({
                     variant="smallBody">
                     {notification.body}
                   </Text>
-
-                  <Center py="xxsY">
-                    <Box
-                      width={theme.spacing.xl}
-                      height={theme.spacing.xxsY}
-                      bg="cardText"
-                      borderRadius="pill"
-                    />
-                  </Center>
                 </VStack>
               </HStack>
+              <Center pb="xxsY" py="mY">
+                <Box
+                  width={theme.spacing.xl}
+                  height={theme.spacing.xxsY}
+                  bg="cardText"
+                  borderRadius="pill"
+                />
+              </Center>
             </Flex>
           </HStack>
         </Animated.View>
