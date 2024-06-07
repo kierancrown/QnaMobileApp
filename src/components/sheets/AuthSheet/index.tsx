@@ -17,40 +17,27 @@ import {
 } from '@react-navigation/stack';
 
 import useAndroidBack from 'app/hooks/useAndroidBack';
+import Screen from './screens/AuthScreen';
+import AuthPromptScreen from './screens/AuthPromptScreen';
 
-import Screen from './screens/ReplyScreen';
-
-interface ReplySheetProps {
+interface AuthSheetProps {
   open?: boolean;
   onClose?: () => void;
-  onSubmit: () => void;
-  avatarImageUrl: string;
-  replyingToUsername: string;
-  replyingToVerified: boolean;
 }
 
-export type ReplyStackParamList = {
-  ReplyScreen: {
-    avatarImageUrl: string;
-    replyingToUsername: string;
-    replyingToVerified: boolean;
+export type AuthStackParamList = {
+  AuthPromptScreen: {
+    reason: string;
   };
+  AuthScreen: {};
 };
 
 export const navigationRef = createNavigationContainerRef();
-const Stack = createStackNavigator<ReplyStackParamList>();
+const Stack = createStackNavigator<AuthStackParamList>();
 
-interface NavigatorProps {
-  avatarImageUrl: string;
-  replyingToUsername: string;
-  replyingToVerified: boolean;
-}
+interface NavigatorProps {}
 
-const Navigator: FC<NavigatorProps> = ({
-  avatarImageUrl,
-  replyingToUsername,
-  replyingToVerified,
-}) => {
+const Navigator: FC<NavigatorProps> = ({}) => {
   const theme = useAppTheme();
 
   const forCardPopin: StackCardStyleInterpolator = useCallback(
@@ -111,28 +98,17 @@ const Navigator: FC<NavigatorProps> = ({
           background: theme.colors.none,
         },
       }}>
-      <Stack.Navigator screenOptions={screenOptions}>
-        <Stack.Screen
-          name="ReplyScreen"
-          component={Screen}
-          initialParams={{
-            avatarImageUrl,
-            replyingToUsername,
-            replyingToVerified,
-          }}
-        />
+      <Stack.Navigator
+        screenOptions={screenOptions}
+        initialRouteName="AuthPromptScreen">
+        <Stack.Screen name="AuthPromptScreen" component={AuthPromptScreen} />
+        <Stack.Screen name="AuthScreen" component={Screen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const ReplySheet: FC<ReplySheetProps> = ({
-  open = false,
-  onClose,
-  avatarImageUrl,
-  replyingToUsername,
-  replyingToVerified,
-}) => {
+const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const {top: topSafeAreaInset} = useSafeAreaInsets();
@@ -169,13 +145,9 @@ const ReplySheet: FC<ReplySheetProps> = ({
       enablePanDownToClose
       backgroundComponent={CustomBackground}
       maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}>
-      <Navigator
-        avatarImageUrl={avatarImageUrl}
-        replyingToUsername={replyingToUsername}
-        replyingToVerified={replyingToVerified}
-      />
+      <Navigator />
     </BottomSheet>
   );
 };
 
-export default ReplySheet;
+export default AuthSheet;

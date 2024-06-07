@@ -19,6 +19,7 @@ import askSheetSlice from './slices/askSheetSlice';
 import searchSlice from './slices/searchSlice';
 import replySlice from './slices/replySlice';
 import alertSlice from './slices/alertSlice';
+import authSheetSlice from './slices/authSheetSlice';
 
 const persistConfig = {
   key: 'persisted',
@@ -36,6 +37,7 @@ const nonPersistedReducers = combineReducers({
   askSheet: askSheetSlice,
   search: searchSlice,
   reply: replySlice,
+  authSheet: authSheetSlice,
 });
 
 const rootReducer = combineReducers({

@@ -1,12 +1,5 @@
 import React, {FC, useRef} from 'react';
-import {
-  Box,
-  Center,
-  Flex,
-  Text,
-  ActivityLoader,
-  Button,
-} from 'app/components/common';
+import {Box, Center, Flex, Button} from 'app/components/common';
 import {FlashListWithHeaders} from '@codeherence/react-native-header';
 import {RefreshControl} from 'react-native-gesture-handler';
 import {useTabBarAnimation} from 'app/context/tabBarContext';
@@ -15,13 +8,12 @@ import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
 import HeaderComponent from './components/Header';
 import {LargeProfileHeaderComponent} from './components/LargeHeader';
-import {RouteProp, useRoute} from '@react-navigation/native';
-import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 import {useAlert} from 'app/components/AlertsWrapper';
+import {useAppDispatch} from 'app/redux/store';
+import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
 
 const Profile: FC = () => {
-  const {params} = useRoute<RouteProp<ProfileStackParamList>>();
-
+  const dispatch = useAppDispatch();
   const theme = useAppTheme();
   const scrollRef = useRef(null);
   const {openAlert} = useAlert();
@@ -46,7 +38,13 @@ const Profile: FC = () => {
         refreshControl={<RefreshControl refreshing={false} />}
         onScrollWorklet={scrollHandlerWorklet}
         ListEmptyComponent={
-          <Center flex={1} my="xxxlY" py="xxxlY">
+          <Center flex={1} my="xxxlY" py="xxxlY" rowGap="mY">
+            <Button
+              title="Open new auth"
+              onPress={() => {
+                dispatch(openAuthSheet());
+              }}
+            />
             <Button
               title="Open test alert"
               onPress={() => {
@@ -78,25 +76,6 @@ const Profile: FC = () => {
                 });
               }}
             />
-            <ActivityLoader size="xl" />
-            <Text
-              variant="medium"
-              my="xlY"
-              color="cardText"
-              py="xxxlY"
-              mt="xxxlY"
-              mb="xxxlY">
-              Nothing to see here
-            </Text>
-            <Text
-              variant="medium"
-              my="xlY"
-              color="cardText"
-              py="xxxlY"
-              mt="xxxlY"
-              mb="xxxlY">
-              Nothing to see here
-            </Text>
           </Center>
         }
         contentContainerStyle={{

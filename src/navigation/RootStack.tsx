@@ -6,15 +6,24 @@ import {useUser} from 'app/lib/supabase/context/auth';
 
 import AuthStack from './AuthStack';
 import {useSelector} from 'react-redux';
-import {RootState} from 'app/redux/store';
+import {RootState, useAppDispatch, useAppSelector} from 'app/redux/store';
 import TabStack from './TabStack';
 import OnboardingStack from './OnboardingStack';
+import AuthSheet from 'app/components/sheets/AuthSheet';
+import {closeAuthSheet} from 'app/redux/slices/authSheetSlice';
 
 const RootStack = () => {
   const theme = useAppTheme();
   const {user} = useUser();
-
+  const dispatch = useAppDispatch();
   const authData = useSelector((state: RootState) => state.persistent.auth);
+  const authSheetOpen = useAppSelector(
+    state => state.nonPersistent.authSheet.sheetOpen,
+  );
+
+  const authSheetDismissed = () => {
+    dispatch(closeAuthSheet());
+  };
 
   const determineStack = () => {
     const {deletedAccount, showOnboarding, skippedAuth} = authData;
@@ -51,6 +60,7 @@ const RootStack = () => {
         }}>
         {determineStack()}
       </NavigationContainer>
+      <AuthSheet open={authSheetOpen} onClose={authSheetDismissed} />
     </>
   );
 };

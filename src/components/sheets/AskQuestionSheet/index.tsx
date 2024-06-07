@@ -152,6 +152,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
     } else {
       navigationRef.current?.goBack();
     }
+    return true;
   }, [actionButton]);
 
   const handleSheetChanges = useCallback(
