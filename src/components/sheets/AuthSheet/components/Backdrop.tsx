@@ -14,7 +14,7 @@ const CustomBackdrop = ({animatedIndex, style}: BottomSheetBackdropProps) => {
     opacity: interpolate(
       animatedIndex.value,
       [-1, 0],
-      [0, 0],
+      [0, 1],
       Extrapolation.CLAMP,
     ),
   }));
@@ -33,7 +33,7 @@ const CustomBackdrop = ({animatedIndex, style}: BottomSheetBackdropProps) => {
 
   return (
     <Animated.View
-      pointerEvents={animatedIndex.value < 1 ? 'none' : 'auto'}
+      pointerEvents={animatedIndex.value < 0 ? 'none' : 'auto'}
       style={containerStyle}
     />
   );

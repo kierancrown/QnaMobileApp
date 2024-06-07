@@ -12,7 +12,7 @@ const CustomBackground: React.FC<BottomSheetBackgroundProps> = ({
   //#region styles
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(animatedIndex.value, [-1, 0], [0.66, 1]),
-    backgroundColor: theme.colors.inputBackground,
+    backgroundColor: theme.colors.mainBackground,
     borderTopStartRadius: interpolate(
       animatedIndex.value,
       [-1, 0],
@@ -29,10 +29,10 @@ const CustomBackground: React.FC<BottomSheetBackgroundProps> = ({
       style,
       containerAnimatedStyle,
       {
-        backgroundColor: theme.colors.inputBackground,
+        backgroundColor: theme.colors.mainBackground,
       },
     ],
-    [style, containerAnimatedStyle, theme.colors.inputBackground],
+    [style, containerAnimatedStyle, theme.colors.mainBackground],
   );
   //#endregion
 

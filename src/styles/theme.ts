@@ -285,6 +285,11 @@ const theme = createTheme({
       fontSize: mvs(34),
       lineHeight: mvs(40),
     },
+    authSheetHeader: {
+      fontFamily: fonts.semiBold,
+      fontSize: mvs(24),
+      lineHeight: mvs(28),
+    },
     subheader: {
       fontFamily: fonts.bold,
       fontSize: mvs(24),

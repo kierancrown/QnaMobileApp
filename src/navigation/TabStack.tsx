@@ -41,6 +41,7 @@ import {useUser} from 'app/lib/supabase/context/auth';
 import {setAvatarImageUrl} from 'app/redux/slices/authSlice';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import notifee, {EventType} from '@notifee/react-native';
+import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -209,7 +210,11 @@ export default function TabStack() {
                 iOS: HapticFeedbackTypes.impactMedium,
                 android: HapticFeedbackTypes.effectHeavyClick,
               }).then();
-              setQuestionSheetOpen(true);
+              if (user) {
+                setQuestionSheetOpen(true);
+              } else {
+                dispatch(openAuthSheet('post'));
+              }
             }}
             {...props}
           />

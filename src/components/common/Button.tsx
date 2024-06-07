@@ -31,6 +31,7 @@ const Button = ({
   animateOnPress = true,
   variant = 'primary',
   title,
+  titleVariant = 'headline',
   fullWidth,
   onLongPress,
   onPress,
@@ -64,7 +65,7 @@ const Button = ({
       opacity.value = withTiming(0.88, {
         duration: 100,
       });
-      scale.value = withTiming(0.95, {
+      scale.value = withTiming(0.99, {
         duration: 66,
       });
     }
@@ -107,7 +108,7 @@ const Button = ({
             ) : null}
             {leftNode}
             <Text
-              variant="headline"
+              variant={titleVariant}
               color={variant === 'text' ? 'brand' : 'white'}>
               {title}
             </Text>
