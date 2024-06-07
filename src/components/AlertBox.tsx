@@ -2,6 +2,7 @@ import React, {FC} from 'react';
 import {Box, Center, HStack, Text, VStack} from './common';
 import {Pressable} from 'react-native';
 import Animated, {
+  AnimatedStyle,
   interpolateColor,
   runOnJS,
   useAnimatedStyle,
@@ -11,6 +12,7 @@ import Animated, {
 import {useAppTheme} from 'app/styles/theme';
 import useMount from 'app/hooks/useMount';
 import {useAlert} from './AlertsWrapper';
+import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 
 export interface AlertBoxProps {
   id: number;
@@ -24,6 +26,7 @@ export interface AlertBoxProps {
     preventDefault?: boolean;
   }[];
   onDismissing?: () => void;
+  animatedStyle?: AnimatedStyle;
 }
 
 const AlertBox: FC<AlertBoxProps> = ({
@@ -33,6 +36,7 @@ const AlertBox: FC<AlertBoxProps> = ({
   buttons,
   noButtonBehavior = 'default',
   onDismissing,
+  animatedStyle,
 }) => {
   const theme = useAppTheme();
   const opacity = useSharedValue(0);
@@ -52,7 +56,7 @@ const AlertBox: FC<AlertBoxProps> = ({
     });
   };
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const internalAnimatedStyle = useAnimatedStyle(() => {
     return {
       position: 'absolute',
       opacity: opacity.value,
@@ -61,7 +65,7 @@ const AlertBox: FC<AlertBoxProps> = ({
   });
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[internalAnimatedStyle, animatedStyle]}>
       <Box
         bg="cardBackground"
         borderRadius="l"
@@ -138,7 +142,7 @@ interface AlertButtonProps {
 const AlertButton: FC<AlertButtonProps> = ({text, variant, onPress}) => {
   const alertButtonPressed = useSharedValue(0);
   const theme = useAppTheme();
-
+  const {triggerHaptic} = useHaptics();
   const animatedStyle = useAnimatedStyle(() => {
     return {
       flex: 1,
@@ -149,6 +153,14 @@ const AlertButton: FC<AlertButtonProps> = ({text, variant, onPress}) => {
       ),
     };
   }, [theme.colors]);
+
+  const internalOnPress = () => {
+    onPress?.();
+    triggerHaptic({
+      iOS: HapticFeedbackTypes.selection,
+      android: HapticFeedbackTypes.virtualKey,
+    }).then();
+  };
 
   const onPressIn = () => {
     alertButtonPressed.value = withTiming(1, {duration: 100});
@@ -161,7 +173,7 @@ const AlertButton: FC<AlertButtonProps> = ({text, variant, onPress}) => {
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
-        onPress={onPress}
+        onPress={internalOnPress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}>
         <Center py="xsY">

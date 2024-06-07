@@ -10,9 +10,13 @@ import React, {
 import {AlertBoxProps} from 'app/components/AlertBox';
 import {Center, Flex} from './common';
 import AlertBox from './AlertBox';
-import {StyleSheet} from 'react-native';
-import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
-import {setShowBackdrop} from 'app/redux/slices/replySlice';
+import {Pressable, StyleSheet, ViewStyle} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 // Define the types
 interface GlobalAlertState {
@@ -28,6 +32,10 @@ interface AlertContextProps {
 interface CombinedAlertProps {
   children: ReactNode;
 }
+
+const pressableStyle: ViewStyle = {
+  flex: 1,
+};
 
 // Initial state
 const initialState: GlobalAlertState = {
@@ -79,6 +87,7 @@ const useAlert = () => {
 const CombinedAlert: FC<CombinedAlertProps> = ({children}) => {
   const [state, dispatch] = useReducer(alertReducer, initialState);
   const [backdropVisible, setBackdropVisible] = useState(false);
+  const boxScale = useSharedValue(1);
 
   useEffect(() => {
     if (state.openAlerts.length > 0) {
@@ -102,6 +111,12 @@ const CombinedAlert: FC<CombinedAlertProps> = ({children}) => {
     };
   }, [backdropVisible]);
 
+  const boxAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{scale: boxScale.value}],
+    };
+  });
+
   return (
     <AlertContext.Provider value={{state, openAlert, closeAlert}}>
       <Flex>
@@ -109,19 +124,29 @@ const CombinedAlert: FC<CombinedAlertProps> = ({children}) => {
         <Animated.View
           pointerEvents={backdropVisible ? 'auto' : 'none'}
           style={[StyleSheet.absoluteFillObject, animatedStyle]}>
-          <Center flex={1} bg="mainBackgroundHalf" px="m" py="mY">
-            {state.openAlerts.map(alert => (
-              <AlertBox
-                key={alert.id}
-                {...alert}
-                onDismissing={() => {
-                  if (state.openAlerts.length < 2) {
-                    setBackdropVisible(false);
-                  }
-                }}
-              />
-            ))}
-          </Center>
+          <Pressable
+            style={pressableStyle}
+            onPress={() => {
+              boxScale.value = withSequence(
+                withTiming(1.025, {duration: 66}),
+                withTiming(1, {duration: 66}),
+              );
+            }}>
+            <Center flex={1} bg="mainBackgroundHalf" px="m" py="mY">
+              {state.openAlerts.map(alert => (
+                <AlertBox
+                  key={alert.id}
+                  {...alert}
+                  animatedStyle={boxAnimatedStyle}
+                  onDismissing={() => {
+                    if (state.openAlerts.length < 2) {
+                      setBackdropVisible(false);
+                    }
+                  }}
+                />
+              ))}
+            </Center>
+          </Pressable>
         </Animated.View>
       </Flex>
     </AlertContext.Provider>
