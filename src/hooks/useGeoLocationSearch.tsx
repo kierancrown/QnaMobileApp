@@ -36,6 +36,7 @@ export const useGeoLocationSearch = () => {
       .from('geolocations')
       .select('*')
       .ilike('name', `%${searchTerm}%`)
+      .order('population', {ascending: false})
       .limit(10);
 
     if (err) {
