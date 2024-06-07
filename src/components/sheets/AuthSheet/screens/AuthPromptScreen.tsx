@@ -14,17 +14,14 @@ import Logo from 'app/assets/logo_new_text.svg';
 import {useAppTheme} from 'app/styles/theme';
 import TypeWriter from 'react-native-typewriter';
 import {ReasonText} from 'app/redux/slices/authSheetSlice';
-import {HapticFeedbackTypes} from 'react-native-haptic-feedback';
-import {useHaptics} from 'app/hooks/useHaptics';
 
 const AuthPromptScreen: FC = () => {
   const {
     params: {},
   } = useRoute<RouteProp<AuthStackParamList, 'AuthScreen'>>();
-  const {triggerHaptic} = useHaptics();
   const theme = useAppTheme();
-  const promptReason = useAppSelector(
-    state => state.nonPersistent.authSheet.promptReason,
+  const {promptReason, sheetOpen} = useAppSelector(
+    state => state.nonPersistent.authSheet,
   );
   const [typingDirection, setTypingDirection] = useState<0 | 1 | -1>(1);
   const [reasonText, setReasonText] = useState<string>(
@@ -36,12 +33,20 @@ const AuthPromptScreen: FC = () => {
   }, [promptReason]);
 
   useEffect(() => {
-    console.log({reasonText});
     setTypingDirection(1);
   }, [reasonText]);
 
+  useEffect(() => {
+    if (sheetOpen) {
+      setTypingDirection(1);
+    } else {
+      setTypingDirection(0);
+    }
+  }, [sheetOpen]);
+
   const cycleReasonText = () => {
     setTypingDirection(0);
+
     setTimeout(() => {
       switch (reasonText) {
         case ReasonText.reply:
@@ -60,7 +65,10 @@ const AuthPromptScreen: FC = () => {
           setReasonText(ReasonText.reply);
           break;
       }
-      setTypingDirection(1);
+      if (!sheetOpen) {
+        setTypingDirection(0);
+        return;
+      }
     }, 100);
   };
 
@@ -70,25 +78,26 @@ const AuthPromptScreen: FC = () => {
         <VStack rowGap="mY" flex={1} py="mY">
           <Logo height={theme.iconSizes.xxxl} width="100%" />
           <Center flex={1} rowGap="mY">
-            <VStack>
+            <VStack minWidth="100%">
               <Text variant="authSheetHeader" textAlign="left">
                 You must be logged in to
               </Text>
               <HStack
+                minWidth="100%"
                 minHeight={theme.textVariants.authSheetHeader.lineHeight}
                 flexWrap="wrap">
                 <Text variant="authSheetHeader" color="brand">
                   <TypeWriter
                     typing={typingDirection}
-                    onTyped={() => {
-                      triggerHaptic({
-                        iOS: HapticFeedbackTypes.soft,
-                        android: HapticFeedbackTypes.soft,
-                      }).then();
-                    }}
                     onTypingEnd={() => {
+                      if (!sheetOpen) {
+                        return;
+                      }
                       if (typingDirection === 1) {
                         setTimeout(() => {
+                          if (!sheetOpen) {
+                            return;
+                          }
                           setTypingDirection(-1);
                         }, 1000);
                       } else if (typingDirection === -1) {
