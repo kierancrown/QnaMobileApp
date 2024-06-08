@@ -43,7 +43,6 @@ const Button = ({
 }: ButtonProps) => {
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
-
   const buttonBackgroundColor: keyof Theme['colors'] =
     (disabled || loading) && variant !== 'text'
       ? 'buttonDisabled'
@@ -108,8 +107,15 @@ const Button = ({
             ) : null}
             {leftNode}
             <Text
+              // @ts-ignore
               variant={titleVariant}
-              color={variant === 'text' ? 'brand' : 'white'}>
+              color={
+                variant === 'text'
+                  ? disabled
+                    ? 'secondary'
+                    : 'brand'
+                  : 'white'
+              }>
               {title}
             </Text>
             {rightNode}

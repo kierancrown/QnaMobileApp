@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {FC, useCallback, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Animated, {
@@ -25,6 +25,8 @@ import Screen from './screens/AuthScreen';
 import AuthPromptScreen from './screens/AuthPromptScreen';
 import {Pressable, StyleSheet, ViewStyle} from 'react-native';
 import {Flex} from 'app/components/common';
+import {useAppSelector} from 'app/redux/store';
+import MagicLinkConfirmationScreen from './screens/MagicLinkConfirmationScreen';
 
 interface AuthSheetProps {
   open?: boolean;
@@ -36,6 +38,10 @@ export type AuthStackParamList = {
     reason: string;
   };
   AuthScreen: {};
+  MagicLinkConfirmationScreen: {
+    email: string;
+    sentTimestamp: number;
+  };
 };
 
 export const navigationRef = createNavigationContainerRef<AuthStackParamList>();
@@ -113,6 +119,10 @@ const Navigator: FC<NavigatorProps> = ({}) => {
         initialRouteName="AuthPromptScreen">
         <Stack.Screen name="AuthPromptScreen" component={AuthPromptScreen} />
         <Stack.Screen name="AuthScreen" component={Screen} />
+        <Stack.Screen
+          name="MagicLinkConfirmationScreen"
+          component={MagicLinkConfirmationScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -122,14 +132,10 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const {top: topSafeAreaInset} = useSafeAreaInsets();
-  const snapPoints = useMemo(() => ['50%'], []);
   const theme = useAppTheme();
-
-  useEffect(() => {
-    if (open) {
-      navigationRef.navigate('AuthPromptScreen', {reason: 'none'});
-    }
-  }, [open]);
+  const snapPoints = useAppSelector(
+    state => state.nonPersistent.authSheet.sheetSnapPoints,
+  );
 
   const onDismiss = useCallback(() => {
     sheetRef.current?.close();
@@ -139,6 +145,7 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   const handleSheetChanges = useCallback(
     (index: number) => {
       if (index === -1) {
+        navigationRef.navigate('AuthPromptScreen', {reason: 'none'});
         onClose?.();
       }
     },
@@ -172,12 +179,15 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         animatedIndex={animatedPosition}
-        keyboardBehavior="interactive"
+        keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
         backdropComponent={null}
         enablePanDownToClose
         backgroundComponent={CustomBackground}
-        maxDynamicContentSize={SCREEN_HEIGHT - topSafeAreaInset}>
+        maxDynamicContentSize={
+          SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY
+        }>
         <Navigator />
       </BottomSheet>
     </>

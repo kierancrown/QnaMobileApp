@@ -241,6 +241,7 @@ const theme = createTheme({
     xxxl: s(64),
     xxxxl: s(96),
     logo: s(120),
+    magicLinkSent: s(133),
   },
   spinnerSizes: {
     xxs: s(12),

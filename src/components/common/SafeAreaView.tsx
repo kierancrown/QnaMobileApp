@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {Keyboard, Pressable} from 'react-native';
+import {Keyboard, Pressable, ViewStyle} from 'react-native';
 import {
   Edges,
   SafeAreaView as RNSafeAreaView,
@@ -8,18 +8,19 @@ import {
 interface SafeAreaViewProps {
   children: React.ReactNode | React.ReactNode[];
   edges?: Edges;
+  style?: ViewStyle;
 }
 
-const SafeAreaView: FC<SafeAreaViewProps> = ({children, edges}) => {
-  const style = {flex: 1};
+const SafeAreaView: FC<SafeAreaViewProps> = ({children, edges, style}) => {
+  const styles = {flex: 1, ...style};
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
   return (
-    <Pressable style={style} onPress={dismissKeyboard}>
-      <RNSafeAreaView style={style} edges={edges}>
+    <Pressable style={styles} onPress={dismissKeyboard}>
+      <RNSafeAreaView style={styles} edges={edges}>
         {children}
       </RNSafeAreaView>
     </Pressable>

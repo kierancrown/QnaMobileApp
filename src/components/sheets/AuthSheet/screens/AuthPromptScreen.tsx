@@ -19,6 +19,7 @@ import Logo from 'app/assets/logo_new_text.svg';
 import {useAppTheme} from 'app/styles/theme';
 import TypeWriter from 'react-native-typewriter';
 import {ReasonText} from 'app/redux/slices/authSheetSlice';
+import {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 
 const AuthPromptScreen: FC = () => {
   const {
@@ -79,7 +80,7 @@ const AuthPromptScreen: FC = () => {
   };
 
   return (
-    <SafeAreaView edges={['bottom']}>
+    <SafeAreaView edges={['bottom']} style={{maxHeight: SCREEN_HEIGHT / 2}}>
       <VStack flex={1} py="mY" px="l" justifyContent="space-between">
         <VStack rowGap="mY" flex={1} py="mY">
           <Logo height={theme.iconSizes.xxxl} width="100%" />
