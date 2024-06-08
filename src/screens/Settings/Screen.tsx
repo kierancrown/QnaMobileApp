@@ -15,8 +15,10 @@ import PrivacyIcon from 'app/assets/icons/settings/Privacy.svg';
 import HelpIcon from 'app/assets/icons/settings/Help.svg';
 import AboutIcon from 'app/assets/icons/settings/About.svg';
 import DebugIcon from 'app/assets/icons/settings/Debug.svg';
+import {useUser} from 'app/lib/supabase/context/auth';
 
 const SettingsScren = () => {
+  const {user} = useUser();
   const theme = useAppTheme();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {navigate} = useNavigation<NavigationProp<ProfileStackParamList>>();
@@ -32,6 +34,7 @@ const SettingsScren = () => {
       <SectionHeader title="Account Settings" />
       <SettingsItem
         title="Account"
+        disabled={!user}
         icon={
           <AccountIcon
             width={theme.iconSizes.intermediate}
@@ -44,6 +47,7 @@ const SettingsScren = () => {
       />
       <SettingsItem
         title="Notifications"
+        disabled={!user}
         icon={
           <NotificationsIcon
             width={theme.iconSizes.intermediate}
@@ -56,6 +60,7 @@ const SettingsScren = () => {
       />
       <SettingsItem
         title="Privacy & Security"
+        disabled={!user}
         icon={
           <PrivacyIcon
             width={theme.iconSizes.intermediate}

@@ -8,13 +8,24 @@ import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import Profile from './Profile/Profile';
 import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
 import {Typewriter} from 'app/components/sheets/AuthSheet/components/Typewriter';
-import {useFocusEffect} from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
+
+import GearIcon from 'app/assets/icons/gear.svg';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {useAppTheme} from 'app/styles/theme';
+import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 
 const ProfileScreen: FC = () => {
-  const dispatch = useAppDispatch();
-  const {user} = useUser();
-  const bottomListPadding = useBottomPadding();
+  const {navigate} = useNavigation<NavigationProp<ProfileStackParamList>>();
   const [typewriterEnabled, setTypewriterEnabled] = useState(false);
+  const bottomListPadding = useBottomPadding();
+  const dispatch = useAppDispatch();
+  const theme = useAppTheme();
+  const {user} = useUser();
 
   useFocusEffect(
     useCallback(() => {
@@ -31,6 +42,18 @@ const ProfileScreen: FC = () => {
 
   return !user ? (
     <SafeAreaView>
+      <HStack py="xsY" px="s" justifyContent="flex-end">
+        <TouchableOpacity
+          onPress={() => {
+            navigate('Settings');
+          }}
+          hitSlop={8}>
+          <GearIcon
+            width={theme.iconSizes.intermediate}
+            height={theme.iconSizes.intermediate}
+          />
+        </TouchableOpacity>
+      </HStack>
       <Center
         flex={1}
         pt="xlY"

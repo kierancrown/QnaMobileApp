@@ -13,6 +13,7 @@ import Animated, {
 interface SettingsItemProps {
   title: string;
   subtitle?: string;
+  disabled?: boolean;
   titleColor?: keyof Theme['colors'];
   onPress?: () => void;
   icon?: React.ReactNode;
@@ -22,6 +23,7 @@ const SettingsItem: FC<SettingsItemProps> = ({
   title,
   subtitle,
   titleColor,
+  disabled,
   onPress,
   icon,
 }) => {
@@ -30,6 +32,7 @@ const SettingsItem: FC<SettingsItemProps> = ({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
+      opacity: withTiming(disabled ? 0.5 : 1),
       backgroundColor: interpolateColor(
         bgAnimation.value,
         [0, 1],
@@ -39,7 +42,7 @@ const SettingsItem: FC<SettingsItemProps> = ({
   }, []);
 
   const onPressIn = () => {
-    if (!onPress) {
+    if (!onPress || disabled) {
       return;
     }
     bgAnimation.value = withTiming(1, {
@@ -48,7 +51,7 @@ const SettingsItem: FC<SettingsItemProps> = ({
   };
 
   const onPressOut = () => {
-    if (!onPress) {
+    if (!onPress || disabled) {
       return;
     }
     bgAnimation.value = withTiming(0, {
@@ -57,7 +60,11 @@ const SettingsItem: FC<SettingsItemProps> = ({
   };
 
   return (
-    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}>
       <Animated.View style={[animatedStyle]}>
         <HStack
           justifyContent="space-between"
