@@ -25,9 +25,10 @@ import Screen from './screens/AuthScreen';
 import AuthPromptScreen from './screens/AuthPromptScreen';
 import {Pressable, StyleSheet, ViewStyle} from 'react-native';
 import {Flex} from 'app/components/common';
-import {useAppSelector} from 'app/redux/store';
+import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import MagicLinkConfirmationScreen from './screens/MagicLinkConfirmationScreen';
 import SuccessScreen from './screens/SuccessScreen';
+import {clearInitialSheetScreen} from 'app/redux/slices/authSheetSlice';
 
 interface AuthSheetProps {
   open?: boolean;
@@ -136,7 +137,7 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   const animatedPosition = useSharedValue(0);
   const {top: topSafeAreaInset} = useSafeAreaInsets();
   const theme = useAppTheme();
-
+  const dispatch = useAppDispatch();
   const {sheetSnapPoints: snapPoints, initialSheetScreen} = useAppSelector(
     state => state.nonPersistent.authSheet,
   );
@@ -175,7 +176,9 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
     if (initialSheetScreen) {
       // @ts-ignore
       navigationRef.navigate(initialSheetScreen);
+      dispatch(clearInitialSheetScreen());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSheetScreen]);
 
   useAndroidBack(onDismiss);

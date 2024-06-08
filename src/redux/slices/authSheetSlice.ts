@@ -46,6 +46,9 @@ export const authSheetSlice = createSlice({
       state.promptReason = action.payload.reason;
       state.initialSheetScreen = action.payload.initialScreen;
     },
+    clearInitialSheetScreen: state => {
+      state.initialSheetScreen = undefined;
+    },
     closeAuthSheet: state => {
       state.sheetOpen = false;
     },
@@ -58,7 +61,11 @@ export const authSheetSlice = createSlice({
   },
 });
 
-export const {openAuthSheet, closeAuthSheet, setSheetSnapPoints} =
-  authSheetSlice.actions;
+export const {
+  openAuthSheet,
+  closeAuthSheet,
+  setSheetSnapPoints,
+  clearInitialSheetScreen,
+} = authSheetSlice.actions;
 
 export default authSheetSlice.reducer;

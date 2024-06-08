@@ -1,95 +1,50 @@
-import React, {FC} from 'react';
+import React, {FC, useCallback, useState} from 'react';
 import {useAppDispatch} from 'app/redux/store';
-import {resetAuth, resetCache} from 'app/redux/slices/authSlice';
-import {Center, Text, VStack, Button, HStack, SafeAreaView} from 'ui';
+import {Text, VStack, Button, HStack, SafeAreaView, Center} from 'ui';
 
-import {Theme} from 'app/styles/theme';
-import {useTheme} from '@shopify/restyle';
 import {useUser} from 'app/lib/supabase/context/auth';
-import {supabase} from 'app/lib/supabase';
-
-import EyesIcon from 'app/assets/icons/Eyes.svg';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
 import Profile from './Profile/Profile';
+import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
+import {Typewriter} from 'app/components/sheets/AuthSheet/components/Typewriter';
+import {useFocusEffect} from '@react-navigation/native';
 
 const ProfileScreen: FC = () => {
   const dispatch = useAppDispatch();
-  const theme = useTheme<Theme>();
-
   const {user} = useUser();
-
   const bottomListPadding = useBottomPadding();
+  const [typewriterEnabled, setTypewriterEnabled] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTypewriterEnabled(true);
+      return () => {
+        setTypewriterEnabled(false);
+      };
+    }, []),
+  );
 
   const login = () => {
-    dispatch(resetAuth());
-    if (user) {
-      supabase.auth.signOut();
-      dispatch(resetCache());
-    }
+    dispatch(openAuthSheet({reason: 'none', initialScreen: 'AuthScreen'}));
   };
-
-  // const deleteAccountPrompt = () => {
-  //   Alert.alert(
-  //     'Delete Account',
-  //     'Are you sure you want to delete your account?',
-  //     [
-  //       {
-  //         text: 'Cancel',
-  //         style: 'cancel',
-  //       },
-  //       {
-  //         text: 'Delete',
-  //         style: 'destructive',
-  //         onPress: () => {
-  //           Alert.alert(
-  //             'Heads up',
-  //             'Deleting your account is permanent. All of your questions and responses will be deleted. Are you sure you want to continue?',
-  //             [
-  //               {
-  //                 text: 'Cancel',
-  //                 style: 'cancel',
-  //               },
-  //               {
-  //                 text: 'Delete',
-  //                 style: 'destructive',
-  //                 onPress: () => {
-  //                   if (user) {
-  //                     deleteUser().then();
-  //                   }
-  //                 },
-  //               },
-  //             ],
-  //           );
-  //         },
-  //       },
-  //     ],
-  //   );
-  // };
 
   return !user ? (
     <SafeAreaView>
       <Center
         flex={1}
+        pt="xlY"
         style={{
           paddingBottom: bottomListPadding,
-          paddingTop: bottomListPadding / 2,
         }}>
         <VStack rowGap="sY" px="l">
-          <EyesIcon
-            fill={theme.colors.foreground}
-            width={theme.iconSizes.xxxxl}
-            height={theme.iconSizes.xxxxl}
-          />
           <Text variant="header" textAlign="left">
             {"You're currently\nannoymous"}
           </Text>
-          <Text variant="subheader" color="cardText" textAlign="left">
-            Login to ask questions and get answers
-          </Text>
+          <Typewriter enabled={typewriterEnabled} />
 
           <HStack>
-            <Button title="Login" mt="lY" onPress={login} />
+            <Button title="Login" borderRadius="pill" mt="lY" onPress={login} />
           </HStack>
         </VStack>
       </Center>
