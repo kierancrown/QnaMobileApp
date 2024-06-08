@@ -167,7 +167,6 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
     () => ({
       opacity: interpolate(animatedPosition.value, [-1, 0], [0, 1]),
       backgroundColor: theme.colors.sheetBackdrop,
-      ...StyleSheet.absoluteFillObject,
     }),
     [theme.colors.sheetBackdrop],
   );
@@ -186,7 +185,7 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   return (
     <>
       <Animated.View
-        style={backdropStyle}
+        style={[backdropStyle, StyleSheet.absoluteFillObject]}
         pointerEvents={open ? 'auto' : 'none'}>
         <Pressable onPress={onDismiss} style={backdropPressableStyle}>
           <Flex />
