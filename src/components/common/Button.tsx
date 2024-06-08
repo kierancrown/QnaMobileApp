@@ -31,6 +31,7 @@ const Button = ({
   animateOnPress = true,
   variant = 'primary',
   title,
+  titleVariant = 'headline',
   fullWidth,
   onLongPress,
   onPress,
@@ -42,7 +43,6 @@ const Button = ({
 }: ButtonProps) => {
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
-
   const buttonBackgroundColor: keyof Theme['colors'] =
     (disabled || loading) && variant !== 'text'
       ? 'buttonDisabled'
@@ -64,7 +64,7 @@ const Button = ({
       opacity.value = withTiming(0.88, {
         duration: 100,
       });
-      scale.value = withTiming(0.95, {
+      scale.value = withTiming(0.99, {
         duration: 66,
       });
     }
@@ -107,8 +107,15 @@ const Button = ({
             ) : null}
             {leftNode}
             <Text
-              variant="headline"
-              color={variant === 'text' ? 'brand' : 'white'}>
+              // @ts-ignore
+              variant={titleVariant}
+              color={
+                variant === 'text'
+                  ? disabled
+                    ? 'secondary'
+                    : 'brand'
+                  : 'white'
+              }>
               {title}
             </Text>
             {rightNode}

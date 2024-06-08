@@ -1,21 +1,28 @@
 import React, {FC} from 'react';
-import {Keyboard, Pressable} from 'react-native';
-import {SafeAreaView as RNSafeAreaView} from 'react-native-safe-area-context';
+import {Keyboard, Pressable, ViewStyle} from 'react-native';
+import {
+  Edges,
+  SafeAreaView as RNSafeAreaView,
+} from 'react-native-safe-area-context';
 
 interface SafeAreaViewProps {
   children: React.ReactNode | React.ReactNode[];
+  edges?: Edges;
+  style?: ViewStyle;
 }
 
-const SafeAreaView: FC<SafeAreaViewProps> = ({children}) => {
-  const style = {flex: 1};
+const SafeAreaView: FC<SafeAreaViewProps> = ({children, edges, style}) => {
+  const styles = {flex: 1, ...style};
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
   return (
-    <Pressable style={style} onPress={dismissKeyboard}>
-      <RNSafeAreaView style={style}>{children}</RNSafeAreaView>
+    <Pressable style={styles} onPress={dismissKeyboard}>
+      <RNSafeAreaView style={styles} edges={edges}>
+        {children}
+      </RNSafeAreaView>
     </Pressable>
   );
 };

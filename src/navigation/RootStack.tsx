@@ -2,39 +2,21 @@ import React from 'react';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 
 import {useAppTheme} from 'app/styles/theme';
-import {useUser} from 'app/lib/supabase/context/auth';
 
-import AuthStack from './AuthStack';
-import {useSelector} from 'react-redux';
-import {RootState} from 'app/redux/store';
+import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import TabStack from './TabStack';
-import OnboardingStack from './OnboardingStack';
+import AuthSheet from 'app/components/sheets/AuthSheet';
+import {closeAuthSheet} from 'app/redux/slices/authSheetSlice';
 
 const RootStack = () => {
   const theme = useAppTheme();
-  const {user} = useUser();
+  const dispatch = useAppDispatch();
+  const authSheetOpen = useAppSelector(
+    state => state.nonPersistent.authSheet.sheetOpen,
+  );
 
-  const authData = useSelector((state: RootState) => state.persistent.auth);
-
-  const determineStack = () => {
-    const {deletedAccount, showOnboarding, skippedAuth} = authData;
-
-    if (deletedAccount) {
-      if (skippedAuth) {
-        return <TabStack />;
-      } else {
-        return <AuthStack />;
-      }
-    }
-    if (showOnboarding) {
-      return <OnboardingStack />;
-    } else if (skippedAuth) {
-      return <TabStack />;
-    }
-    if (user) {
-      return <TabStack />;
-    }
-    return <AuthStack />;
+  const authSheetDismissed = () => {
+    dispatch(closeAuthSheet());
   };
 
   return (
@@ -49,8 +31,9 @@ const RootStack = () => {
             text: theme.colors.foreground,
           },
         }}>
-        {determineStack()}
+        <TabStack />
       </NavigationContainer>
+      <AuthSheet open={authSheetOpen} onClose={authSheetDismissed} />
     </>
   );
 };

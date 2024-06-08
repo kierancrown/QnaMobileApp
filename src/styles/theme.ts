@@ -241,6 +241,7 @@ const theme = createTheme({
     xxxl: s(64),
     xxxxl: s(96),
     logo: s(120),
+    magicLinkSent: s(133),
   },
   spinnerSizes: {
     xxs: s(12),
@@ -284,6 +285,11 @@ const theme = createTheme({
       fontFamily: fonts.bold,
       fontSize: mvs(34),
       lineHeight: mvs(40),
+    },
+    authSheetHeader: {
+      fontFamily: fonts.semiBold,
+      fontSize: mvs(24),
+      lineHeight: mvs(28),
     },
     subheader: {
       fontFamily: fonts.bold,

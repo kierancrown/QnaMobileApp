@@ -140,6 +140,7 @@ const ReplySheet: FC<ReplySheetProps> = ({
 
   const onDismiss = useCallback(() => {
     sheetRef.current?.close();
+    return true;
   }, []);
 
   const handleSheetChanges = useCallback(
