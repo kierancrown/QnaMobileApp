@@ -26,6 +26,8 @@ import {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import {useSheetNavigationHeight} from '../hooks/useSheetNavigationHeight';
 
 import AtIcon from 'app/assets/icons/envelope.svg';
+import {supabase} from 'app/lib/supabase';
+import {openAlert} from 'app/redux/slices/alertSlice';
 
 const isValidEmail = (email: string) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,7 +40,7 @@ const AuthScreen: FC = () => {
   } = useRoute<RouteProp<AuthStackParamList, 'AuthScreen'>>();
   const open = useAppSelector(state => state.nonPersistent.authSheet.sheetOpen);
   const [email, setEmail] = useState('');
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const theme = useAppTheme();
   const topSafeAreaInset = useSafeAreaInsets().top;
@@ -57,10 +59,26 @@ const AuthScreen: FC = () => {
   });
 
   const submit = async () => {
-    navigate('MagicLinkConfirmationScreen', {
-      email,
-      sentTimestamp: Date.now(),
+    setLoading(true);
+    const {error} = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: 'qna://login',
+      },
     });
+    setLoading(false);
+    if (error) {
+      openAlert({
+        title: 'Login Error',
+        message: error.message,
+      });
+      return;
+    } else {
+      navigate('MagicLinkConfirmationScreen', {
+        email,
+        sentTimestamp: Date.now(),
+      });
+    }
   };
 
   return (
@@ -109,7 +127,7 @@ const AuthScreen: FC = () => {
         <Button
           variant="primary"
           disabled={loading || !isValidEmail(email)}
-          title="Send magic link"
+          title={loading ? 'Delivering magic' : 'Send magic link'}
           titleVariant="bodyBold"
           borderRadius="textInput"
           minWidth="100%"

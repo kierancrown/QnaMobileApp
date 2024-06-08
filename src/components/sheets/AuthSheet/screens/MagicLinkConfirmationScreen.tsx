@@ -18,13 +18,15 @@ import {Linking} from 'react-native';
 import Animation from 'app/assets/animations/magic-link-sent-alt.json';
 import LottieView from 'lottie-react-native';
 import {useAppTheme} from 'app/styles/theme';
+import {supabase} from 'app/lib/supabase';
+import {openAlert} from 'app/redux/slices/alertSlice';
 
 const MagicLinkConfirmationScreen: FC = () => {
   const {
     params: {email, sentTimestamp},
   } = useRoute<RouteProp<AuthStackParamList, 'MagicLinkConfirmationScreen'>>();
   const theme = useAppTheme();
-  const [resending] = useState(false);
+  const [resending, setResending] = useState(false);
   const [openEmailAvailable, setOpenEmailAvailable] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(60);
   const resendTimestamp = dayjs(sentTimestamp).add(60, 'second').valueOf();
@@ -70,8 +72,21 @@ const MagicLinkConfirmationScreen: FC = () => {
     Linking.openURL(url);
   };
 
-  const onResend = () => {
-    console.log('resend');
+  const onResend = async () => {
+    setResending(true);
+    const {error} = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: 'qna://login',
+      },
+    });
+    setResending(false);
+    if (error) {
+      openAlert({
+        title: 'Login Error',
+        message: error.message,
+      });
+    }
   };
 
   return (
@@ -105,6 +120,7 @@ const MagicLinkConfirmationScreen: FC = () => {
               title="Open Email App"
               onPress={openInbox}
               minWidth="100%"
+              titleVariant="bodyBold"
             />
           ) : email ? (
             <Button
@@ -117,7 +133,7 @@ const MagicLinkConfirmationScreen: FC = () => {
           <Button
             title={
               resending
-                ? 'Sending new magic link'
+                ? 'Delivering magic'
                 : secondsLeft <= 0
                 ? 'Resend Email'
                 : `Resend in ${secondsLeft}s`

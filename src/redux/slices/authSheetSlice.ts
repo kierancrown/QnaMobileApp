@@ -1,5 +1,6 @@
 import {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import {createSlice} from '@reduxjs/toolkit';
+import {AuthStackParamList} from 'app/components/sheets/AuthSheet';
 import {SharedValue} from 'react-native-reanimated';
 
 export interface AuthSheetState {
@@ -9,6 +10,7 @@ export interface AuthSheetState {
     | (string | number)[]
     | SharedValue<(string | number)[]>
     | undefined;
+  initialSheetScreen?: keyof AuthStackParamList;
 }
 
 export enum ReasonText {
@@ -24,6 +26,7 @@ const initialState: AuthSheetState = {
   sheetOpen: false,
   promptReason: 'none',
   sheetSnapPoints: [SCREEN_HEIGHT / 2],
+  initialSheetScreen: undefined,
 };
 
 export const authSheetSlice = createSlice({
@@ -33,11 +36,15 @@ export const authSheetSlice = createSlice({
     openAuthSheet: (
       state,
       action: {
-        payload: AuthSheetState['promptReason'];
+        payload: {
+          reason: AuthSheetState['promptReason'];
+          initialScreen?: keyof AuthStackParamList;
+        };
       },
     ) => {
       state.sheetOpen = true;
-      state.promptReason = action.payload;
+      state.promptReason = action.payload.reason;
+      state.initialSheetScreen = action.payload.initialScreen;
     },
     closeAuthSheet: state => {
       state.sheetOpen = false;

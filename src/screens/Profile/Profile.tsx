@@ -42,7 +42,7 @@ const Profile: FC = () => {
             <Button
               title="Open new auth"
               onPress={() => {
-                dispatch(openAuthSheet('post'));
+                dispatch(openAuthSheet({reason: 'post'}));
               }}
             />
             <Button

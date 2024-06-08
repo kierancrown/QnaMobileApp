@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useMemo, useRef} from 'react';
+import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Animated, {
@@ -27,6 +27,7 @@ import {Pressable, StyleSheet, ViewStyle} from 'react-native';
 import {Flex} from 'app/components/common';
 import {useAppSelector} from 'app/redux/store';
 import MagicLinkConfirmationScreen from './screens/MagicLinkConfirmationScreen';
+import SuccessScreen from './screens/SuccessScreen';
 
 interface AuthSheetProps {
   open?: boolean;
@@ -42,6 +43,7 @@ export type AuthStackParamList = {
     email: string;
     sentTimestamp: number;
   };
+  SuccessScreen: undefined;
 };
 
 export const navigationRef = createNavigationContainerRef<AuthStackParamList>();
@@ -123,6 +125,7 @@ const Navigator: FC<NavigatorProps> = ({}) => {
           name="MagicLinkConfirmationScreen"
           component={MagicLinkConfirmationScreen}
         />
+        <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -133,14 +136,21 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   const animatedPosition = useSharedValue(0);
   const {top: topSafeAreaInset} = useSafeAreaInsets();
   const theme = useAppTheme();
-  const snapPoints = useAppSelector(
-    state => state.nonPersistent.authSheet.sheetSnapPoints,
+
+  const {sheetSnapPoints: snapPoints, initialSheetScreen} = useAppSelector(
+    state => state.nonPersistent.authSheet,
   );
 
   const onDismiss = useCallback(() => {
     sheetRef.current?.close();
     return true;
   }, []);
+
+  useEffect(() => {
+    if (!open) {
+      sheetRef.current?.close();
+    }
+  }, [open, onClose]);
 
   const handleSheetChanges = useCallback(
     (index: number) => {
@@ -160,6 +170,13 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
     }),
     [theme.colors.sheetBackdrop],
   );
+
+  useEffect(() => {
+    if (initialSheetScreen) {
+      // @ts-ignore
+      navigationRef.navigate(initialSheetScreen);
+    }
+  }, [initialSheetScreen]);
 
   useAndroidBack(onDismiss);
 

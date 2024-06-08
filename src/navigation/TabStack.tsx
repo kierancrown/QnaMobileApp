@@ -213,7 +213,7 @@ export default function TabStack() {
               if (user) {
                 setQuestionSheetOpen(true);
               } else {
-                dispatch(openAuthSheet('post'));
+                dispatch(openAuthSheet({reason: 'post'}));
               }
             }}
             {...props}

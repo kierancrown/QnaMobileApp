@@ -282,7 +282,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
                 if (user) {
                   dispatch(openReplySheet());
                 } else {
-                  dispatch(openAuthSheet('reply'));
+                  dispatch(openAuthSheet({reason: 'reply'}));
                 }
               }}
               style={replyPressableStyle}>

@@ -16,6 +16,7 @@ import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
 import {useOnboarding} from 'app/hooks/useOnboarding';
 import {useAlert} from 'app/components/AlertsWrapper';
+import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -181,8 +182,6 @@ export const AuthContextProvider = (props: any) => {
       }
       const url = new URL(urlString);
 
-      console.log({url: url.toString()});
-
       if (url.searchParams.get('error')) {
         const error = url.searchParams.get('error');
         const errorCode = url.searchParams.get('error_code');
@@ -210,8 +209,10 @@ export const AuthContextProvider = (props: any) => {
             access_token: accessToken,
           })
           .then(res => {
-            console.log('Auth success', res);
             setUser(res.data.user);
+            dispatch(
+              openAuthSheet({reason: 'none', initialScreen: 'SuccessScreen'}),
+            );
           })
           .catch(err => console.log({err}));
       }
