@@ -1,4 +1,9 @@
-import {RouteProp, useRoute} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {
   Button,
   Center,
@@ -23,6 +28,7 @@ const AuthPromptScreen: FC = () => {
   const {promptReason, sheetOpen} = useAppSelector(
     state => state.nonPersistent.authSheet,
   );
+  const {navigate} = useNavigation<NavigationProp<AuthStackParamList>>();
   const [typingDirection, setTypingDirection] = useState<0 | 1 | -1>(1);
   const [reasonText, setReasonText] = useState<string>(
     ReasonText[promptReason],
@@ -119,6 +125,8 @@ const AuthPromptScreen: FC = () => {
             titleVariant="bodyBold"
             borderRadius="textInput"
             minWidth="100%"
+            // @ts-ignore
+            onPress={() => navigate('AuthScreen')}
           />
         </VStack>
       </VStack>

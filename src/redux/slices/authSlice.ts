@@ -33,6 +33,9 @@ export const authSlice = createSlice({
     },
     resetAuth: state => {
       state.skippedAuth = false;
+      state.username = undefined;
+      state.avatarImageUrl = undefined;
+      state.isVerified = false;
     },
     resetCache: state => {
       state.username = undefined;

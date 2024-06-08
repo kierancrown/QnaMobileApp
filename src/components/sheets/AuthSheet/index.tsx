@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useMemo, useRef} from 'react';
+import React, {FC, useCallback, useEffect, useMemo, useRef} from 'react';
 import BottomSheet, {SCREEN_HEIGHT} from '@gorhom/bottom-sheet';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Animated, {
@@ -38,7 +38,7 @@ export type AuthStackParamList = {
   AuthScreen: {};
 };
 
-export const navigationRef = createNavigationContainerRef();
+export const navigationRef = createNavigationContainerRef<AuthStackParamList>();
 const Stack = createStackNavigator<AuthStackParamList>();
 
 const backdropPressableStyle: ViewStyle = {
@@ -124,6 +124,12 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
   const {top: topSafeAreaInset} = useSafeAreaInsets();
   const snapPoints = useMemo(() => ['50%'], []);
   const theme = useAppTheme();
+
+  useEffect(() => {
+    if (open) {
+      navigationRef.navigate('AuthPromptScreen', {reason: 'none'});
+    }
+  }, [open]);
 
   const onDismiss = useCallback(() => {
     sheetRef.current?.close();
