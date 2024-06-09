@@ -216,12 +216,7 @@ export const AuthContextProvider = (props: any) => {
           .then(async res => {
             setUser(res.data.user);
             const session = res.data.session;
-            if (!session) {
-              openAlert({
-                title: 'Error',
-                message: 'Session is null',
-              });
-            } else if (!res.data.user) {
+            if (!res.data.user) {
               openAlert({
                 title: 'Error',
                 message: 'User is null',
