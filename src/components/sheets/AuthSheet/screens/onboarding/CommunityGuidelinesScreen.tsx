@@ -22,10 +22,7 @@ const CommunityGuidelinesScreen: FC = () => {
   const theme = useAppTheme();
   const {top: topSafeAreaInset, bottom: bottomSafeAreaInset} =
     useSafeAreaInsets();
-  useSheetNavigationHeight(
-    SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY,
-    false,
-  );
+  useSheetNavigationHeight(SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY);
   const dispatch = useAppDispatch();
   const closeSelf = useCallback(() => dispatch(closeAuthSheet()), [dispatch]);
 

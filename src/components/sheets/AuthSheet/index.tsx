@@ -202,15 +202,8 @@ const AuthSheet: FC<AuthSheetProps> = () => {
 
   useAndroidBack(onDismiss);
 
-  return (
-    <>
-      <Animated.View
-        style={[backdropStyle, StyleSheet.absoluteFillObject]}
-        pointerEvents={authSheetOpen ? 'auto' : 'none'}>
-        <Pressable onPress={onDismiss} style={backdropPressableStyle}>
-          <Flex />
-        </Pressable>
-      </Animated.View>
+  const sheet = useMemo(
+    () => (
       <BottomSheet
         ref={sheetRef}
         index={authSheetOpen ? 0 : -1}
@@ -219,7 +212,13 @@ const AuthSheet: FC<AuthSheetProps> = () => {
         onChange={handleSheetChanges}
         animatedIndex={animatedPosition}
         keyboardBehavior="extend"
-        enablePanDownToClose
+        enablePanDownToClose={
+          !(
+            initialSheetScreen === 'OnboardingWelcomeScreen' ||
+            initialSheetScreen === 'OnboardingTopicsScreen' ||
+            initialSheetScreen === 'OnboardingCommunityGuidelinesScreen'
+          )
+        }
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         backdropComponent={null}
@@ -229,6 +228,28 @@ const AuthSheet: FC<AuthSheetProps> = () => {
         }>
         <Navigator />
       </BottomSheet>
+    ),
+    [
+      animatedPosition,
+      authSheetOpen,
+      handleSheetChanges,
+      snapPoints,
+      theme.spacing.mY,
+      topSafeAreaInset,
+      initialSheetScreen,
+    ],
+  );
+
+  return (
+    <>
+      <Animated.View
+        style={[backdropStyle, StyleSheet.absoluteFillObject]}
+        pointerEvents={authSheetOpen ? 'auto' : 'none'}>
+        <Pressable onPress={onDismiss} style={backdropPressableStyle}>
+          <Flex />
+        </Pressable>
+      </Animated.View>
+      {sheet}
     </>
   );
 };
