@@ -217,6 +217,9 @@ export const AuthContextProvider = (props: any) => {
             setUser(res.data.user);
             const session = res.data.session;
 
+            console.log('Session', session);
+            console.log('User', res.data.user);
+
             const onboardingCompleted = await hasOnboarded(session?.user);
             if (onboardingCompleted !== true) {
               console.log('Onboarding step', onboardingCompleted);
