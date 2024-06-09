@@ -239,13 +239,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_question_metadata_location_fkey"
-            columns: ["location"]
-            isOneToOne: false
-            referencedRelation: "geolocations"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "public_question_metadata_question_id_fkey"
             columns: ["question_id"]
             isOneToOne: true
@@ -257,6 +250,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_metadata_location_fkey"
+            columns: ["location"]
+            isOneToOne: false
+            referencedRelation: "geolocations"
             referencedColumns: ["id"]
           },
         ]
@@ -409,6 +409,13 @@ export type Database = {
             referencedRelation: "user_metadata"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "responses_thread_fkey"
+            columns: ["thread"]
+            isOneToOne: false
+            referencedRelation: "responses"
+            referencedColumns: ["id"]
+          },
         ]
       }
       topics: {
@@ -426,6 +433,27 @@ export type Database = {
           created_at?: string
           id?: number
           name?: string
+        }
+        Relationships: []
+      }
+      user_connections: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: number
+          to_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id?: string
+          id?: number
+          to_user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: number
+          to_user_id?: string
         }
         Relationships: []
       }
@@ -449,27 +477,36 @@ export type Database = {
       }
       user_metadata: {
         Row: {
+          bio: string | null
           has_onboarded: boolean
           id: number
+          onboarding_step: number
           profile_picture: string | null
+          spoken_lang: string[] | null
           updated_at: string | null
           user_id: string
           username: string | null
           verified: boolean
         }
         Insert: {
+          bio?: string | null
           has_onboarded?: boolean
           id?: number
+          onboarding_step?: number
           profile_picture?: string | null
+          spoken_lang?: string[] | null
           updated_at?: string | null
           user_id?: string
           username?: string | null
           verified?: boolean
         }
         Update: {
+          bio?: string | null
           has_onboarded?: boolean
           id?: number
+          onboarding_step?: number
           profile_picture?: string | null
+          spoken_lang?: string[] | null
           updated_at?: string | null
           user_id?: string
           username?: string | null
