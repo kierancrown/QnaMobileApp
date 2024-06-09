@@ -216,32 +216,26 @@ export const AuthContextProvider = (props: any) => {
           .then(async res => {
             setUser(res.data.user);
             const session = res.data.session;
-            if (!res.data.user) {
-              openAlert({
-                title: 'Error',
-                message: 'User is null',
-              });
+
+            const onboardingCompleted = await hasOnboarded(session?.user);
+            if (onboardingCompleted !== true) {
+              console.log('Onboarding step', onboardingCompleted);
+              dispatch(
+                openAuthSheet({
+                  reason: 'none',
+                  initialScreen:
+                    onboardingCompleted === 0
+                      ? 'OnboardingWelcomeScreen'
+                      : 'OnboardingTopicsScreen',
+                }),
+              );
             } else {
-              const onboardingCompleted = await hasOnboarded(session?.user);
-              if (onboardingCompleted !== true) {
-                console.log('Onboarding step', onboardingCompleted);
-                dispatch(
-                  openAuthSheet({
-                    reason: 'none',
-                    initialScreen:
-                      onboardingCompleted === 0
-                        ? 'OnboardingWelcomeScreen'
-                        : 'OnboardingTopicsScreen',
-                  }),
-                );
-              } else {
-                dispatch(
-                  openAuthSheet({
-                    reason: 'none',
-                    initialScreen: 'SuccessScreen',
-                  }),
-                );
-              }
+              dispatch(
+                openAuthSheet({
+                  reason: 'none',
+                  initialScreen: 'SuccessScreen',
+                }),
+              );
               // Register for push notifications
               if (session) {
                 const sId = extractSessionId(session);
