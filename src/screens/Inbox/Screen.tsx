@@ -22,6 +22,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {InboxStackParamList} from 'app/navigation/InboxStack';
 import Username from 'app/components/Username';
 import {useAlert} from 'app/components/AlertsWrapper';
+import InboxIcon from 'app/assets/icons/tabbar/Inbox.svg';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 
@@ -246,6 +247,17 @@ const InboxScreen: FC = () => {
       {loading && !refreshing ? (
         <Center flex={1}>
           <ActivityLoader />
+        </Center>
+      ) : notifications.length === 0 ? (
+        <Center flex={1} rowGap="mY">
+          <InboxIcon
+            fill={theme.colors.cardText}
+            width={theme.iconSizes.xxxl}
+            height={theme.iconSizes.xxxl}
+          />
+          <Text variant="medium" color="cardText">
+            No notifications yet
+          </Text>
         </Center>
       ) : (
         <FlashList

@@ -81,7 +81,7 @@ export const AuthContextProvider = (props: any) => {
               initialScreen:
                 onboardingCompleted === 0
                   ? 'OnboardingWelcomeScreen'
-                  : 'OnboardingApperanceScreen',
+                  : 'OnboardingTopicsScreen',
             }),
           );
         }
@@ -236,7 +236,7 @@ export const AuthContextProvider = (props: any) => {
                     initialScreen:
                       onboardingCompleted === 0
                         ? 'OnboardingWelcomeScreen'
-                        : 'OnboardingApperanceScreen',
+                        : 'OnboardingTopicsScreen',
                   }),
                 );
               } else {

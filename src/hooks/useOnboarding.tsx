@@ -1,13 +1,10 @@
 import {supabase} from 'app/lib/supabase';
-import {useAppDispatch} from 'app/redux/store';
-import {completeOnboarding as dispatchCompleted} from 'app/redux/slices/authSlice';
 import {useCallback} from 'react';
 import {useUsername} from './useUsername';
 import {useUser} from 'app/lib/supabase/context/auth';
 import {User} from '@supabase/supabase-js';
 
 export const useOnboarding = () => {
-  const dispatch = useAppDispatch();
   const {updateUsername} = useUsername();
   const {user} = useUser();
 
@@ -52,15 +49,16 @@ export const useOnboarding = () => {
       .from('user_metadata')
       .update({
         has_onboarded: true,
+        onboarding_step: 3,
       })
       .eq('user_id', user.id ?? '');
 
     if (error) {
-      throw error;
+      console.error(error);
+      return false;
     }
-
-    dispatch(dispatchCompleted());
-  }, [dispatch, user]);
+    return true;
+  }, [user]);
 
   return {hasOnboarded, completeOnboarding, completeStep1};
 };

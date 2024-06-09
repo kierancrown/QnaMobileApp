@@ -14,35 +14,36 @@ import {useSheetNavigationHeight} from '../../hooks/useSheetNavigationHeight';
 import {Keyboard, Pressable} from 'react-native';
 import {FlexStyle} from 'app/helpers/commonStyles';
 import {useOnboarding} from 'app/hooks/useOnboarding';
-import OfflineAvatar from 'app/components/common/OfflineAvatar';
+import {openAlert} from 'app/redux/slices/alertSlice';
 
-const ApperanceScreen: FC = () => {
+const TopicsScreen: FC = () => {
   const {
     params: {},
   } = useRoute<RouteProp<AuthStackParamList, 'AuthScreen'>>();
   const theme = useAppTheme();
   const {top: topSafeAreaInset, bottom: bottomSafeAreaInset} =
     useSafeAreaInsets();
-  const {navigate} = useNavigation<NavigationProp<AuthStackParamList>>();
   useSheetNavigationHeight(
     SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY,
     false,
   );
-  const {} = useOnboarding();
+  const {navigate} = useNavigation<NavigationProp<AuthStackParamList>>();
+  const {completeOnboarding} = useOnboarding();
   const [settingInformation, setSettingInformation] = useState(false);
 
   const nextStep = async () => {
+    console.log('nextStep');
     setSettingInformation(true);
-    // const result = await completeStep1(username, bio);
-    // if (result) {
-    //   // navigate('AuthScreen');
-    // } else {
-    //   setSettingInformation(false);
-    //   openAlert({
-    //     title: 'Something went wrong',
-    //     message: 'Please try again',
-    //   });
-    // }
+    const result = await completeOnboarding();
+    if (result) {
+      navigate('OnboardingCommunityGuidelinesScreen');
+    } else {
+      setSettingInformation(false);
+      openAlert({
+        title: 'Something went wrong',
+        message: 'Please try again',
+      });
+    }
   };
 
   return (
@@ -50,11 +51,15 @@ const ApperanceScreen: FC = () => {
       <VStack py="mY" px="s" pt="xlY" flex={1}>
         <VStack px="s" pb="xxlY" rowGap="xsY">
           <Text variant="header">Let's get started</Text>
-          <Text variant="bodyBold">Show people what you look like</Text>
+          <Text variant="bodyBold">
+            Pick some topics you're interested in to customise your experiance
+          </Text>
         </VStack>
 
         <Center>
-          <OfflineAvatar size="xxxxl" defaultAvatar />
+          <Text textAlign="center">
+            Well this is embarassing... I haven't coded this yet
+          </Text>
         </Center>
       </VStack>
       <VStack px="s" style={{paddingBottom: bottomSafeAreaInset}}>
@@ -64,10 +69,12 @@ const ApperanceScreen: FC = () => {
           titleVariant="bodyBold"
           borderRadius="textInput"
           minWidth="100%"
+          onPress={nextStep}
+          disabled={settingInformation}
         />
       </VStack>
     </Pressable>
   );
 };
 
-export default ApperanceScreen;
+export default TopicsScreen;

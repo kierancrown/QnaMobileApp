@@ -112,7 +112,7 @@ const WelcomeScreen: FC = () => {
     setSettingInformation(true);
     const result = await completeStep1(username, bio);
     if (result) {
-      navigate('OnboardingApperanceScreen');
+      navigate('OnboardingTopicsScreen');
     } else {
       setSettingInformation(false);
       openAlert({

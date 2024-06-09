@@ -28,14 +28,15 @@ import {Flex} from 'app/components/common';
 import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import MagicLinkConfirmationScreen from './screens/MagicLinkConfirmationScreen';
 import SuccessScreen from './screens/SuccessScreen';
-import {clearInitialSheetScreen} from 'app/redux/slices/authSheetSlice';
+import {
+  clearInitialSheetScreen,
+  closeAuthSheet,
+} from 'app/redux/slices/authSheetSlice';
 import WelcomeScreen from './screens/onboarding/WelcomeScreen';
-import ApperanceScreen from './screens/onboarding/ApperanceScreen';
+import TopicsScreen from './screens/onboarding/TopicsScreen';
+import CommunityGuidelinesScreen from './screens/onboarding/CommunityGuidelinesScreen';
 
-interface AuthSheetProps {
-  open?: boolean;
-  onClose?: () => void;
-}
+interface AuthSheetProps {}
 
 export type AuthStackParamList = {
   AuthPromptScreen: {
@@ -48,7 +49,8 @@ export type AuthStackParamList = {
   };
   SuccessScreen: undefined;
   OnboardingWelcomeScreen: undefined;
-  OnboardingApperanceScreen: undefined;
+  OnboardingTopicsScreen: undefined;
+  OnboardingCommunityGuidelinesScreen: undefined;
 };
 
 export const navigationRef = createNavigationContainerRef<AuthStackParamList>();
@@ -137,44 +139,48 @@ const Navigator: FC<NavigatorProps> = ({}) => {
           name="OnboardingWelcomeScreen"
           component={WelcomeScreen}
         />
+        <Stack.Screen name="OnboardingTopicsScreen" component={TopicsScreen} />
         <Stack.Screen
-          name="OnboardingApperanceScreen"
-          component={ApperanceScreen}
+          name="OnboardingCommunityGuidelinesScreen"
+          component={CommunityGuidelinesScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
+const AuthSheet: FC<AuthSheetProps> = () => {
   const sheetRef = useRef<BottomSheet>(null);
   const animatedPosition = useSharedValue(0);
   const {top: topSafeAreaInset} = useSafeAreaInsets();
   const theme = useAppTheme();
   const dispatch = useAppDispatch();
+  const authSheetOpen = useAppSelector(
+    state => state.nonPersistent.authSheet.sheetOpen,
+  );
   const {sheetSnapPoints: snapPoints, initialSheetScreen} = useAppSelector(
     state => state.nonPersistent.authSheet,
   );
 
   const onDismiss = useCallback(() => {
-    sheetRef.current?.close();
+    dispatch(closeAuthSheet());
     return true;
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    if (!open) {
+    if (!authSheetOpen) {
       sheetRef.current?.close();
     }
-  }, [open, onClose]);
+  }, [authSheetOpen]);
 
   const handleSheetChanges = useCallback(
     (index: number) => {
       if (index === -1) {
         navigationRef.navigate('AuthPromptScreen', {reason: 'none'});
-        onClose?.();
+        onDismiss();
       }
     },
-    [onClose],
+    [onDismiss],
   );
 
   const backdropStyle = useAnimatedStyle(
@@ -200,23 +206,23 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
     <>
       <Animated.View
         style={[backdropStyle, StyleSheet.absoluteFillObject]}
-        pointerEvents={open ? 'auto' : 'none'}>
+        pointerEvents={authSheetOpen ? 'auto' : 'none'}>
         <Pressable onPress={onDismiss} style={backdropPressableStyle}>
           <Flex />
         </Pressable>
       </Animated.View>
       <BottomSheet
         ref={sheetRef}
-        index={open ? 0 : -1}
+        index={authSheetOpen ? 0 : -1}
         handleComponent={null}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         animatedIndex={animatedPosition}
         keyboardBehavior="extend"
+        enablePanDownToClose
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         backdropComponent={null}
-        enablePanDownToClose={initialSheetScreen === 'OnboardingWelcomeScreen'}
         backgroundComponent={CustomBackground}
         maxDynamicContentSize={
           SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY
