@@ -18,7 +18,7 @@ import {useSheetNavigationHeight} from '../hooks/useSheetNavigationHeight';
 const SuccessScreen: FC = () => {
   const {username, isVerified} = useUsername();
   const dispatch = useAppDispatch();
-  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [secondsLeft, setSecondsLeft] = useState(5);
   const autoCloseTimestamp = useMemo(
     () => dayjs(Date.now()).add(5, 'second').valueOf(),
     [],

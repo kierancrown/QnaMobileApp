@@ -5,12 +5,10 @@ import useMount from 'app/hooks/useMount';
 import {Linking} from 'react-native';
 import {useAppDispatch} from 'app/redux/store';
 import {
-  completeOnboarding,
   deletedAccount,
   resetAuth,
   resetCache,
   resetDeletedAccount,
-  showOnboarding,
 } from 'app/redux/slices/authSlice';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
@@ -88,9 +86,16 @@ export const AuthContextProvider = (props: any) => {
           setTimeout(async () => {
             const onboardingCompleted = await hasOnboarded(session?.user);
             if (!onboardingCompleted) {
-              dispatch(showOnboarding());
+              dispatch(
+                openAuthSheet({
+                  reason: 'none',
+                  initialScreen: 'OnboardingWelcomeScreen',
+                }),
+              );
             } else {
-              dispatch(completeOnboarding());
+              dispatch(
+                openAuthSheet({reason: 'none', initialScreen: 'SuccessScreen'}),
+              );
               // Register for push notifications
               if (session) {
                 const sId = extractSessionId(session);
@@ -210,9 +215,6 @@ export const AuthContextProvider = (props: any) => {
           })
           .then(res => {
             setUser(res.data.user);
-            dispatch(
-              openAuthSheet({reason: 'none', initialScreen: 'SuccessScreen'}),
-            );
           })
           .catch(err => console.log({err}));
       }

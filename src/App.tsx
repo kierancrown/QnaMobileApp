@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC} from 'react';
 import RootStack from './navigation/RootStack';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -14,7 +14,6 @@ import {NotificationProvider} from './context/PushNotificationContext';
 import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import SplashScreen from './screens/SplashScreen';
 import {SystemBars} from 'react-native-bars';
 import theme from './styles/theme';
 import {CombinedAlert} from './components/AlertsWrapper';
@@ -43,8 +42,6 @@ dayjs.extend(updateLocale);
 const gestureStyle = {flex: 1, backgroundColor: theme.colors.black};
 
 const App: FC = () => {
-  const [displaySplash, setDisplaySplash] = useState(true);
-
   return (
     <>
       <GestureHandlerRootView style={gestureStyle}>
@@ -56,12 +53,6 @@ const App: FC = () => {
                   <CombinedAlert>
                     <AuthContextProvider>
                       <RootStack />
-
-                      {displaySplash && (
-                        <SplashScreen
-                          onDismiss={() => setDisplaySplash(false)}
-                        />
-                      )}
                     </AuthContextProvider>
                   </CombinedAlert>
                 </NotificationProvider>

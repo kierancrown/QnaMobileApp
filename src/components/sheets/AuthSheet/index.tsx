@@ -29,6 +29,7 @@ import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import MagicLinkConfirmationScreen from './screens/MagicLinkConfirmationScreen';
 import SuccessScreen from './screens/SuccessScreen';
 import {clearInitialSheetScreen} from 'app/redux/slices/authSheetSlice';
+import WelcomeScreen from './screens/onboarding/WelcomeScreen';
 
 interface AuthSheetProps {
   open?: boolean;
@@ -45,6 +46,7 @@ export type AuthStackParamList = {
     sentTimestamp: number;
   };
   SuccessScreen: undefined;
+  OnboardingWelcomeScreen: undefined;
 };
 
 export const navigationRef = createNavigationContainerRef<AuthStackParamList>();
@@ -81,10 +83,12 @@ const Navigator: FC<NavigatorProps> = ({}) => {
           overflow: 'hidden',
         },
         containerStyle: {
-          opacity: nextProgress?.interpolate({
-            inputRange: [0, 1],
-            outputRange: [1, 0],
-          }),
+          opacity: nextProgress
+            ? nextProgress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0],
+              })
+            : 1,
         },
       };
     },
@@ -127,6 +131,10 @@ const Navigator: FC<NavigatorProps> = ({}) => {
           component={MagicLinkConfirmationScreen}
         />
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+        <Stack.Screen
+          name="OnboardingWelcomeScreen"
+          component={WelcomeScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -202,7 +210,7 @@ const AuthSheet: FC<AuthSheetProps> = ({open = false, onClose}) => {
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         backdropComponent={null}
-        enablePanDownToClose
+        enablePanDownToClose={initialSheetScreen === 'OnboardingWelcomeScreen'}
         backgroundComponent={CustomBackground}
         maxDynamicContentSize={
           SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY
