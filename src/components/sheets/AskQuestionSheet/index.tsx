@@ -238,6 +238,7 @@ const AskQuestionSheet: FC<AskQuestionSheetProps> = ({
         ref={sheetRef}
         index={open ? 0 : -1}
         animateOnMount={false}
+        android_keyboardInputMode="adjustResize"
         handleComponent={null}
         snapPoints={snapPoints}
         keyboardBehavior="extend"

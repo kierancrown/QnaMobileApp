@@ -8,7 +8,6 @@ import {
   deletedAccount,
   resetAuth,
   resetCache,
-  resetDeletedAccount,
 } from 'app/redux/slices/authSlice';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {Buffer} from 'buffer';
@@ -79,32 +78,8 @@ export const AuthContextProvider = (props: any) => {
         setUserSession(session);
         setUser(session?.user ?? null);
 
-        if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
-          console.log('resetting deleted account');
-          dispatch(resetDeletedAccount());
-        } else if (event === 'SIGNED_IN') {
-          setTimeout(async () => {
-            const onboardingCompleted = await hasOnboarded(session?.user);
-            if (!onboardingCompleted) {
-              dispatch(
-                openAuthSheet({
-                  reason: 'none',
-                  initialScreen: 'OnboardingWelcomeScreen',
-                }),
-              );
-            } else {
-              dispatch(
-                openAuthSheet({reason: 'none', initialScreen: 'SuccessScreen'}),
-              );
-              // Register for push notifications
-              if (session) {
-                const sId = extractSessionId(session);
-                if (sId) {
-                  silentTokenRegistration(sId, true);
-                }
-              }
-            }
-          }, 0);
+        if (event === 'SIGNED_IN') {
+          // TODO: Old stuff here
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setUserSession(null);
@@ -213,10 +188,47 @@ export const AuthContextProvider = (props: any) => {
             refresh_token: refreshToken,
             access_token: accessToken,
           })
-          .then(res => {
+          .then(async res => {
             setUser(res.data.user);
+            const session = res.data.session;
+            if (!session) {
+              openAlert({
+                title: 'Error',
+                message: 'Session is null',
+              });
+            } else {
+              const onboardingCompleted = await hasOnboarded(session?.user);
+              if (!onboardingCompleted) {
+                dispatch(
+                  openAuthSheet({
+                    reason: 'none',
+                    initialScreen: 'OnboardingWelcomeScreen',
+                  }),
+                );
+              } else {
+                dispatch(
+                  openAuthSheet({
+                    reason: 'none',
+                    initialScreen: 'SuccessScreen',
+                  }),
+                );
+                // Register for push notifications
+                if (session) {
+                  const sId = extractSessionId(session);
+                  if (sId) {
+                    silentTokenRegistration(sId, true);
+                  }
+                }
+              }
+            }
           })
-          .catch(err => console.log({err}));
+          .catch(err => {
+            const error = err as Error;
+            openAlert({
+              title: 'Error',
+              message: error.message,
+            });
+          });
       }
     });
     return () => {
