@@ -202,8 +202,12 @@ const AuthSheet: FC<AuthSheetProps> = () => {
 
   useAndroidBack(onDismiss);
 
-  const sheet = useMemo(
-    () => (
+  const sheet = useMemo(() => {
+    const isOnboarding =
+      initialSheetScreen === 'AuthPromptScreen' ||
+      initialSheetScreen === 'OnboardingTopicsScreen' ||
+      initialSheetScreen === 'OnboardingCommunityGuidelinesScreen';
+    return (
       <BottomSheet
         ref={sheetRef}
         index={authSheetOpen ? 0 : -1}
@@ -212,13 +216,8 @@ const AuthSheet: FC<AuthSheetProps> = () => {
         onChange={handleSheetChanges}
         animatedIndex={animatedPosition}
         keyboardBehavior="extend"
-        enablePanDownToClose={
-          !(
-            initialSheetScreen === 'OnboardingWelcomeScreen' ||
-            initialSheetScreen === 'OnboardingTopicsScreen' ||
-            initialSheetScreen === 'OnboardingCommunityGuidelinesScreen'
-          )
-        }
+        enableHandlePanningGesture={false}
+        enablePanDownToClose={!isOnboarding}
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         backdropComponent={null}
@@ -228,17 +227,16 @@ const AuthSheet: FC<AuthSheetProps> = () => {
         }>
         <Navigator />
       </BottomSheet>
-    ),
-    [
-      animatedPosition,
-      authSheetOpen,
-      handleSheetChanges,
-      snapPoints,
-      theme.spacing.mY,
-      topSafeAreaInset,
-      initialSheetScreen,
-    ],
-  );
+    );
+  }, [
+    animatedPosition,
+    authSheetOpen,
+    handleSheetChanges,
+    snapPoints,
+    theme.spacing.mY,
+    topSafeAreaInset,
+    initialSheetScreen,
+  ]);
 
   return (
     <>
