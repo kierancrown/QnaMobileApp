@@ -30,6 +30,7 @@ import MagicLinkConfirmationScreen from './screens/MagicLinkConfirmationScreen';
 import SuccessScreen from './screens/SuccessScreen';
 import {clearInitialSheetScreen} from 'app/redux/slices/authSheetSlice';
 import WelcomeScreen from './screens/onboarding/WelcomeScreen';
+import ApperanceScreen from './screens/onboarding/ApperanceScreen';
 
 interface AuthSheetProps {
   open?: boolean;
@@ -47,6 +48,7 @@ export type AuthStackParamList = {
   };
   SuccessScreen: undefined;
   OnboardingWelcomeScreen: undefined;
+  OnboardingApperanceScreen: undefined;
 };
 
 export const navigationRef = createNavigationContainerRef<AuthStackParamList>();
@@ -134,6 +136,10 @@ const Navigator: FC<NavigatorProps> = ({}) => {
         <Stack.Screen
           name="OnboardingWelcomeScreen"
           component={WelcomeScreen}
+        />
+        <Stack.Screen
+          name="OnboardingApperanceScreen"
+          component={ApperanceScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

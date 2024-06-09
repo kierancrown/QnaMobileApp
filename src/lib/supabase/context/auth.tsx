@@ -68,9 +68,31 @@ export const AuthContextProvider = (props: any) => {
   };
 
   useMount(() => {
-    supabase.auth.getSession().then(({data: {session}}) => {
+    supabase.auth.getSession().then(async ({data: {session}}) => {
       setUserSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        const onboardingCompleted = await hasOnboarded(session?.user);
+        if (onboardingCompleted !== true) {
+          console.log('Onboarding step', onboardingCompleted);
+          dispatch(
+            openAuthSheet({
+              reason: 'none',
+              initialScreen:
+                onboardingCompleted === 0
+                  ? 'OnboardingWelcomeScreen'
+                  : 'OnboardingApperanceScreen',
+            }),
+          );
+        }
+        // Register for push notifications
+        if (session) {
+          const sId = extractSessionId(session);
+          if (sId) {
+            silentTokenRegistration(sId, true);
+          }
+        }
+      }
     });
 
     const {data: authListener} = supabase.auth.onAuthStateChange(
@@ -182,6 +204,9 @@ export const AuthContextProvider = (props: any) => {
       const refreshToken = url.searchParams.get('refresh_token');
       const accessToken = url.searchParams.get('access_token');
 
+      console.log('Refresh token', refreshToken);
+      console.log('Access token', accessToken);
+
       if (accessToken && refreshToken) {
         supabase.auth
           .setSession({
@@ -196,13 +221,22 @@ export const AuthContextProvider = (props: any) => {
                 title: 'Error',
                 message: 'Session is null',
               });
+            } else if (!res.data.user) {
+              openAlert({
+                title: 'Error',
+                message: 'User is null',
+              });
             } else {
               const onboardingCompleted = await hasOnboarded(session?.user);
-              if (!onboardingCompleted) {
+              if (onboardingCompleted !== true) {
+                console.log('Onboarding step', onboardingCompleted);
                 dispatch(
                   openAuthSheet({
                     reason: 'none',
-                    initialScreen: 'OnboardingWelcomeScreen',
+                    initialScreen:
+                      onboardingCompleted === 0
+                        ? 'OnboardingWelcomeScreen'
+                        : 'OnboardingApperanceScreen',
                   }),
                 );
               } else {
@@ -212,12 +246,12 @@ export const AuthContextProvider = (props: any) => {
                     initialScreen: 'SuccessScreen',
                   }),
                 );
-                // Register for push notifications
-                if (session) {
-                  const sId = extractSessionId(session);
-                  if (sId) {
-                    silentTokenRegistration(sId, true);
-                  }
+              }
+              // Register for push notifications
+              if (session) {
+                const sId = extractSessionId(session);
+                if (sId) {
+                  silentTokenRegistration(sId, true);
                 }
               }
             }

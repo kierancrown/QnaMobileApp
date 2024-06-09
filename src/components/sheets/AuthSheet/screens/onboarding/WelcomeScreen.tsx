@@ -33,6 +33,8 @@ import {Keyboard, Pressable} from 'react-native';
 import {FlexStyle} from 'app/helpers/commonStyles';
 import {MeasureSize} from 'app/components/utils/MeasureSize';
 import {useUsernameCheck} from '../../hooks/useUsernameCheck';
+import {useOnboarding} from 'app/hooks/useOnboarding';
+import {openAlert} from 'app/redux/slices/alertSlice';
 
 const WelcomeScreen: FC = () => {
   const {
@@ -42,11 +44,14 @@ const WelcomeScreen: FC = () => {
   const {top: topSafeAreaInset, bottom: bottomSafeAreaInset} =
     useSafeAreaInsets();
   const {navigate} = useNavigation<NavigationProp<AuthStackParamList>>();
-  useSheetNavigationHeight(SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY);
+  useSheetNavigationHeight(
+    SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY,
+    false,
+  );
   const [headerHeight, setHeaderHeight] = useState(0);
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
-
+  const {completeStep1} = useOnboarding();
   const charsRemaining = useMemo(() => MAX_BIO_LENGTH - bio.length, [bio]);
   const [settingInformation, setSettingInformation] = useState(false);
   const keyboard = useAnimatedKeyboard();
@@ -102,6 +107,20 @@ const WelcomeScreen: FC = () => {
     };
   }, []);
   // #endregion
+
+  const nextStep = async () => {
+    setSettingInformation(true);
+    const result = await completeStep1(username, bio);
+    if (result) {
+      navigate('OnboardingApperanceScreen');
+    } else {
+      setSettingInformation(false);
+      openAlert({
+        title: 'Something went wrong',
+        message: 'Please try again',
+      });
+    }
+  };
 
   return (
     <Pressable style={FlexStyle} onPress={() => Keyboard.dismiss()}>
@@ -204,11 +223,13 @@ const WelcomeScreen: FC = () => {
             titleVariant="bodyBold"
             borderRadius="textInput"
             minWidth="100%"
+            onPress={nextStep}
             disabled={
               charsRemaining < 0 ||
               !usernameAvailable ||
               invalidUsername ||
               settingInformation ||
+              username.length < 3 ||
               checkingUsername
             }
           />
