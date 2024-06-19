@@ -1,15 +1,15 @@
 import {useState} from 'react';
 import useMount from './useMount';
-import {useUser} from 'app/lib/supabase/context/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const usePreference = <T,>(key: string, defaultValue: T) => {
   const [value, _setValue] = useState<T>(defaultValue);
   const [loading, setLoading] = useState(false);
-  const {user} = useUser();
+  const {profile, authStatus} = useAuth();
 
   const refresh = async () => {
-    if (!user?.id) {
+    if (authStatus !== 'SIGNED_IN') {
       return;
     }
     setLoading(true);
@@ -18,7 +18,7 @@ const usePreference = <T,>(key: string, defaultValue: T) => {
   };
 
   const setValue = async (newValue: T) => {
-    if (user?.id) {
+    if (authStatus === 'SIGNED_IN') {
       setLoading(true);
       _setValue(newValue);
       try {
@@ -32,22 +32,22 @@ const usePreference = <T,>(key: string, defaultValue: T) => {
   };
 
   const saveToDisk = async (newValue: T) => {
-    if (!user?.id) {
+    if (authStatus !== 'SIGNED_IN' || !profile?.user_id) {
       return;
     }
     const convertedValue =
       typeof newValue === 'object'
         ? JSON.stringify(newValue)
         : String(newValue);
-    const concatedKey = `${user.id}-${key}`;
+    const concatedKey = `${profile?.user_id}-${key}`;
     return AsyncStorage.setItem(concatedKey, convertedValue);
   };
 
   const loadFromDisk = async () => {
-    if (!user?.id) {
+    if (authStatus !== 'SIGNED_IN' || !profile?.user_id) {
       return;
     }
-    const concatedKey = `${user.id}-${key}`;
+    const concatedKey = `${profile?.user_id}-${key}`;
     const storedValue = await AsyncStorage.getItem(concatedKey);
     if (storedValue) {
       _setValue(JSON.parse(storedValue));

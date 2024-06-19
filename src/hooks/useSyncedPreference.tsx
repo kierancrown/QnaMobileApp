@@ -1,18 +1,18 @@
 import {useState} from 'react';
 import useMount from './useMount';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {Json} from 'app/types/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const useSyncedPreference = <T,>(key: string, defaultValue: T) => {
   const [id, setId] = useState<number>();
   const [value, _setValue] = useState<T>(defaultValue);
   const [loading, setLoading] = useState(false);
-  const {user} = useUser();
+  const {authStatus, profile} = useAuth();
 
   const refresh = async () => {
-    if (!user?.id) {
+    if (authStatus !== 'SIGNED_IN' || !profile?.user_id) {
       setLoading(false);
       return;
     }
@@ -21,7 +21,7 @@ const useSyncedPreference = <T,>(key: string, defaultValue: T) => {
       .from('user_preferences')
       .select('id, value')
       .eq('key', key)
-      .eq('user_id', user.id)
+      .eq('user_id', profile.user_id)
       .then(({data, error}) => {
         if (error) {
           console.error('Error fetching user preferences', error);
@@ -40,7 +40,7 @@ const useSyncedPreference = <T,>(key: string, defaultValue: T) => {
   };
 
   const setValue = async (newValue: T) => {
-    if (user?.id) {
+    if (authStatus === 'SIGNED_IN' && profile?.user_id) {
       setLoading(true);
       _setValue(newValue);
       try {
@@ -50,7 +50,7 @@ const useSyncedPreference = <T,>(key: string, defaultValue: T) => {
           value: (typeof newValue === 'string'
             ? {value: newValue}
             : newValue) as Json,
-          user_id: user.id,
+          user_id: profile.user_id,
         });
 
         if (error) {

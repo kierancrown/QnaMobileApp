@@ -37,11 +37,11 @@ import {useSubmitQuestion} from 'app/components/sheets/AskQuestionSheet/hooks/us
 import ReplySheet from 'app/components/sheets/ReplySheet';
 import {closeReplySheet} from 'app/redux/slices/replySlice';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {setAvatarImageUrl} from 'app/redux/slices/authSlice';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import notifee, {EventType} from '@notifee/react-native';
 import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -109,14 +109,14 @@ export default function TabStack() {
   const {submit} = useSubmitQuestion();
   const dispatch = useAppDispatch();
   const {navigate} = useNavigation<NavigationProp<InboxStackParamList>>();
-  const {user} = useUser();
+  const {authStatus, profile} = useAuth();
 
   useEffect(() => {
-    if (user) {
+    if (authStatus === 'SIGNED_IN' && profile?.user_id) {
       supabase
         .from('user_metadata')
         .select('profile_picture')
-        .eq('user_id', user.id!)
+        .eq('user_id', profile.user_id)
         .single()
         .then(({data}) => {
           if (data?.profile_picture) {
@@ -125,7 +125,7 @@ export default function TabStack() {
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [authStatus, profile?.user_id]);
 
   useEffect(() => {
     return notifee.onForegroundEvent(({type, detail}) => {
@@ -171,7 +171,7 @@ export default function TabStack() {
               navigate('QuestionDetail', {
                 questionId: item.id,
                 responseCount: item.question_metadata?.response_count || 0,
-                isOwner: item.user_id === user?.id,
+                isOwner: item.user_id === profile?.user_id,
                 ownerUsername: item.user_metadata?.username || 'Anonymous',
                 ownerVerified: item.user_metadata?.verified || false,
                 skeletonLayout: {
@@ -197,7 +197,7 @@ export default function TabStack() {
           break;
       }
     });
-  }, [user?.id, navigate]);
+  }, [profile?.user_id, navigate]);
 
   return (
     <TabBarProvider>
@@ -210,7 +210,7 @@ export default function TabStack() {
                 iOS: HapticFeedbackTypes.impactMedium,
                 android: HapticFeedbackTypes.effectHeavyClick,
               }).then();
-              if (user) {
+              if (authStatus === 'SIGNED_IN' && profile?.user_id) {
                 setQuestionSheetOpen(true);
               } else {
                 dispatch(openAuthSheet({reason: 'post'}));

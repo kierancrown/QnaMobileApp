@@ -9,15 +9,14 @@ import {Platform, PermissionsAndroid, Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
 import {useAppDispatch} from 'app/redux/store';
 import {setUnreadCount} from 'app/redux/slices/notificationSlice';
-import {getUserId} from 'app/lib/supabase/helpers/userId';
 import theme from 'app/styles/theme';
 import {Notification} from 'app/screens/Inbox/Screen';
 import {Flex} from 'app/components/common';
 import InAppNotification from 'app/components/InAppNotification';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 // Define the context
 interface NotificationContextType {
@@ -55,12 +54,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
   const dispatch = useAppDispatch();
-  const {user} = useUser();
+  const {profile, authStatus} = useAuth();
   const [currentNotification, setCurrentNotification] =
     useState<Notification>();
 
   const getUnreadCount = useCallback(async () => {
-    const userId = await getUserId();
+    const userId = profile?.user_id;
     if (!userId) {
       return 0;
     }
@@ -78,7 +77,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     console.log('Unread count:', data?.length);
 
     return data?.length || 0;
-  }, []);
+  }, [profile?.user_id]);
 
   const getToken = async () => {
     if (Platform.OS === 'ios') {
@@ -154,10 +153,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       }
     }
 
-    const authStatus = await messaging().requestPermission();
+    const fbAuthStatus = await messaging().requestPermission();
     const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      fbAuthStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      fbAuthStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
       const token = await getToken();
@@ -176,7 +175,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     sessionId: string,
     skipUserCheck = false,
   ) => {
-    if (!skipUserCheck && !user) {
+    if (!skipUserCheck && authStatus !== 'SIGNED_IN') {
       return;
     }
 
@@ -251,11 +250,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       messaging().onMessage(onForegroundMessage);
       messaging().setBackgroundMessageHandler(onMessageReceived);
     };
-  }, [dispatch, getUnreadCount, user]);
+  }, [dispatch, getUnreadCount, authStatus]);
 
   useEffect(() => {
     (async () => {
-      const userId = await getUserId();
+      const userId = profile?.user_id;
       if (userId) {
         const unreadCount = await getUnreadCount();
         dispatch(setUnreadCount(unreadCount));
@@ -263,7 +262,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         console.log('User not found');
       }
     })();
-  }, [dispatch, getUnreadCount]);
+  }, [dispatch, getUnreadCount, profile?.user_id]);
 
   return (
     <NotificationContext.Provider

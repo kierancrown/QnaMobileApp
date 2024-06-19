@@ -35,6 +35,8 @@ import {
 import WelcomeScreen from './screens/onboarding/WelcomeScreen';
 import TopicsScreen from './screens/onboarding/TopicsScreen';
 import CommunityGuidelinesScreen from './screens/onboarding/CommunityGuidelinesScreen';
+import {useFeatureFlag} from 'app/wrappers/FeatureFlagProvider';
+import OtpScreen from './screens/OtpScreen';
 
 interface AuthSheetProps {}
 
@@ -42,7 +44,13 @@ export type AuthStackParamList = {
   AuthPromptScreen: {
     reason: string;
   };
-  AuthScreen: {};
+  AuthScreen: {
+    authType?: 'otp' | 'magic_link';
+  };
+  OtpScreen: {
+    email: string;
+    sentTimestamp: number;
+  };
   MagicLinkConfirmationScreen: {
     email: string;
     sentTimestamp: number;
@@ -64,6 +72,7 @@ interface NavigatorProps {}
 
 const Navigator: FC<NavigatorProps> = ({}) => {
   const theme = useAppTheme();
+  const magicLinkEnabled = useFeatureFlag<boolean>('auth_magic_link', false);
 
   const forCardPopin: StackCardStyleInterpolator = useCallback(
     ({current, next}) => {
@@ -129,11 +138,18 @@ const Navigator: FC<NavigatorProps> = ({}) => {
         screenOptions={screenOptions}
         initialRouteName="AuthPromptScreen">
         <Stack.Screen name="AuthPromptScreen" component={AuthPromptScreen} />
-        <Stack.Screen name="AuthScreen" component={Screen} />
+        <Stack.Screen
+          name="AuthScreen"
+          component={Screen}
+          initialParams={{
+            authType: magicLinkEnabled === true ? 'magic_link' : 'otp',
+          }}
+        />
         <Stack.Screen
           name="MagicLinkConfirmationScreen"
           component={MagicLinkConfirmationScreen}
         />
+        <Stack.Screen name="OtpScreen" component={OtpScreen} />
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
         <Stack.Screen
           name="OnboardingWelcomeScreen"

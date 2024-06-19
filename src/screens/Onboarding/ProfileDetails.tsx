@@ -15,7 +15,6 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import axios from 'axios';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {decode} from 'base64-arraybuffer';
 import {useDebounceValue} from 'usehooks-ts';
 import Input from 'app/components/common/TextInput';
@@ -33,9 +32,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {useAlert} from 'app/components/AlertsWrapper';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const ProfileDetails = () => {
-  const {user} = useUser();
+  const {authStatus, profile} = useAuth();
   const avatarRef = useRef<AvatarRef>(null);
   const {updateUsername} = useUsername();
   const {completeOnboarding} = useOnboarding();
@@ -239,8 +239,8 @@ const ProfileDetails = () => {
     setLoading(true);
     try {
       const success = await updateUsername(username.trim());
-      if (success && user) {
-        await completeOnboarding(user);
+      if (success && authStatus === 'SIGNED_IN' && profile?.user_id) {
+        await completeOnboarding();
       } else {
         openAlert({
           title: 'Something went wrong',

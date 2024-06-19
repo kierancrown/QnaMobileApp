@@ -1,17 +1,17 @@
 import {useCallback, useEffect, useState} from 'react';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {PixelRatio} from 'react-native';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 export const useProfilePicture = (userId?: string, size?: number) => {
-  const {user} = useUser();
+  const {profile, authStatus} = useAuth();
   const [profilePictureThumbhash, setProfilePictureThumbhash] =
     useState<string>();
   const [profilePicture, setProfilePicture] = useState<string>();
   const imageSize = parseInt(((size ?? 100) * PixelRatio.get()).toFixed(), 10);
 
   const refreshProfilePicture = useCallback(() => {
-    if (!user && !userId) {
+    if (authStatus !== 'SIGNED_IN' || !profile?.user_id) {
       setProfilePicture(undefined);
       return;
     }
@@ -26,7 +26,7 @@ export const useProfilePicture = (userId?: string, size?: number) => {
         )
         `,
       )
-      .eq('user_id', userId ?? user.id)
+      .eq('user_id', userId ?? profile.user_id)
       .single()
       .then(({data, error}) => {
         if (error) {
@@ -49,7 +49,7 @@ export const useProfilePicture = (userId?: string, size?: number) => {
           setProfilePicture(d.publicUrl);
         }
       });
-  }, [imageSize, user, userId]);
+  }, [authStatus, imageSize, profile?.user_id, userId]);
 
   // const deleteProfilePicture = async (): Promise<boolean> => {
   //   return new Promise((resolve, reject) => {

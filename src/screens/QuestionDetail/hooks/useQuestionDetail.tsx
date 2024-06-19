@@ -1,15 +1,15 @@
-import {useUser} from 'app/lib/supabase/context/auth';
 import {useCallback, useMemo, useState} from 'react';
 import useMount from '../../../hooks/useMount';
 import {supabase} from 'app/lib/supabase';
 import {QuestionsDetailData} from 'app/lib/supabase/queries/questionDetail';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 interface UseQuestionDetailProps {
   questionId: number;
 }
 
 export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
-  const {user} = useUser();
+  const {authStatus, profile} = useAuth();
 
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [question, setQuestion] = useState<QuestionsDetailData | null>(null);
@@ -29,12 +29,12 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
     async (id?: number) => {
       setUpvoteLoading(true);
       // Get upvoted status
-      if ((id || question) && user) {
+      if ((id || question) && authStatus === 'SIGNED_IN' && profile) {
         const {data, error: e} = await supabase
           .from('question_upvotes')
           .select('id')
           .eq('question_id', id ?? question!.id)
-          .eq('user_id', user.id);
+          .eq('user_id', profile.user_id);
         if (e) {
           setError(e.message);
         } else {
@@ -63,11 +63,11 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
 
       setUpvoteLoading(false);
     },
-    [question, user],
+    [question, authStatus, profile],
   );
 
   const upvoteQuestion = async () => {
-    if (!question || !user) {
+    if (!question || authStatus !== 'SIGNED_IN' || !profile) {
       setError('You must be logged in to upvote a question');
       return false;
     }
@@ -77,7 +77,7 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
         .from('question_upvotes')
         .delete()
         .eq('question_id', question.id)
-        .eq('user_id', user.id);
+        .eq('user_id', profile.user_id);
 
       if (e) {
         setError(e.message);
@@ -87,7 +87,7 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
       // add upvote
       const {error: e} = await supabase
         .from('question_upvotes')
-        .insert({question_id: question.id, user_id: user.id});
+        .insert({question_id: question.id, user_id: profile.user_id});
 
       if (e) {
         setError(e.message);
@@ -100,7 +100,12 @@ export const useQuestionDetail = ({questionId}: UseQuestionDetailProps) => {
 
   const deleteQuestion = async () => {
     setDeleteLoading(true);
-    if (!question || !user || question.user_id !== user.id) {
+    if (
+      !question ||
+      authStatus !== 'SIGNED_IN' ||
+      !profile ||
+      question.user_id !== profile.user_id
+    ) {
       setError('You do not have permission to delete this question');
     } else {
       const {error: e} = await supabase

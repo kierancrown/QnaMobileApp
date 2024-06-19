@@ -30,7 +30,7 @@ import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import Username from 'app/components/Username';
 import {openReplySheet} from 'app/redux/slices/replySlice';
 import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
-import {useUser} from 'app/lib/supabase/context/auth';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -66,7 +66,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
     appState => appState.persistent.auth.avatarImageUrl,
   );
   const {triggerHaptic} = useHaptics();
-  const {user} = useUser();
+  const {authStatus} = useAuth();
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
   const dispatch = useAppDispatch();
@@ -279,7 +279,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
                   iOS: HapticFeedbackTypes.impactMedium,
                   android: HapticFeedbackTypes.effectHeavyClick,
                 });
-                if (user) {
+                if (authStatus === 'SIGNED_IN') {
                   dispatch(openReplySheet());
                 } else {
                   dispatch(openAuthSheet({reason: 'reply'}));

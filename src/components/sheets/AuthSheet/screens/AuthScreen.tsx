@@ -36,7 +36,7 @@ const isValidEmail = (email: string) => {
 
 const AuthScreen: FC = () => {
   const {
-    params: {},
+    params: {authType},
   } = useRoute<RouteProp<AuthStackParamList, 'AuthScreen'>>();
   const open = useAppSelector(state => state.nonPersistent.authSheet.sheetOpen);
   const [email, setEmail] = useState('');
@@ -63,7 +63,8 @@ const AuthScreen: FC = () => {
     const {error} = await supabase.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: 'qna://login',
+        emailRedirectTo: authType === 'magic_link' ? 'qna://login' : undefined,
+        shouldCreateUser: false,
       },
     });
     setLoading(false);
@@ -74,10 +75,13 @@ const AuthScreen: FC = () => {
       });
       return;
     } else {
-      navigate('MagicLinkConfirmationScreen', {
-        email,
-        sentTimestamp: Date.now(),
-      });
+      navigate(
+        authType === 'magic_link' ? 'MagicLinkConfirmationScreen' : 'OtpScreen',
+        {
+          email,
+          sentTimestamp: Date.now(),
+        },
+      );
     }
   };
 
@@ -86,7 +90,10 @@ const AuthScreen: FC = () => {
       <VStack py="mY" px="s" rowGap="xxlY" pt="xlY">
         <VStack px="s" rowGap="xsY">
           <Text variant="header">Login</Text>
-          <Text variant="bodyBold">We'll send a magic link to your email</Text>
+          <Text variant="bodyBold">
+            We'll send a {authType === 'magic_link' ? 'magic link' : 'code'} to
+            your email
+          </Text>
         </VStack>
         <Input
           value={email}
@@ -127,7 +134,13 @@ const AuthScreen: FC = () => {
         <Button
           variant="primary"
           disabled={loading || !isValidEmail(email)}
-          title={loading ? 'Delivering magic' : 'Send magic link'}
+          title={
+            loading
+              ? `Delivering ${
+                  authType === 'magic_link' ? 'magic link' : 'code'
+                }`
+              : `Send ${authType === 'magic_link' ? 'magic link' : 'code'}`
+          }
           titleVariant="bodyBold"
           borderRadius="textInput"
           minWidth="100%"

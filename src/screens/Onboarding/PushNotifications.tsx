@@ -8,13 +8,13 @@ import {Linking, StyleSheet} from 'react-native';
 import {useNotification} from 'app/context/PushNotificationContext';
 import {useNavigation} from '@react-navigation/native';
 import {OnboardingStackNavigationProp} from 'app/navigation/OnboardingStack';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {isEmulator} from 'react-native-device-info';
 import useMount from 'app/hooks/useMount';
 import {useAlert} from 'app/components/AlertsWrapper';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const PushNotifications = () => {
-  const {sessionId} = useUser();
+  const {sessionId} = useAuth();
   const animation = useRef<LottieView>(null);
   const {requestPermission, checkPermission} = useNotification();
   const {navigate} = useNavigation<OnboardingStackNavigationProp>();

@@ -8,7 +8,6 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import ThemeProvider from './wrappers/ThemeProvider';
-import {AuthContextProvider} from './lib/supabase/context/auth';
 import {NotificationProvider} from './context/PushNotificationContext';
 
 import dayjs from 'dayjs';
@@ -17,6 +16,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import {SystemBars} from 'react-native-bars';
 import theme from './styles/theme';
 import {CombinedAlert} from './components/AlertsWrapper';
+import AuthProvider from './wrappers/AuthProvider';
+import {FeatureFlagProvider} from './wrappers/FeatureFlagProvider';
 
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
@@ -51,9 +52,11 @@ const App: FC = () => {
               <ThemeProvider>
                 <NotificationProvider>
                   <CombinedAlert>
-                    <AuthContextProvider>
-                      <RootStack />
-                    </AuthContextProvider>
+                    <FeatureFlagProvider>
+                      <AuthProvider>
+                        <RootStack />
+                      </AuthProvider>
+                    </FeatureFlagProvider>
                   </CombinedAlert>
                 </NotificationProvider>
               </ThemeProvider>

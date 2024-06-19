@@ -16,18 +16,18 @@ import QuestionItem from 'app/components/QuestionItem';
 
 import {HapticFeedbackTypes, useHaptics} from 'app/hooks/useHaptics';
 import {useTabBarAnimation, useTabPress} from 'app/context/tabBarContext';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {FlashList} from '@shopify/flash-list';
 import HeaderComponent from './components/header';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAlert} from 'app/components/AlertsWrapper';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
   const theme = useTheme<Theme>();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
-  const {user} = useUser();
+  const {profile} = useAuth();
   const {openAlert} = useAlert();
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);
@@ -121,7 +121,7 @@ const Questions: FC = () => {
                 navigate('QuestionDetail', {
                   questionId: item.id,
                   responseCount: item.question_metadata?.response_count || 0,
-                  isOwner: item.user_id === user?.id,
+                  isOwner: item.user_id === profile?.user_id,
                   ownerUsername: item.user_metadata?.username || 'Anonymous',
                   ownerVerified: item.user_metadata?.verified || false,
                   skeletonLayout: {
@@ -155,7 +155,7 @@ const Questions: FC = () => {
               }
               nsfw={item.nsfw}
               userVerified={item.user_metadata?.verified || false}
-              isOwner={item.user_id === user?.id}
+              isOwner={item.user_id === profile?.user_id}
               id={item.id}
               avatarImage={{
                 // @ts-ignore

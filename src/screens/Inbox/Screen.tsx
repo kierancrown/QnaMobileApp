@@ -2,7 +2,6 @@ import React, {FC, useMemo, useRef, useState} from 'react';
 import {ActivityLoader, Center, Flex, HStack, Text} from 'ui';
 import {Database} from 'app/types/supabase';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
@@ -23,6 +22,7 @@ import {InboxStackParamList} from 'app/navigation/InboxStack';
 import Username from 'app/components/Username';
 import {useAlert} from 'app/components/AlertsWrapper';
 import InboxIcon from 'app/assets/icons/tabbar/Inbox.svg';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 
@@ -30,7 +30,7 @@ const InboxScreen: FC = () => {
   const theme = useTheme<Theme>();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
-  const {user} = useUser();
+  const {authStatus, profile} = useAuth();
   const {openAlert} = useAlert();
   const dispatch = useAppDispatch();
   const {navigate} = useNavigation<NavigationProp<InboxStackParamList>>();
@@ -78,7 +78,7 @@ const InboxScreen: FC = () => {
   });
 
   const refreshNotifications = async (initialLoad = false) => {
-    if (!user) {
+    if (authStatus !== 'SIGNED_IN' || !profile?.user_id) {
       return;
     }
 
@@ -88,7 +88,7 @@ const InboxScreen: FC = () => {
     const {data, error} = await supabase
       .from('notifications')
       .select('*')
-      .eq('user_id', user?.id)
+      .eq('user_id', profile.user_id)
       .order('created_at', {ascending: false});
 
     if (error) {
@@ -222,7 +222,7 @@ const InboxScreen: FC = () => {
       navigate('QuestionDetail', {
         questionId: item.id,
         responseCount: item.question_metadata?.response_count || 0,
-        isOwner: item.user_id === user?.id,
+        isOwner: item.user_id === profile?.user_id,
         ownerUsername: item.user_metadata?.username || 'Anonymous',
         ownerVerified: item.user_metadata?.verified || false,
         skeletonLayout: {

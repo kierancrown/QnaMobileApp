@@ -4,7 +4,6 @@ import {ActivityLoader, Box, Flex, HStack, Text, VStack} from 'ui';
 
 import {Theme} from 'app/styles/theme';
 import {useTheme} from '@shopify/restyle';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {HomeStackParamList} from 'app/navigation/HomeStack';
 import {useReplyTabBar, useTabBarAnimation} from 'app/context/tabBarContext';
@@ -21,6 +20,7 @@ import useSheetHeight from 'app/components/sheets/ReplySheet/utils/useSheetHeigh
 import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import {setReplyData} from 'app/redux/slices/replySlice';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const QuestionDetailScreen: FC = () => {
   const {
@@ -31,7 +31,7 @@ const QuestionDetailScreen: FC = () => {
   );
   const dispatch = useAppDispatch();
   const theme = useTheme<Theme>();
-  const {user} = useUser();
+  const {profile} = useAuth();
   const scrollRef = useRef(null);
   const [refreshing] = useState(false);
   // Question detail hook
@@ -54,7 +54,7 @@ const QuestionDetailScreen: FC = () => {
     fetchNextPage,
   } = useResponses({questionId});
 
-  const isOwner = question?.user_id === user?.id;
+  const isOwner = question?.user_id === profile?.user_id;
 
   const {scrollHandlerWorklet} = useTabBarAnimation({
     scrollToTop: () => {
@@ -217,7 +217,7 @@ const QuestionDetailScreen: FC = () => {
               username={item.user_metadata?.username ?? 'Anonymous'}
               verified={item.user_metadata?.verified ?? false}
               userId={item.user_id}
-              isOwner={item.user_id === user?.id}
+              isOwner={item.user_id === profile?.user_id}
             />
           )}
         />

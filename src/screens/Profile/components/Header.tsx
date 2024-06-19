@@ -12,11 +12,8 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Center, HStack} from 'app/components/common';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
 
-import useProfile from 'app/hooks/useProfile';
-
 import BackIcon from 'app/assets/icons/arrows/ArrowLeft.svg';
 import ElipsisIcon from 'app/assets/icons/actions/ellipsis.svg';
-import {useUser} from 'app/lib/supabase/context/auth';
 import Username from 'app/components/Username';
 
 import {useAppTheme} from 'app/styles/theme';
@@ -33,6 +30,8 @@ import FlagIcon from 'app/assets/icons/Flag.svg';
 import BanIcon from 'app/assets/icons/Ban.svg';
 import AskUserIcon from 'app/assets/icons/actions/AskUserThick.svg';
 import OfflineAvatar from 'app/components/common/OfflineAvatar';
+import {useAuth} from 'app/wrappers/AuthProvider';
+import useProfile from 'app/hooks/useProfile';
 
 const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {goBack, navigate} =
@@ -40,14 +39,15 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
   const {
     params: {userId, displayBackButton},
   } = useRoute<RouteProp<ProfileStackParamList, 'Profile'>>();
+  const {authStatus, profile, logout} = useAuth();
   const {username, verified, avatar} = useProfile(userId);
-  const {user} = useUser();
-  const {logout} = useUser();
   const theme = useAppTheme();
+
+  console.log(profile?.user_id, userId);
 
   const menuItems: PopoverMenuItemsProps = useMemo(
     () =>
-      userId == null || user?.id === userId
+      authStatus === 'SIGNED_IN' && userId === undefined
         ? [
             {
               title: 'Your likes',
@@ -138,7 +138,7 @@ const HeaderComponent = ({showNavBar}: {showNavBar: SharedValue<number>}) => {
             },
           ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [userId, user],
+    [userId, profile],
   );
 
   return (

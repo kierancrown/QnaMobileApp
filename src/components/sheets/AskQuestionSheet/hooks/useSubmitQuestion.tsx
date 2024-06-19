@@ -1,8 +1,8 @@
 import {useAlert} from 'app/components/AlertsWrapper';
 import {supabase} from 'app/lib/supabase';
-import {useUser} from 'app/lib/supabase/context/auth';
 import {resetSheet, setLoading} from 'app/redux/slices/askSheetSlice';
 import {RootState, useAppDispatch} from 'app/redux/store';
+import {useAuth} from 'app/wrappers/AuthProvider';
 import {decode} from 'base64-arraybuffer';
 import {Asset} from 'react-native-image-picker';
 import {useSelector} from 'react-redux';
@@ -10,21 +10,21 @@ import {useSelector} from 'react-redux';
 export const useSubmitQuestion = () => {
   const dispatch = useAppDispatch();
   const {openAlert} = useAlert();
-  const {user} = useUser();
+  const {profile} = useAuth();
   const askSheetData = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,
   );
 
   const uploadAsset = async (asset: Asset): Promise<string> => {
     return new Promise((resolve, reject) => {
-      if (!asset.base64 || !user?.id) {
+      if (!asset.base64 || !profile?.user_id) {
         return;
       }
 
       supabase.storage
         .from('question_attatchments')
         .upload(
-          `public/${user.id}/${asset.timestamp ?? Date.now()}.jpg`,
+          `public/${profile.user_id}/${asset.timestamp ?? Date.now()}.jpg`,
           decode(asset.base64),
           {
             contentType: 'image/jpg',
@@ -49,7 +49,7 @@ export const useSubmitQuestion = () => {
     dispatch(setLoading(true));
 
     const askData = askSheetData;
-    const userId = user?.id;
+    const userId = profile?.user_id;
 
     if (!userId) {
       dispatch(setLoading(false));

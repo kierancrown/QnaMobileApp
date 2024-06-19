@@ -2,7 +2,6 @@ import React, {FC, useCallback, useState} from 'react';
 import {useAppDispatch} from 'app/redux/store';
 import {Text, VStack, Button, HStack, SafeAreaView, Center} from 'ui';
 
-import {useUser} from 'app/lib/supabase/context/auth';
 import {useBottomPadding} from 'app/hooks/useBottomPadding';
 
 import Profile from './Profile/Profile';
@@ -18,6 +17,7 @@ import GearIcon from 'app/assets/icons/gear.svg';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useAppTheme} from 'app/styles/theme';
 import {ProfileStackParamList} from 'app/navigation/ProfileStack';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 const ProfileScreen: FC = () => {
   const {navigate} = useNavigation<NavigationProp<ProfileStackParamList>>();
@@ -25,7 +25,7 @@ const ProfileScreen: FC = () => {
   const bottomListPadding = useBottomPadding();
   const dispatch = useAppDispatch();
   const theme = useAppTheme();
-  const {user} = useUser();
+  const {authStatus} = useAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -40,7 +40,7 @@ const ProfileScreen: FC = () => {
     dispatch(openAuthSheet({reason: 'none', initialScreen: 'AuthScreen'}));
   };
 
-  return !user ? (
+  return authStatus !== 'SIGNED_IN' ? (
     <SafeAreaView>
       <HStack py="xsY" px="s" justifyContent="flex-end">
         <TouchableOpacity

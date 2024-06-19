@@ -1,10 +1,10 @@
-import {useUser} from 'app/lib/supabase/context/auth';
 import {useEffect, useMemo, useState} from 'react';
 import {supabase} from 'app/lib/supabase';
+import {useAuth} from 'app/wrappers/AuthProvider';
 
 export const useProfile = (userId?: string) => {
-  const {user} = useUser();
-  const uid = useMemo(() => userId || user?.id, [userId, user]);
+  const {profile} = useAuth();
+  const uid = useMemo(() => userId || profile?.user_id, [userId, profile]);
 
   const [username, setUsername] = useState<string>('');
   const [avatar, setAvatar] = useState<string>('');
@@ -32,7 +32,7 @@ export const useProfile = (userId?: string) => {
           setVerified(data.verified);
         }
       });
-  }, [uid, user, userId]);
+  }, [uid, profile]);
 
   return {username, avatar, verified};
 };
