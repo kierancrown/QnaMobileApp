@@ -45,7 +45,10 @@ const AuthScreen: FC = () => {
   const theme = useAppTheme();
   const topSafeAreaInset = useSafeAreaInsets().top;
   const {navigate} = useNavigation<NavigationProp<AuthStackParamList>>();
-  useSheetNavigationHeight(SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY);
+  useSheetNavigationHeight(
+    SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY,
+    false,
+  );
 
   useEffect(() => {
     if (!open) {
@@ -64,7 +67,7 @@ const AuthScreen: FC = () => {
       email: email,
       options: {
         emailRedirectTo: authType === 'magic_link' ? 'qna://login' : undefined,
-        shouldCreateUser: false,
+        // shouldCreateUser: false,
       },
     });
     setLoading(false);

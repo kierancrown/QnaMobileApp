@@ -21,6 +21,7 @@ import {getEmailClients, openInbox} from 'react-native-email-link';
 import {isEmulatorSync} from 'react-native-device-info';
 import dayjs from 'dayjs';
 import {Alert, Linking} from 'react-native';
+import {useAuth} from 'app/hooks/useAuth';
 
 const OtpScreen: FC = () => {
   const {
@@ -37,6 +38,7 @@ const OtpScreen: FC = () => {
   const [secondsLeft, setSecondsLeft] = useState(60);
   const resendTimestamp = dayjs(sentTimestamp).add(60, 'second').valueOf();
   useSheetNavigationHeight(SCREEN_HEIGHT - topSafeAreaInset - theme.spacing.mY);
+  const {hasOnboarded, onboardingStep, authStatus} = useAuth({});
 
   useMount(() => {
     if (isEmulatorSync()) {
@@ -48,6 +50,21 @@ const OtpScreen: FC = () => {
       }
     });
   });
+
+  useEffect(() => {
+    if (authStatus === 'SIGNED_IN') {
+      if (hasOnboarded) {
+        navigate('SuccessScreen');
+      } else {
+        navigate(
+          onboardingStep === 0
+            ? 'OnboardingWelcomeScreen'
+            : 'OnboardingTopicsScreen',
+        );
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authStatus]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -116,17 +133,6 @@ const OtpScreen: FC = () => {
       return;
     }
   };
-
-  useMount(() => {
-    const {data: authListener} = supabase.auth.onAuthStateChange(event => {
-      if (event === 'SIGNED_IN') {
-        navigate('SuccessScreen');
-      }
-    });
-    return () => {
-      return authListener.subscription.unsubscribe();
-    };
-  });
 
   return (
     <SafeAreaView edges={['bottom']}>

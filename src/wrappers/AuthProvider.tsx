@@ -160,6 +160,7 @@ export default function AuthProvider({children}: AuthProviderProps) {
     return () => {
       Linking.removeAllListeners('url');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getProfile = useCallback(
@@ -217,7 +218,7 @@ export default function AuthProvider({children}: AuthProviderProps) {
         setAuthStatus('SIGNED_OUT');
       }
     },
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [getProfile],
   );
 
