@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {supabase} from 'app/lib/supabase';
 import {PixelRatio} from 'react-native';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from './useAuth';
 
 export const useProfilePicture = (userId?: string, size?: number) => {
-  const {profile, authStatus} = useAuth();
+  const {profile, authStatus} = useAuth({});
   const [profilePictureThumbhash, setProfilePictureThumbhash] =
     useState<string>();
   const [profilePicture, setProfilePicture] = useState<string>();

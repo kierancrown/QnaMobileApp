@@ -41,7 +41,7 @@ import {setAvatarImageUrl} from 'app/redux/slices/authSlice';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import notifee, {EventType} from '@notifee/react-native';
 import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from 'app/hooks/useAuth';
 
 export type TabStackParamList = {
   HomeTab: undefined;
@@ -109,7 +109,7 @@ export default function TabStack() {
   const {submit} = useSubmitQuestion();
   const dispatch = useAppDispatch();
   const {navigate} = useNavigation<NavigationProp<InboxStackParamList>>();
-  const {authStatus, profile} = useAuth();
+  const {authStatus, profile} = useAuth({});
 
   useEffect(() => {
     if (authStatus === 'SIGNED_IN' && profile?.user_id) {

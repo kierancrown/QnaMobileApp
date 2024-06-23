@@ -3,13 +3,13 @@ import useMount from './useMount';
 import {supabase} from 'app/lib/supabase';
 import {Json} from 'app/types/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from './useAuth';
 
 const useSyncedPreference = <T,>(key: string, defaultValue: T) => {
   const [id, setId] = useState<number>();
   const [value, _setValue] = useState<T>(defaultValue);
   const [loading, setLoading] = useState(false);
-  const {authStatus, profile} = useAuth();
+  const {authStatus, profile} = useAuth({});
 
   const refresh = async () => {
     if (authStatus !== 'SIGNED_IN' || !profile?.user_id) {

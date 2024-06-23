@@ -1,9 +1,9 @@
 import {useEffect, useMemo, useState} from 'react';
 import {supabase} from 'app/lib/supabase';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from './useAuth';
 
 export const useProfile = (userId?: string) => {
-  const {profile} = useAuth();
+  const {profile} = useAuth({});
   const uid = useMemo(() => userId || profile?.user_id, [userId, profile]);
 
   const [username, setUsername] = useState<string>('');

@@ -30,7 +30,7 @@ import {useAppDispatch, useAppSelector} from 'app/redux/store';
 import Username from 'app/components/Username';
 import {openReplySheet} from 'app/redux/slices/replySlice';
 import {openAuthSheet} from 'app/redux/slices/authSheetSlice';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from 'app/hooks/useAuth';
 
 interface FloatTabBarProps {
   state: TabNavigationState<ParamListBase>;
@@ -66,7 +66,7 @@ export const FloatingTabBar: FC<FloatTabBarProps> = ({
     appState => appState.persistent.auth.avatarImageUrl,
   );
   const {triggerHaptic} = useHaptics();
-  const {authStatus} = useAuth();
+  const {authStatus} = useAuth({});
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
   const dispatch = useAppDispatch();

@@ -1,8 +1,8 @@
 import {supabase} from 'app/lib/supabase';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from './useAuth';
 
 export const useUsername = () => {
-  const {authStatus, profile, refreshProfile} = useAuth();
+  const {authStatus, profile} = useAuth({});
 
   const username = profile?.username ?? undefined;
   const isVerified = profile?.verified ?? false;
@@ -23,7 +23,7 @@ export const useUsername = () => {
         throw error;
       }
     }
-    refreshProfile();
+    // refreshProfile();
     return true;
   };
 

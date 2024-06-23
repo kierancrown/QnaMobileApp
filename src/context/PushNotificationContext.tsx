@@ -16,7 +16,7 @@ import theme from 'app/styles/theme';
 import {Notification} from 'app/screens/Inbox/Screen';
 import {Flex} from 'app/components/common';
 import InAppNotification from 'app/components/InAppNotification';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from 'app/hooks/useAuth';
 
 // Define the context
 interface NotificationContextType {
@@ -54,7 +54,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
   const dispatch = useAppDispatch();
-  const {profile, authStatus} = useAuth();
+  const {profile, authStatus} = useAuth({});
   const [currentNotification, setCurrentNotification] =
     useState<Notification>();
 

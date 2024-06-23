@@ -1,8 +1,8 @@
 import {useAlert} from 'app/components/AlertsWrapper';
+import {useAuth} from 'app/hooks/useAuth';
 import {supabase} from 'app/lib/supabase';
 import {resetSheet, setLoading} from 'app/redux/slices/askSheetSlice';
 import {RootState, useAppDispatch} from 'app/redux/store';
-import {useAuth} from 'app/wrappers/AuthProvider';
 import {decode} from 'base64-arraybuffer';
 import {Asset} from 'react-native-image-picker';
 import {useSelector} from 'react-redux';
@@ -10,7 +10,7 @@ import {useSelector} from 'react-redux';
 export const useSubmitQuestion = () => {
   const dispatch = useAppDispatch();
   const {openAlert} = useAlert();
-  const {profile} = useAuth();
+  const {profile} = useAuth({});
   const askSheetData = useSelector(
     (state: RootState) => state.nonPersistent.askSheet,
   );

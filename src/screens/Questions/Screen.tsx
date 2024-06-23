@@ -20,14 +20,14 @@ import {FlashList} from '@shopify/flash-list';
 import HeaderComponent from './components/header';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAlert} from 'app/components/AlertsWrapper';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from 'app/hooks/useAuth';
 
 const Questions: FC = () => {
   const {navigate} = useNavigation<HomeStackNavigationProp>();
   const theme = useTheme<Theme>();
   const bottomListPadding = useBottomPadding(theme.spacing.mY);
   const {triggerHaptic} = useHaptics();
-  const {profile} = useAuth();
+  const {profile} = useAuth({});
   const {openAlert} = useAlert();
   const [questions, setQuestions] = useState<QuestionsWithCount>([]);
   const [loading, setLoading] = useState(false);

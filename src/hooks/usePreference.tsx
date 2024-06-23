@@ -1,12 +1,12 @@
 import {useState} from 'react';
 import useMount from './useMount';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuth} from 'app/wrappers/AuthProvider';
+import {useAuth} from './useAuth';
 
 const usePreference = <T,>(key: string, defaultValue: T) => {
   const [value, _setValue] = useState<T>(defaultValue);
   const [loading, setLoading] = useState(false);
-  const {profile, authStatus} = useAuth();
+  const {profile, authStatus} = useAuth({});
 
   const refresh = async () => {
     if (authStatus !== 'SIGNED_IN') {
